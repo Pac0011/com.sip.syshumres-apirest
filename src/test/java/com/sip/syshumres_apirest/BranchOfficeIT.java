@@ -103,10 +103,19 @@ public class BranchOfficeIT {
 	@Test
 	public void formEditWithError() throws Exception {
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.get(
-				"/" + BranchOfficeController.URLENDPOINT + "/{id}", 666L)
+				"/" + BranchOfficeController.URLENDPOINT + BranchOfficeController.ID, 666L)
 				.accept(MediaType.APPLICATION_JSON))
 				.andReturn();
 		assertEquals(HttpStatus.NOT_FOUND.value(), mockMvcResult.getResponse().getStatus());
+	}
+	
+	@Test
+	public void methodNotSupportedError() throws Exception {
+		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.get(
+				"/" + BranchOfficeController.URLENDPOINT)
+				.accept(MediaType.APPLICATION_JSON))
+				.andReturn();
+		assertEquals(HttpStatus.BAD_REQUEST.value(), mockMvcResult.getResponse().getStatus());
 	}
 	
 	private String mapToJson(Object object) throws JsonProcessingException {
