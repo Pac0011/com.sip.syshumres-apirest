@@ -32,11 +32,11 @@ public class CommonController<E, S extends CommonService<E>> {
     protected String filter;
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody E entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody E entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
-		E s = service.create(entity);
+		E s = service.save(entity);
 		return ResponseEntity.status(HttpStatus.CREATED).body(s);
 	}
 	

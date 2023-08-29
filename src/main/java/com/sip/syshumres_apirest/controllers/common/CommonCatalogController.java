@@ -66,11 +66,11 @@ public class CommonCatalogController<E extends BaseEntityCatalog, S extends Comm
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody E entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody E entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
-		E s = service.create(entity);
+		E s = service.save(entity);
 		return ResponseEntity.status(HttpStatus.CREATED).body(s);
 	}
 	
@@ -95,7 +95,7 @@ public class CommonCatalogController<E extends BaseEntityCatalog, S extends Comm
 		E c = o.get();
 		c.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		c.setEnabled(entity.isEnabled());
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.create(c));
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(c));
 	}
 
 }

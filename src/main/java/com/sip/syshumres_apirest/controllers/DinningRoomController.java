@@ -62,7 +62,7 @@ public class DinningRoomController extends CommonCatalogController<DinningRoom, 
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setPrice(entity.getPrice());
 		e.setEnabled(entity.isEnabled());
-		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.create(e));
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.save(e));
 	}
 
 }
