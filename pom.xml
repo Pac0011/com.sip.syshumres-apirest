@@ -13,6 +13,7 @@
   <description>Api rest for App</description>
 
   <dependencies>
+    <!-- Web -->
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-web</artifactId>
@@ -23,34 +24,36 @@
 		<scope>runtime</scope>
 		<optional>true</optional>
 	</dependency>
+	<!-- Model mapper -->
 	<dependency>
 	    <groupId>org.modelmapper</groupId>
 	    <artifactId>modelmapper</artifactId>
 	    <version>3.1.0</version>
 	</dependency>
-		
+	<!-- Services -->
 	<dependency>
 	    <artifactId>syshumres-services</artifactId>
 	    <groupId>com.sip</groupId>
 	    <version>0.0.1-SNAPSHOT</version>
     </dependency>
+    <!-- Utils -->
     <dependency>
 	    <artifactId>syshumres-utils</artifactId>
 	    <groupId>com.sip</groupId>
 	    <version>0.0.1-SNAPSHOT</version>
     </dependency>
+    <!-- Exceptions -->
     <dependency>
 	    <artifactId>syshumres-exceptions</artifactId>
 	    <groupId>com.sip</groupId>
 	    <version>0.0.1-SNAPSHOT</version>
     </dependency>
-    
     <!-- AOP -->
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-aop</artifactId>
     </dependency>
-    <!-- SWAGGER -->
+    <!-- Swagger -->
 	<dependency>
 		<groupId>io.springfox</groupId>
 		<artifactId>springfox-swagger2</artifactId>
@@ -61,7 +64,10 @@
 		<artifactId>springfox-swagger-ui</artifactId>
 		<version>2.9.2</version>
 	</dependency>
-  
   </dependencies>
+  
+  <properties>
+     <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
+  </properties>
   
 </project>

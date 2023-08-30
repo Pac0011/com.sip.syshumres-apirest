@@ -34,8 +34,8 @@ import com.sip.syshumres_entities.dtos.UserDTO;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.UserService;
-import com.sip.syshumres_utils.ErrorsBindingFields;
 import com.sip.syshumres_utils.StringTrim;
 
 import io.swagger.annotations.Api;

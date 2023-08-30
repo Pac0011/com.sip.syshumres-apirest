@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.sip.syshumres_entities.common.BaseEntityCatalog;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.common.CommonService;
-import com.sip.syshumres_utils.ErrorsBindingFields;
 import com.sip.syshumres_utils.StringTrim;
 
 

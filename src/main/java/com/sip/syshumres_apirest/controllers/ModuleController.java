@@ -30,8 +30,8 @@ import com.sip.syshumres_entities.dtos.ModuleDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.FatherAssignException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.ModuleService;
-import com.sip.syshumres_utils.ErrorsBindingFields;
 import com.sip.syshumres_utils.StringTrim;
 
 

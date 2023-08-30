@@ -31,8 +31,8 @@ import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.FatherAssignException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.MalFormedHeaderException;
+import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.BranchOfficeService;
-import com.sip.syshumres_utils.ErrorsBindingFields;
 import com.sip.syshumres_utils.StringTrim;
 
 import org.springframework.beans.factory.annotation.Autowired;

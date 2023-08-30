@@ -11,8 +11,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.common.CommonService;
-import com.sip.syshumres_utils.ErrorsBindingFields;
 
 /**
  * Clase. Controlador comun

@@ -22,8 +22,8 @@ import com.sip.syshumres_entities.DinningRoom;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.DinningRoomService;
-import com.sip.syshumres_utils.ErrorsBindingFields;
 import com.sip.syshumres_utils.StringTrim;
 
 @RestController
