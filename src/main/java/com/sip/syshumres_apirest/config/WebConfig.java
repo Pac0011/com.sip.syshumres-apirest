@@ -1,4 +1,4 @@
-package com.sip.syshumres_apirest.conf;
+package com.sip.syshumres_apirest.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
