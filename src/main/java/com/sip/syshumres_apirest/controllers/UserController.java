@@ -9,7 +9,6 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -65,9 +64,6 @@ public class UserController {
 	private UserMapper customMapper;
 		
 	private String filter;
-	
-	@Value("${SESSION.USER.NAME}")
-	private String sessionUserName;
 	
 	@Autowired
 	public UserController(UserService service) {
