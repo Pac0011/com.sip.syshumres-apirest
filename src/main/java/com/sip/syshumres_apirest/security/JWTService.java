@@ -31,11 +31,15 @@ public class JWTService {
 	private final static String ACCESS_TOKEN_SECRET = "sjkdhfjisd8726347jJHHHSDhsgdfhsgdfh";
 	private final static Long ACCESS_TOKEN_VALIDITY_SECONDS = 7_200L;//2 Hour
 	
-	@Autowired
 	private UserDetailServiceImpl userDetailServiceImpl;
 	
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;
+	
+	@Autowired
+	public JWTService(UserDetailServiceImpl userDetailServiceImpl) {
+		this.userDetailServiceImpl = userDetailServiceImpl;
+	}
 
 	public String createToken(String name, String username, HttpServletRequest request) throws UsernameNotFoundException {
 		long expirationTime = ACCESS_TOKEN_VALIDITY_SECONDS * 1_000;

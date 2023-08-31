@@ -24,17 +24,23 @@ import com.sip.syshumres_repositories.UserRepository;
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
 	
-	@Autowired
 	private UserRepository userRepository;
 	
-	@Autowired
 	private AuthorityRepository authorityRepository;
 	
-	@Autowired
 	private ModuleRepository moduleRepository;
 	
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;
+	
+	@Autowired
+	public UserDetailServiceImpl(UserRepository userRepository, AuthorityRepository authorityRepository,
+			ModuleRepository moduleRepository) {
+		super();
+		this.userRepository = userRepository;
+		this.authorityRepository = authorityRepository;
+		this.moduleRepository = moduleRepository;
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -17,7 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 	
 	private final UserDetailsService userDetailService;
+	
 	private final JWTAuthorizationFilter jwtAuthorizationFilter;
+	
 	private final JWTService jwtService;
 	
 	@Value("${URL.DOCUMENTS.EMPLOYEES}")
@@ -39,7 +41,7 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
 		
 		JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(jwtService);
 		jwtAuthenticationFilter.setAuthenticationManager(authManager);

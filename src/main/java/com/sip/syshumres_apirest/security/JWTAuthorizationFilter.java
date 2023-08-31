@@ -18,9 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Component
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	
-	@Autowired
 	private JWTService jwtService;
 	
+	@Autowired
+	public JWTAuthorizationFilter(JWTService jwtService) {
+		this.jwtService = jwtService;
+	}
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, 
 									HttpServletResponse response, 
