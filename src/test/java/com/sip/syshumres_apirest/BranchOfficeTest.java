@@ -39,9 +39,12 @@ public class BranchOfficeTest {
 	  @Test
 	  void testGetListBranchs() {
 	      List<BranchOffice> listGet = service.findByEnabledTrueOrderByDescription();
+	      listGet.forEach((b) -> System.out.println(b));
+	      
 	      BranchOffice branch = new BranchOffice();
+	      //Al buscar el objecto solo lo compara con el id = 1, pq el metodo equals del objecto solo lo compara por el id
 		  branch.setId(1L);
-		  branch.setDescription("Corporativo");
+		 // branch.setDescription("Corporativo");//Este campo no viene definido en el equals del entity
 		  assertTrue(listGet.size() > 0);
 		  assertTrue(listGet.contains(branch));
 	      //assertEquals("Corporativo", listGet.get(1).getDescription());
