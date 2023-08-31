@@ -9,7 +9,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -27,9 +29,12 @@ import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_utils.RandomString;
 
+@PropertySource(
+	    ignoreResourceNotFound = false,
+	    value = "classpath:application.properties")//test/resources/application.properties
 @SpringBootTest
 @WebAppConfiguration
-//@AutoConfigureMockMvc(addFilters = false)//no aplica filtros de autenticacion
+@AutoConfigureMockMvc(addFilters = false)//no aplica filtros de autenticacion
 public class BranchOfficeIT {
 		
     private MockMvc mockMvc;
