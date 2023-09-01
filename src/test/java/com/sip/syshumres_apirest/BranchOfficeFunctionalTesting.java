@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
@@ -26,26 +30,61 @@ import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException.BadRequest;
 
 //@RunWith(SpringRunner.class)
 //@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @SpringBootTest
+//Esta tomando el properties de la App y no del Test
 //@TestPropertySource(locations = "classpath:test.properties")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)//Para evitar que en cada Test inicialice la Clase y elimine el token
 public class BranchOfficeFunctionalTesting {
 	
 	//@Value("${local.server.port}")
 	//private int port;
 	
-	private String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImJyYW5jaE9mZmljZSI6IkNhbmN1biIsIm1lbnUiOlt7Im4iOiJBZG1vbiBzdWN1cnNhbGVzIiwidSI6IiMiLCJpIjoiZmEgZmEtYmFycyIsImMiOlt7Im4iOiJBZG1pbmlzdHJhZG9yYXMiLCJ1IjoibWFuYWdpbmctY29tcGFuaWVzIiwiaSI6ImZhIGZhLXVuaXZlcnNpdHkiLCJjIjpudWxsfSx7Im4iOiJSZWdpb25lcyIsInUiOiJyZWdpb25zIiwiaSI6ImZhIGZhLXBpZS1jaGFydCIsImMiOm51bGx9LHsibiI6IlN1Y3Vyc2FsZXMiLCJ1IjoiYnJhbmNoLW9mZmljZXMiLCJpIjoiZmEgZmEtYnVpbGRpbmciLCJjIjpudWxsfSx7Im4iOiJUaXBvIGRlIHN1Y3Vyc2FsZXMiLCJ1IjoiYnJhbmNoLW9mZmljZXMtdHlwZXMiLCJpIjoiZmEgZmEtaW5kdXN0cnkiLCJjIjpudWxsfV19LHsibiI6IkNhdGFsb2dvcyIsInUiOiIjIiwiaSI6ImZhIGZhLWJhcnMiLCJjIjpbeyJuIjoiQXJlYXMiLCJ1IjoiZW1wbG95ZWUtYXJlYXMiLCJpIjoiZmEgZmEtc2l0ZW1hcCIsImMiOm51bGx9LHsibiI6IkJhbmNvcyBlbXBsZWFkbyIsInUiOiJlbXBsb3llZS1iYW5rcyIsImkiOiJmYSBmYS11bml2ZXJzaXR5IiwiYyI6bnVsbH0seyJuIjoiQ2VudHJvcyBkZSBjb3N0b3MiLCJ1IjoiY29zdC1jZW50ZXJzIiwiaSI6ImZhIGZhLXVzZCIsImMiOm51bGx9LHsibiI6IkNvbWVkb3IiLCJ1IjoiZGlubmluZy1yb29tIiwiaSI6ImZhIGZhLWJpcnRoZGF5LWNha2UiLCJjIjpudWxsfSx7Im4iOiJEb2N1bWVudG9zIGNvbnRyYXRhY2lvbiIsInUiOiJoaXJpbmctZG9jdW1lbnRzIiwiaSI6ImZhIGZhLWJvb2siLCJjIjpudWxsfSx7Im4iOiJPdHJhcyByYXpvbmVzIGRlIGJhamEiLCJ1Ijoib3RoZXItcmVhc29uLXF1aXQtam9iIiwiaSI6ImZhIGZhLW91dGRlbnQiLCJjIjpudWxsfSx7Im4iOiJQZXJmaWwgcHVlc3RvcyIsInUiOiJlbXBsb3llZS1wb3NpdGlvbi1wcm9maWxlcyIsImkiOiJmYSBmYS10aC1saXN0IiwiYyI6bnVsbH0seyJuIjoiUHVlc3RvcyIsInUiOiJlbXBsb3llZS1wb3NpdGlvbnMiLCJpIjoiZmEgZmEtc2l0ZW1hcCIsImMiOm51bGx9LHsibiI6IlJhem9uZXMgZGUgYmFqYSIsInUiOiJyZWFzb24tcXVpdC1qb2IiLCJpIjoiZmEgZmEtdGgtbGlzdCIsImMiOm51bGx9LHsibiI6IlRpcG8gcGxhbnRpbGxhIiwidSI6InR5cGUtc3RhZmYiLCJpIjoiZmEgZmEtdXNlci1jaXJjbGUiLCJjIjpudWxsfSx7Im4iOiJUaXBvIHNhbHVkIGVtcGxlYWRvIiwidSI6ImVtcGxveWVlLXR5cGVzLWhlYWx0aCIsImkiOiJmYSBmYS11c2VyLW1kIiwiYyI6bnVsbH0seyJuIjoiVGlwb3MgZGUgZG9jdW1lbnRvcyIsInUiOiJoaXJpbmctZG9jdW1lbnRzLXR5cGUiLCJpIjoiZmEgZmEtYm9vayIsImMiOm51bGx9LHsibiI6IlRpcG9zIGRlIGVtcGxlYWRvIiwidSI6ImVtcGxveWVlLXR5cGVzIiwiaSI6ImZhIGZhLXVzZXItY2lyY2xlIiwiYyI6bnVsbH0seyJuIjoiVHVybm9zIiwidSI6InR1cm5zIiwiaSI6ImZhIGZhLWhvdXJnbGFzcy1oYWxmIiwiYyI6bnVsbH0seyJuIjoiVmFjdW5hcyBjb3ZpZCIsInUiOiJjb3ZpZC12YWNjaW5lcyIsImkiOiJmYSBmYS1tZWRraXQiLCJjIjpudWxsfV19LHsibiI6IkVtcGxlYWRvcyIsInUiOiIjIiwiaSI6ImZhIGZhLXVzZXJzIiwiYyI6W3sibiI6IkFkbWluaXN0cmF0aXZvcyIsInUiOiJlbXBsb3llZS1wcm9maWxlcy1hZG0iLCJpIjoiZmEgZmEtYWRkcmVzcy1jYXJkIiwiYyI6bnVsbH0seyJuIjoiT3BlcmF0aXZvcyIsInUiOiJlbXBsb3llZS1wcm9maWxlcy1vcGVyIiwiaSI6ImZhIGZhLXVzZXItY2lyY2xlIiwiYyI6bnVsbH1dfSx7Im4iOiJNb2R1bG9zIiwidSI6Im1vZHVsZXMiLCJpIjoiZmEgZmEtdGFza3MiLCJjIjpbXX0seyJuIjoiUHJvc3BlY3RvcyIsInUiOiIvcHJvc3BlY3QtcHJvZmlsZXMiLCJpIjoiZmEgZmEtdXNlcnMiLCJjIjpbXX0seyJuIjoiUm9sZXMiLCJ1IjoiYXV0aG9yaXRpZXMiLCJpIjoiZmEgZmEtYWRkcmVzcy1jYXJkIiwiYyI6W119LHsibiI6IlVzdWFyaW9zIiwidSI6InVzZXJzIiwiaSI6ImZhIGZhLXVzZXJzIiwiYyI6W119XSwiaWF0IjoxNjkyMzg3OTM2LCJleHAiOjE2OTIzOTUxMzZ9.gpwwwr8Wpmc8MKqiKjGV3fHZwwZCUKw2cxFESi4P9qA";
-	
+	private String token;
 	private long idEdit = 1L;
 	private long idError = 0;
 	
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
 	@Test
+	@Order(1)
+	public void login() {
+		String credentials = "{\"username\": \"admin\", \"password\": \"admin\"}";
+		ResponseEntity<?> response = new RestBuilder<String>()
+				.clazz(String.class)
+				.path("login")
+				.post()
+				.body(credentials)
+				.builder();
+		
+		List<String> listAuthorization = response.getHeaders().getValuesAsList("Authorization");
+		listAuthorization.forEach((String a) -> {
+			System.out.println(a);
+			assertTrue(a.contains("Bearer"));
+			setToken(a.replaceAll("Bearer", "").trim());
+		});
+		System.out.println("=======token======");
+		System.out.println(this.token);
+		System.out.println("=======");
+		assertEquals(HttpStatus.SC_OK, response.getStatusCodeValue());
+	}
+	
+	@Test
+	@Order(2)
 	public void listActive() {
 		ResponseEntity<?> response = new RestBuilder<String>()
 				.clazz(String.class)
-				.basicAuthToken(token)
+				.basicAuthToken(this.token)
 				.path(BranchOfficeController.URLENDPOINT)
 				.path(BranchOfficeController.ACTIVE)
 				.get().builder();
@@ -61,11 +100,12 @@ public class BranchOfficeFunctionalTesting {
 	}
 	
 	@Test
+	@Order(3) 
 	public void page() {
 		//?page=0&size=5&sort=
 		ResponseEntity<?> response = new RestBuilder<String>()
 				.clazz(String.class)
-				.basicAuthToken(token)
+				.basicAuthToken(getToken())
 				.path(BranchOfficeController.URLENDPOINT)
 				.path(BranchOfficeController.PAGE)
 				.param("page", "0")
@@ -87,10 +127,11 @@ public class BranchOfficeFunctionalTesting {
 	}
 	
 	@Test
+	@Order(4) 
 	public void formEdit() {
 		ResponseEntity<?> response = new RestBuilder<String>()
 				.clazz(String.class)
-				.basicAuthToken(token)
+				.basicAuthToken(getToken())
 				.path(BranchOfficeController.URLENDPOINT)
 				.path(BranchOfficeController.ID)
 				.expand(this.idEdit)
@@ -109,13 +150,12 @@ public class BranchOfficeFunctionalTesting {
 	}
 		
 	@Test
+	@Order(5)
 	public void error() {
-		//Falla recupera BADREQUEST
-		//Throwable exception = 
-		assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = assertThrows(BadRequest.class, () -> {
 	    	new RestBuilder<String>()
 			.clazz(String.class)
-			.basicAuthToken(token)
+			.basicAuthToken(getToken())
 			.path(BranchOfficeController.URLENDPOINT)
 			.path(BranchOfficeController.ERROR)
 			.path(BranchOfficeController.ID)
@@ -123,7 +163,8 @@ public class BranchOfficeFunctionalTesting {
 			.get().builder();
 	    });
 		
-		//Assert.assertEquals("Username cannot be blank", exception.getMessage());
+		//Recupera BadRequest y en el mensaje viene el json del la Exception IllegalArgumentException
+		assertTrue(exception.getMessage().indexOf("IllegalArgumentException") > 0); 
 	}
 	
 	private List<EntitySelectDTO> mapToEntity(String body) throws JsonMappingException, JsonProcessingException {
