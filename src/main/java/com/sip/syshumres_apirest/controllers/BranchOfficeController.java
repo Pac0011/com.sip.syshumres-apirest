@@ -34,6 +34,7 @@ import com.sip.syshumres_exceptions.MalFormedHeaderException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.BranchOfficeService;
 import com.sip.syshumres_utils.StringTrim;
+import com.sip.syshumres_apirest.aspects.LogWeb;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -120,6 +121,7 @@ public class BranchOfficeController {
 		return this.list(text, pageableOrder);
 	}
 	
+	@LogWeb
 	@PostMapping
 	public ResponseEntity<?> create(@Valid @RequestBody BranchOffice entity, BindingResult result) {
 		if (result.hasErrors()) {
@@ -143,6 +145,7 @@ public class BranchOfficeController {
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
 	}
 	
+	@LogWeb
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody BranchOffice entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, IllegalArgumentException {
