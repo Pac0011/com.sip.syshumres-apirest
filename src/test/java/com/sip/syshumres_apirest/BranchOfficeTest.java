@@ -1,5 +1,6 @@
 package com.sip.syshumres_apirest;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -30,14 +31,14 @@ public class BranchOfficeTest {
 	  private BranchOfficeController controller;
 	 
 	  @Test
-	  public void testContextLoads() {
+	  public void contextLoads() {
 	      Assertions.assertThat(controller).isNotNull();
 	      //System.out.println(controller.toString());
 	  }
 	  
 	  //Checar esta busqueda assertTrue(listGet.contains(branch));
 	  @Test
-	  void testGetListBranchs() {
+	  void listBranchs() {
 	      List<BranchOffice> listGet = service.findByEnabledTrueOrderByDescription();
 	      listGet.forEach((b) -> System.out.println(b));
 	      
@@ -48,6 +49,13 @@ public class BranchOfficeTest {
 		  assertTrue(listGet.size() > 0);
 		  assertTrue(listGet.contains(branch));
 	      //assertEquals("Corporativo", listGet.get(1).getDescription());
+	  }
+	  
+	  @Test
+	  void error() {
+		  assertThrows(IllegalArgumentException.class, () -> {
+			  controller.formEdit(0L);
+		  });
 	  }
 
 }
