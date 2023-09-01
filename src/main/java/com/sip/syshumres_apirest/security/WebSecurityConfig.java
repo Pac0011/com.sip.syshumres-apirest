@@ -1,5 +1,6 @@
 package com.sip.syshumres_apirest.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,7 @@ public class WebSecurityConfig {
 	@Value("${URL.PASSWORD.RECOVERY}")
 	private String urlRecovery;
 	
+	@Autowired
 	public WebSecurityConfig(UserDetailsService userDetailsService, 
 			JWTAuthorizationFilter jwtAuthorizationFilter,
 			JWTService jwtService) {
