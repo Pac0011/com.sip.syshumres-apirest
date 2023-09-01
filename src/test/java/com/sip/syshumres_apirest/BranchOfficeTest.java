@@ -10,17 +10,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.test.context.TestPropertySource;
 
 import com.sip.syshumres_apirest.controllers.BranchOfficeController;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_services.BranchOfficeService;
 
 
-@PropertySource(
-	    ignoreResourceNotFound = false,
-	    value = "classpath:application.properties")//test/resources/application.properties
 @SpringBootTest
+@TestPropertySource(locations = "/application-test.properties")
 @AutoConfigureMockMvc(addFilters = false)//no aplica filtros de autenticacion
 public class BranchOfficeTest {
 	

@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -29,10 +29,9 @@ import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_utils.RandomString;
 
-@PropertySource(
-	    ignoreResourceNotFound = false,
-	    value = "classpath:application.properties")//test/resources/application.properties
+
 @SpringBootTest
+@TestPropertySource(locations = "/application-test.properties")
 @WebAppConfiguration
 @AutoConfigureMockMvc(addFilters = false)//no aplica filtros de autenticacion
 public class BranchOfficeIT {
@@ -56,6 +55,7 @@ public class BranchOfficeIT {
 		assertEquals(HttpStatus.OK.value(), mockMvcResult.getResponse().getStatus());
 		
 		List<EntitySelectDTO> listGet = mapToEntity(mockMvcResult.getResponse().getContentAsString());
+		listGet.forEach((b) -> System.out.println(b));
 		assertTrue(listGet.size() > 0);
 	}
 	
