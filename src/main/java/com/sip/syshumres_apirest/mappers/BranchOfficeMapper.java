@@ -6,6 +6,7 @@ import java.util.Comparator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sip.syshumres_apirest.aspects.LogCreateEntity;
 import com.sip.syshumres_apirest.aspects.LogEditEntity;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
@@ -66,6 +67,7 @@ public class BranchOfficeMapper {
 		return this.modelMapper.map(entity, EntitySelectDTO.class);
 	}
 	
+	@LogCreateEntity
 	public BranchOffice toCreateEntity(BranchOffice entity) {
 		BranchOffice e = new BranchOffice();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));

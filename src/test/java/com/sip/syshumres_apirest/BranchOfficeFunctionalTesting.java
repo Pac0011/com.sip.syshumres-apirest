@@ -24,19 +24,20 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sip.syshumres_apirest.controllers.BranchOfficeController;
-import com.sip.syshumres_apirest.resources.RestBuilder;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.HttpClientErrorException.BadRequest;
 
-//@RunWith(SpringRunner.class)
 //@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @SpringBootTest
-//Esta tomando el properties de la App y no del Test
-//@TestPropertySource(locations = "classpath:test.properties")
+@ActiveProfiles("test")
+//@TestPropertySource(locations = "/application-test.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)//Para evitar que en cada Test inicialice la Clase y elimine el token
 public class BranchOfficeFunctionalTesting {
