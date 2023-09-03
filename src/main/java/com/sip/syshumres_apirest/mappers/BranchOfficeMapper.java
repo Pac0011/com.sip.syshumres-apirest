@@ -6,6 +6,7 @@ import java.util.Comparator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sip.syshumres_apirest.aspects.LogEditEntity;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
@@ -84,6 +85,7 @@ public class BranchOfficeMapper {
 		return e;
 	}
 	
+	@LogEditEntity
 	public BranchOffice toEditEntity(BranchOffice e, BranchOffice entity) {
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getPhoneNumber()));

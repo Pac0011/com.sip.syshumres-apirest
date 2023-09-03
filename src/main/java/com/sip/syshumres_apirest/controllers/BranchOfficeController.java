@@ -128,7 +128,7 @@ public class BranchOfficeController {
 			return ErrorsBindingFields.validate(result);
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.create(customMapper.toCreateEntity(entity)));
+				body(service.save(customMapper.toCreateEntity(entity)));
 	}
 	
 	@GetMapping(ID)
@@ -170,7 +170,7 @@ public class BranchOfficeController {
 		}
 		
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.create(customMapper.toEditEntity(e, entity)));
+				body(this.service.save(customMapper.toEditEntity(e, entity)));
 	}
 	
 	@GetMapping(ERROR + ID)

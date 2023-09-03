@@ -31,6 +31,10 @@ public class WebLogAspect {
 	
 	@Pointcut("@annotation(LogWeb)")  
     public void logPointcut() {  
+    }
+	
+	@Pointcut("@annotation(LogEditEntity) && args(originalEntity, newEntity)")  
+    public void logEditEntityPointcut(Object originalEntity, Object newEntity) {  
     } 
 	
 	@Before("logPointcut()")  
@@ -53,6 +57,23 @@ public class WebLogAspect {
 		//		+ joinPoint.getSignature().getName().concat("()");
 		//logger.info("{},args:{}",qualifiedName, JSON.toJSONString(joinPoint.getArgs()));
 		logger.info("================ooo=======================");
+    }
+	
+	@Before("logEditEntityPointcut(originalEntity, newEntity)")  
+    public void logEditAdvice(JoinPoint joinPoint, Object originalEntity, Object newEntity) {
+		timeThreadLocal.set(System.currentTimeMillis());
+		
+		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		if (attributes == null) {
+			return;
+		}
+		HttpServletRequest request = attributes.getRequest();
+		logger.info("=========Edit entity===========");
+		logger.info("Before method: " + joinPoint.getSignature());
+		logger.info("user:{}, ip:{}, url-{}", getUserName(), getIpAddr(request), request.getRequestURL().toString());
+		logger.info("Original: " + originalEntity);
+		logger.info("New: " + newEntity);
+		logger.info("================End edit=======================");
     }
 	
    /* @Before("execution(* com.sip.sysrh.hiring.controller.AuthorityController.*(..))")
