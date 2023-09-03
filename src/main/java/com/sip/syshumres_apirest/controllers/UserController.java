@@ -127,7 +127,7 @@ public class UserController {
 	      @ApiResponse(code = 400, message = "Bad request"), 
 	      @ApiResponse(code = 403, message = "forbidden!!!"),
 	      @ApiResponse(code = 404, message = "not found!!!") })
-	public ResponseEntity<?> save(@Valid @RequestBody User entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody User entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}

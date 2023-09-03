@@ -123,7 +123,7 @@ public class ModuleController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody Module entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody Module entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
