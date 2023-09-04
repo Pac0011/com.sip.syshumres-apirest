@@ -76,7 +76,7 @@ public class WebLogAspect {
 		logger.info("Before method: " + joinPoint.getSignature());
 		logger.info("user:{}, ip:{}, url-{}", getUserName(), getIpAddr(request), request.getRequestURL().toString());
 		logger.info("New: " + newEntity);
-		logger.info("================End edit=======================");
+		logger.info("================End create=======================");
     }
 	
 	@Before("logEditEntityPointcut(originalEntity, newEntity)")  
@@ -85,6 +85,7 @@ public class WebLogAspect {
 		
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		if (attributes == null) {
+			logger.info("=========attributes == null===========");
 			return;
 		}
 		HttpServletRequest request = attributes.getRequest();
