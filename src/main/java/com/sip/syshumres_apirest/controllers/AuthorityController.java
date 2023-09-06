@@ -63,9 +63,10 @@ public class AuthorityController {
     private String filter;
     
     @Autowired
-	public AuthorityController(AuthorityService service) {
+	public AuthorityController(AuthorityService service, 
+			AuthorityMapper customMapper) {
 		this.service = service;
-		this.customMapper = new AuthorityMapper();
+		this.customMapper = customMapper;
 		this.filter = "";
 	}
 	

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sip.syshumres_apirest.mappers.ModuleMapper;
+import com.sip.syshumres_apirest.mappers.ModuleCustomMapper;
 import com.sip.syshumres_entities.Module;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_entities.dtos.ModuleDTO;
@@ -50,14 +50,15 @@ public class ModuleController {
 	
 	private ModuleService service;
 	
-	private ModuleMapper customMapper;
+	private ModuleCustomMapper customMapper;
 		
 	private String filter;
 
 	@Autowired
-	public ModuleController(ModuleService service) {
+	public ModuleController(ModuleService service, 
+			ModuleCustomMapper customMapper) {
 		this.service = service;
-		this.customMapper = new ModuleMapper();
+		this.customMapper = customMapper;
 		this.filter = "";
 	}
 	

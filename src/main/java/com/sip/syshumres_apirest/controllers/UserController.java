@@ -66,9 +66,10 @@ public class UserController {
 	private String filter;
 	
 	@Autowired
-	public UserController(UserService service) {
+	public UserController(UserService service, 
+			UserMapper customMapper) {
 		this.service = service;
-		this.customMapper = new UserMapper();
+		this.customMapper = customMapper;
 		this.filter = "";
 	}
 	
