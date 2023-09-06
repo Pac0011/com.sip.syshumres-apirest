@@ -11,12 +11,12 @@ import com.sip.syshumres_entities.dtos.ModuleDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
 
-public class ModuleMapper {
+public class ModuleCustomMapper {
 	
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public ModuleMapper() {
+	public ModuleCustomMapper() {
 	}
 	
 	public ModuleDTO toDto(Module entity) {
