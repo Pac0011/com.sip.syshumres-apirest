@@ -11,6 +11,9 @@ import com.sip.syshumres_apirest.mappers.EmployeeClinicalDataMapper;
 import com.sip.syshumres_apirest.mappers.EmployeeGeneralDataMapper;
 import com.sip.syshumres_apirest.mappers.EmployeeLaborDataMapper;
 import com.sip.syshumres_apirest.mappers.EmployeePayrollMapper;
+import com.sip.syshumres_apirest.mappers.EmployeePositionMapper;
+import com.sip.syshumres_apirest.mappers.EmployeePositionProfileMapper;
+import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
 import com.sip.syshumres_apirest.mappers.ModuleCustomMapper;
 import com.sip.syshumres_apirest.mappers.UserMapper;
 
@@ -48,6 +51,11 @@ public class ModelMapperConfig {
 	}
 	
 	@Bean
+	public EmployeeProfileMapper employeeProfileMapper() {
+		return new EmployeeProfileMapper();
+	}
+	
+	@Bean
 	public EmployeeClinicalDataMapper employeeClinicalDataMapper() {
 		return new EmployeeClinicalDataMapper();
 		
@@ -66,5 +74,15 @@ public class ModelMapperConfig {
 	@Bean
 	public EmployeeLaborDataMapper employeeLaborDataMapper() {
 		return new EmployeeLaborDataMapper();
+	}
+	
+	@Bean
+	public EmployeePositionMapper employeePositionMapper() {
+		return new EmployeePositionMapper();
+	}
+	
+	@Bean
+	public EmployeePositionProfileMapper employeePositionProfileMapper() {
+		return new EmployeePositionProfileMapper();
 	}
 }
