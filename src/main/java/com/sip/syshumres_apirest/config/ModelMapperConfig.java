@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.sip.syshumres_apirest.mappers.AuthorityMapper;
 import com.sip.syshumres_apirest.mappers.BranchOfficeMapper;
+import com.sip.syshumres_apirest.mappers.CostCenterMapper;
 import com.sip.syshumres_apirest.mappers.EmployeeAreaMapper;
 import com.sip.syshumres_apirest.mappers.EmployeeClinicalDataMapper;
 import com.sip.syshumres_apirest.mappers.EmployeeGeneralDataMapper;
@@ -14,6 +15,7 @@ import com.sip.syshumres_apirest.mappers.EmployeePayrollMapper;
 import com.sip.syshumres_apirest.mappers.EmployeePositionMapper;
 import com.sip.syshumres_apirest.mappers.EmployeePositionProfileMapper;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
+import com.sip.syshumres_apirest.mappers.ManagingCompanyMapper;
 import com.sip.syshumres_apirest.mappers.ModuleCustomMapper;
 import com.sip.syshumres_apirest.mappers.UserMapper;
 
@@ -28,6 +30,10 @@ public class ModelMapperConfig {
 	@Bean
 	public AuthorityMapper authorityMapper() {
 		return new AuthorityMapper();
+	}
+	
+	@Bean CostCenterMapper costCenterMapper() {
+		return new CostCenterMapper();
 	}
 	
 	@Bean
@@ -84,5 +90,10 @@ public class ModelMapperConfig {
 	@Bean
 	public EmployeePositionProfileMapper employeePositionProfileMapper() {
 		return new EmployeePositionProfileMapper();
+	}
+	
+	@Bean
+	public ManagingCompanyMapper managingCompanyMapper() {
+		return new ManagingCompanyMapper();
 	}
 }
