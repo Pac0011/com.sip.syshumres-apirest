@@ -92,6 +92,11 @@
 	    <groupId>org.springframework.boot</groupId>
 	    <artifactId>spring-boot-starter-mail</artifactId>
     </dependency>
+    <!-- Activemq -->
+    <dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-activemq</artifactId>
+	</dependency>
   </dependencies>
   
   <properties>
