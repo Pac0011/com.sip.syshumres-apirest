@@ -17,6 +17,7 @@ import com.sip.syshumres_apirest.mappers.EmployeePositionProfileMapper;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
 import com.sip.syshumres_apirest.mappers.ManagingCompanyMapper;
 import com.sip.syshumres_apirest.mappers.ModuleCustomMapper;
+import com.sip.syshumres_apirest.mappers.ProspectProfileMapper;
 import com.sip.syshumres_apirest.mappers.UserMapper;
 
 @Configuration
@@ -95,5 +96,10 @@ public class ModelMapperConfig {
 	@Bean
 	public ManagingCompanyMapper managingCompanyMapper() {
 		return new ManagingCompanyMapper();
+	}
+	
+	@Bean
+	public ProspectProfileMapper prospectProfileMapper() {
+		return new ProspectProfileMapper();
 	}
 }
