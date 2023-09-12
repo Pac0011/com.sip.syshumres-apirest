@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sip.syshumres_apirest.controllers.BranchOfficeController;
+import com.sip.syshumres_apirest.resources.RestBuilder;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 
