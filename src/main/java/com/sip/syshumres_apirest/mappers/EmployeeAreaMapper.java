@@ -6,6 +6,7 @@ import java.util.Comparator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sip.syshumres_entities.CostCenter;
 import com.sip.syshumres_entities.EmployeeArea;
 import com.sip.syshumres_entities.dtos.EmployeeAreaDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
@@ -51,21 +52,29 @@ public class EmployeeAreaMapper {
 		return this.modelMapper.map(entity, EntitySelectDTO.class);
 	}
 	
-	public EmployeeArea toSaveEntity(EmployeeArea entity) {
+	public EmployeeArea toSaveEntity(EmployeeAreaDTO entity) {
 		EmployeeArea e = new EmployeeArea();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
-		e.setCostCenter(entity.getCostCenter());
-		e.setFather(entity.getFather());
+		if (entity.getCostCenter() != null) {
+	        e.setCostCenter(this.modelMapper.map(entity.getCostCenter(), CostCenter.class));
+	    }
+		if (entity.getFather() != null) {
+	        e.setFather(this.modelMapper.map(entity.getFather(), EmployeeArea.class));
+	    }
 		//e.setChilds(entity.getChilds());
 		e.setEnabled(entity.isEnabled());
 	
 		return e;
 	}
 	
-	public EmployeeArea toEditEntity(EmployeeArea e, EmployeeArea entity) {
+	public EmployeeArea toEditEntity(EmployeeArea e, EmployeeAreaDTO entity) {
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
-		e.setCostCenter(entity.getCostCenter());
-		e.setFather(entity.getFather());
+		if (entity.getCostCenter() != null) {
+	        e.setCostCenter(this.modelMapper.map(entity.getCostCenter(), CostCenter.class));
+	    }
+		if (entity.getFather() != null) {
+	        e.setFather(this.modelMapper.map(entity.getFather(), EmployeeArea.class));
+	    }
 		//e.setChilds(entity.getChilds());
 		e.setEnabled(entity.isEnabled());
 		

@@ -128,12 +128,13 @@ public class UserController {
 	      @ApiResponse(code = 400, message = "Bad request"), 
 	      @ApiResponse(code = 403, message = "forbidden!!!"),
 	      @ApiResponse(code = 404, message = "not found!!!") })
-	public ResponseEntity<?> create(@Valid @RequestBody User entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody UserDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
+		User user = customMapper.toSaveEntity(entity);
 		
-		Map<String, Object> errorsCustomFields = this.service.validEntity(entity, 0L);
+		Map<String, Object> errorsCustomFields = this.service.validEntity(user, 0L);
 		if (errorsCustomFields != null) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
@@ -142,7 +143,7 @@ public class UserController {
 		entity.setPassword(this.service.encodePassword(entity.getPassword()));
 		
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toSaveEntity(entity)));
+				body(service.save(user));
 	}
 	
 	@ApiOperation(value = "Form to edit User", response = Iterable.class, tags = "formEdit")
@@ -166,7 +167,7 @@ public class UserController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody User entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody UserDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
 		//Se quito validacion ya que el password se actualiza de forma independiente.
 		//if (result.hasErrors()) {
@@ -183,14 +184,16 @@ public class UserController {
 		if (!o.isPresent()) {
 			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
 		}
+		User entityDb = o.get(); 
+		entityDb = customMapper.toEditEntity(entityDb, entity);
 		
-		Map<String, Object> errorsCustomFields = this.service.validEntity(entity, id);
+		Map<String, Object> errorsCustomFields = this.service.validEntity(entityDb, id);
 		if (errorsCustomFields != null) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(o.get(), entity)));
+				body(this.service.save(entityDb));
 	}
 	
 	@PatchMapping(ID + CHANGE)

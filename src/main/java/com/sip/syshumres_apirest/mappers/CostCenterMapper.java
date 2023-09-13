@@ -32,7 +32,7 @@ public class CostCenterMapper {
 		return this.modelMapper.map(entity, EntitySelectDTO.class);
 	}
 	
-	public CostCenter toSaveEntity(CostCenter entity) {
+	public CostCenter toSaveEntity(CostCenterDTO entity) {
 		CostCenter e = new CostCenter();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setCode(StringTrim.trimAndRemoveDiacriticalMarks(entity.getCode()));
@@ -41,7 +41,7 @@ public class CostCenterMapper {
 		return e;
 	}
 	
-	public CostCenter toEditEntity(CostCenter e, CostCenter entity) {
+	public CostCenter toEditEntity(CostCenter e, CostCenterDTO entity) {
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setCode(StringTrim.trimAndRemoveDiacriticalMarks(entity.getCode()));
 		e.setEnabled(entity.isEnabled());

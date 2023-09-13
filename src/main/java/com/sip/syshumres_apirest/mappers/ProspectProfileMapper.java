@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sip.syshumres_entities.ProspectProfile;
+import com.sip.syshumres_entities.ProspectStatus;
 import com.sip.syshumres_entities.dtos.ProspectProfileDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
@@ -71,7 +72,7 @@ public class ProspectProfileMapper {
 	    return entity;
 	}
 	
-	public ProspectProfile toSaveEntity(ProspectProfile entity) {
+	public ProspectProfile toSaveEntity(ProspectProfileDTO entity) {
 		ProspectProfile e = new ProspectProfile();
 		e.setFirstName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getFirstName()));
 		e.setLastName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLastName()));
@@ -83,12 +84,14 @@ public class ProspectProfileMapper {
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		e.setNationality(StringTrim.trimAndRemoveDiacriticalMarks(entity.getNationality()));
 		e.setObservations(StringTrim.trimAndRemoveDiacriticalMarks(entity.getObservations()));
-		e.setProspectStatus(entity.getProspectStatus());
+		if (entity.getProspectStatus() != null) {
+	        e.setProspectStatus(this.modelMapper.map(entity.getProspectStatus(), ProspectStatus.class));
+	    }
 		
 		return e;
 	}
 	
-	public ProspectProfile toEditEntity(ProspectProfile e, ProspectProfile entity) {
+	public ProspectProfile toEditEntity(ProspectProfile e, ProspectProfileDTO entity) {
 		e.setFirstName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getFirstName()));
 		e.setLastName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLastName()));
 		e.setLastNameSecond(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLastNameSecond()));
@@ -99,7 +102,9 @@ public class ProspectProfileMapper {
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		e.setNationality(StringTrim.trimAndRemoveDiacriticalMarks(entity.getNationality()));
 		e.setObservations(StringTrim.trimAndRemoveDiacriticalMarks(entity.getObservations()));
-		e.setProspectStatus(entity.getProspectStatus());
+		if (entity.getProspectStatus() != null) {
+	        e.setProspectStatus(this.modelMapper.map(entity.getProspectStatus(), ProspectStatus.class));
+	    }
 		
 		return e;
 	}

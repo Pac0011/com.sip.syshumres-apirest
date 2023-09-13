@@ -146,7 +146,7 @@ public class EmployeeProfileController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody EmployeeProfile entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody EmployeeProfile entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}

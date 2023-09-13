@@ -121,7 +121,7 @@ public class BranchOfficeController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody BranchOffice entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody BranchOfficeDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
@@ -144,7 +144,7 @@ public class BranchOfficeController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody BranchOffice entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody BranchOfficeDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, IllegalArgumentException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
@@ -161,13 +161,13 @@ public class BranchOfficeController {
 			throw new EntityIdNotFoundException("Id sucursal " + id + " no encontrado");
 		}
 		
-		BranchOffice e = o.get();
-		if (entity.getFather() != null && e.getId() == entity.getFather().getId()) {
+		BranchOffice entityDb = o.get();
+		if (entity.getFather() != null && entityDb.getId() == entity.getFather().getId()) {
 			throw new FatherAssignException("El padre de la sucursal no puede ser ella misma");
 		}
 		
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(e, entity)));
+				body(this.service.save(customMapper.toEditEntity(entityDb, entity)));
 	}
 	
 	@GetMapping(ERROR + ID)

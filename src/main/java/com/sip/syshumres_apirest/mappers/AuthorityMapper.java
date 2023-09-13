@@ -51,7 +51,7 @@ public class AuthorityMapper {
 		return this.modelMapper.map(entity, EntitySelectDTO.class);
 	}
 	
-	public Authority toSaveEntity(Authority entity) {
+	public Authority toSaveEntity(AuthorityDTO entity) {
 		Authority e = new Authority();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setDetail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDetail()));
@@ -60,7 +60,7 @@ public class AuthorityMapper {
 		return e;
 	}
 	
-	public Authority toEditEntity(Authority e, Authority entity) {
+	public Authority toEditEntity(Authority e, AuthorityDTO entity) {
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setDetail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDetail()));
 		e.setEnabled(entity.isEnabled());

@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sip.syshumres_apirest.aspects.LogCreateEntity;
 import com.sip.syshumres_apirest.aspects.LogEditEntity;
 import com.sip.syshumres_entities.BranchOffice;
+import com.sip.syshumres_entities.BranchOfficeType;
+import com.sip.syshumres_entities.CostCenter;
+import com.sip.syshumres_entities.Region;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
@@ -68,7 +71,7 @@ public class BranchOfficeMapper {
 	}
 	
 	@LogCreateEntity
-	public BranchOffice toCreateEntity(BranchOffice entity) {
+	public BranchOffice toCreateEntity(BranchOfficeDTO entity) {
 		BranchOffice e = new BranchOffice();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getPhoneNumber()));
@@ -76,11 +79,19 @@ public class BranchOfficeMapper {
 		e.setShortPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getShortPhoneNumber()));
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		e.setAddress(entity.getAddress());
-		e.setBranchOfficeType(entity.getBranchOfficeType());
+		if (entity.getBranchOfficeType() != null) {
+	        e.setBranchOfficeType(this.modelMapper.map(entity.getBranchOfficeType(), BranchOfficeType.class));
+	    }
 		//e.setManagingCompany(entity.getManagingCompany());
-		e.setCostCenter(entity.getCostCenter());
-		e.setRegion(entity.getRegion());
-		e.setFather(entity.getFather());
+		if (entity.getCostCenter() != null) {
+	        e.setCostCenter(this.modelMapper.map(entity.getCostCenter(), CostCenter.class));
+	    }
+		if (entity.getRegion() != null) {
+	        e.setRegion(this.modelMapper.map(entity.getRegion(), Region.class));
+	    }
+		if (entity.getFather() != null) {
+	        e.setFather(this.modelMapper.map(entity.getFather(), BranchOffice.class));
+	    }
 		//e.setChilds(entity.getChilds());
 		e.setEnabled(entity.isEnabled());
 		
@@ -88,18 +99,26 @@ public class BranchOfficeMapper {
 	}
 	
 	@LogEditEntity
-	public BranchOffice toEditEntity(BranchOffice e, BranchOffice entity) {
+	public BranchOffice toEditEntity(BranchOffice e, BranchOfficeDTO entity) {
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getPhoneNumber()));
 		e.setExtPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getExtPhoneNumber()));
 		e.setShortPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getShortPhoneNumber()));
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		e.setAddress(entity.getAddress());
-		e.setBranchOfficeType(entity.getBranchOfficeType());
+		if (entity.getBranchOfficeType() != null) {
+	        e.setBranchOfficeType(this.modelMapper.map(entity.getBranchOfficeType(), BranchOfficeType.class));
+	    }
 		//e.setManagingCompany(entity.getManagingCompany());
-		e.setCostCenter(entity.getCostCenter());
-		e.setRegion(entity.getRegion());
-		e.setFather(entity.getFather());
+		if (entity.getCostCenter() != null) {
+	        e.setCostCenter(this.modelMapper.map(entity.getCostCenter(), CostCenter.class));
+	    }
+		if (entity.getRegion() != null) {
+	        e.setRegion(this.modelMapper.map(entity.getRegion(), Region.class));
+	    }
+		if (entity.getFather() != null) {
+	        e.setFather(this.modelMapper.map(entity.getFather(), BranchOffice.class));
+	    }
 		//e.setChilds(entity.getChilds());
 		e.setEnabled(entity.isEnabled());
 		

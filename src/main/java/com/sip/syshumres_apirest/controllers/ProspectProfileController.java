@@ -158,7 +158,7 @@ public class ProspectProfileController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody ProspectProfile entity, BindingResult result, HttpSession session) 
+	public ResponseEntity<?> create(@Valid @RequestBody ProspectProfileDTO entity, BindingResult result, HttpSession session) 
 		throws UserSessionNotFoundException, BranchOfficeUserNotFoundException, StatusCatalogNotFoundException, 
 		ProspectFieldsAlreadyExistException, EmployeeFieldsAlreadyExistException {
 		if (result.hasErrors()) {
@@ -178,10 +178,11 @@ public class ProspectProfileController {
 			throw new StatusCatalogNotFoundException("Estatus de Prospecto INICIO_PROCESO no encontrado");
 		}
 		
-		this.service.validEntity(entity, 0L);
+		ProspectProfile prospectProfile = customMapper.toSaveEntity(entity);
+		this.service.validEntity(prospectProfile, 0L);
 
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toSaveEntity(entity), optionalB.get(), optional.get()));
+				body(service.save(prospectProfile, optionalB.get(), optional.get()));
 	}
 	
 	@GetMapping(ID)
@@ -199,7 +200,7 @@ public class ProspectProfileController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody ProspectProfile entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody ProspectProfileDTO entity, BindingResult result, @PathVariable Long id) 
 			throws IdsEntityNotEqualsException, EntityIdNotFoundException, ProspectFieldsAlreadyExistException, 
 			EmployeeFieldsAlreadyExistException, IllegalArgumentException {
 		if (result.hasErrors()) {
@@ -216,12 +217,13 @@ public class ProspectProfileController {
 		if (!o.isPresent()) {
 			throw new EntityIdNotFoundException("Id Prospecto no encontrado");
 		}
+		ProspectProfile entityDb = o.get();
+		entityDb = customMapper.toEditEntity(entityDb, entity);
 		
-		ProspectProfile c = o.get();
-		this.service.validEntity(entity, id);
+		this.service.validEntity(entityDb, id);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(c, entity)));
+				body(this.service.save(entityDb));
 	}
 	
 	@PutMapping(ID + NEWHIRE)

@@ -6,6 +6,7 @@ import java.util.Comparator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.UserDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
@@ -51,27 +52,31 @@ public class UserMapper {
 		return dto;
 	}
 	
-	public User toSaveEntity(User entity) {
+	public User toSaveEntity(UserDTO entity) {
 		User e = new User();
 		e.setFirstName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getFirstName()));
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		e.setUsername(StringTrim.trimAndRemoveDiacriticalMarks(entity.getUsername()));
 		e.setTokenExpired(entity.isTokenExpired());
 		e.setEnabled(entity.isEnabled());
-		e.setBranchOffice(entity.getBranchOffice());
+		if (entity.getBranchOffice() != null) {
+	        e.setBranchOffice(this.modelMapper.map(entity.getBranchOffice(), BranchOffice.class));
+	    }
 		e.setMultiBranchOffice(entity.isMultiBranchOffice());
 		e.setSeeAllBranchs(entity.isSeeAllBranchs());
 		
 		return e;
 	}
 	
-	public User toEditEntity(User e, User entity) {
+	public User toEditEntity(User e, UserDTO entity) {
         e.setFirstName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getFirstName()));
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		e.setUsername(StringTrim.trimAndRemoveDiacriticalMarks(entity.getUsername()));
 		e.setTokenExpired(entity.isTokenExpired());
 		e.setEnabled(entity.isEnabled());
-		e.setBranchOffice(entity.getBranchOffice());
+		if (entity.getBranchOffice() != null) {
+	        e.setBranchOffice(this.modelMapper.map(entity.getBranchOffice(), BranchOffice.class));
+	    }
 		e.setMultiBranchOffice(entity.isMultiBranchOffice());
 		e.setSeeAllBranchs(entity.isSeeAllBranchs());
 		

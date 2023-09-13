@@ -165,13 +165,13 @@ public class ModuleController {
 			throw new EntityIdNotFoundException("Id modulo " + id + " no encontrado");
 		}
 		
-		Module e = o.get();
-		if (entity.getFather() != null && e.getId() == entity.getFather().getId()) {
+		Module entityDb = o.get();
+		if (entity.getFather() != null && entityDb.getId() == entity.getFather().getId()) {
 			throw new FatherAssignException("El padre del modulo no puede ser el mismo");
 		}
 
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(e, entity)));
+				body(this.service.save(customMapper.toEditEntity(entityDb, entity)));
 	}
 
 }

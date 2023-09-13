@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sip.syshumres_apirest.controllers.BranchOfficeController;
 import com.sip.syshumres_entities.BranchOffice;
+import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_utils.RandomString;
 
@@ -73,7 +74,7 @@ public class BranchOfficeIT {
 	
 	@Test
 	public void create() throws Exception {
-		BranchOffice b = buildBranchOffice();
+		BranchOfficeDTO b = buildBranchOffice();
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.post(
 				"/" + BranchOfficeController.URLENDPOINT)
 				.accept(MediaType.APPLICATION_JSON_VALUE)
@@ -94,7 +95,7 @@ public class BranchOfficeIT {
 	
 	@Test
 	public void createWithError() throws Exception {
-		BranchOffice b = buildBranchOffice();
+		BranchOfficeDTO b = buildBranchOffice();
 		b.setEmail(null);
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.post(
 				"/" + BranchOfficeController.URLENDPOINT)
@@ -128,9 +129,9 @@ public class BranchOfficeIT {
 		return mapper.writeValueAsString(object);
 	}
 	
-	private BranchOffice buildBranchOffice() {
+	private BranchOfficeDTO buildBranchOffice() {
 		String nameTest = "Prueba" + RandomString.getRandomNumber(6);
-		BranchOffice b = new BranchOffice();
+		BranchOfficeDTO b = new BranchOfficeDTO();
 		b.setDescription(nameTest);
 		b.setEmail(nameTest + "@prueba.com");
 		b.setEnabled(true);

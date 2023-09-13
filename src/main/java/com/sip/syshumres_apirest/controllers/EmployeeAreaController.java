@@ -117,7 +117,7 @@ public class EmployeeAreaController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody EmployeeArea entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody EmployeeAreaDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
@@ -140,7 +140,7 @@ public class EmployeeAreaController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody EmployeeArea entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody EmployeeAreaDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, IllegalArgumentException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);

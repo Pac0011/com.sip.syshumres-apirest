@@ -138,7 +138,7 @@ public class AuthorityController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody Authority entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody AuthorityDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
@@ -162,7 +162,7 @@ public class AuthorityController {
 	
 	//@LogWeb
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody Authority entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody AuthorityDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);

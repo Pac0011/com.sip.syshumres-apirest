@@ -115,7 +115,7 @@ public class CostCenterController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody CostCenter entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody CostCenterDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
@@ -124,7 +124,7 @@ public class CostCenterController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody CostCenter entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody CostCenterDTO entity, BindingResult result, @PathVariable Long id) 
 			throws IdsEntityNotEqualsException, EntityIdNotFoundException, IllegalArgumentException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
