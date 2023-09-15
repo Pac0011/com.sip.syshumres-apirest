@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sip.syshumres_entities.EmployeePositionProfile;
+import com.sip.syshumres_entities.TypeStaff;
 import com.sip.syshumres_entities.dtos.EmployeePositionProfileDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
@@ -35,22 +36,26 @@ public class EmployeePositionProfileMapper {
 		return dto;
 	}
 	
-	public EmployeePositionProfile toSaveEntity(EmployeePositionProfile entity) {
+	public EmployeePositionProfile toSaveEntity(EmployeePositionProfileDTO entity) {
 		EmployeePositionProfile e = new EmployeePositionProfile();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setPayroll(entity.isPayroll());
 		e.setHasStaff(entity.isHasStaff());
-		e.setTypeStaff(entity.getTypeStaff());
+		if (entity.getTypeStaff() != null) {
+	        e.setTypeStaff(this.modelMapper.map(entity.getTypeStaff(), TypeStaff.class));
+	    }
 		e.setEnabled(entity.isEnabled());
 		
 		return e;
 	}
 	
-	public EmployeePositionProfile toEditEntity(EmployeePositionProfile e, EmployeePositionProfile entity) {
+	public EmployeePositionProfile toEditEntity(EmployeePositionProfile e, EmployeePositionProfileDTO entity) {
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setPayroll(entity.isPayroll());
 		e.setHasStaff(entity.isHasStaff());
-		e.setTypeStaff(entity.getTypeStaff());
+		if (entity.getTypeStaff() != null) {
+	        e.setTypeStaff(this.modelMapper.map(entity.getTypeStaff(), TypeStaff.class));
+	    }
 		e.setEnabled(entity.isEnabled());
 		
 		return e;

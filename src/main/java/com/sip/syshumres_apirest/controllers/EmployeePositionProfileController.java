@@ -116,7 +116,7 @@ public class EmployeePositionProfileController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody EmployeePositionProfile entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody EmployeePositionProfileDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
@@ -140,7 +140,7 @@ public class EmployeePositionProfileController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody EmployeePositionProfile entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody EmployeePositionProfileDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);

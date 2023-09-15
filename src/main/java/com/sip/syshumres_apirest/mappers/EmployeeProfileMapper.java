@@ -6,7 +6,12 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sip.syshumres_entities.EmployeeArea;
+import com.sip.syshumres_entities.EmployeePosition;
+import com.sip.syshumres_entities.EmployeePositionProfile;
 import com.sip.syshumres_entities.EmployeeProfile;
+import com.sip.syshumres_entities.Gender;
+import com.sip.syshumres_entities.MaritalStatus;
 import com.sip.syshumres_entities.dtos.EmployeeClinicalDataDTO;
 import com.sip.syshumres_entities.dtos.EmployeeDocumentDTO;
 import com.sip.syshumres_entities.dtos.EmployeeGeneralDataDTO;
@@ -147,7 +152,7 @@ public class EmployeeProfileMapper {
 		return dto;
 	}
 	
-	public EmployeeProfile toSaveEntity(EmployeeProfile entity) {
+	public EmployeeProfile toSaveEntity(EmployeeProfileDTO entity) {
 		EmployeeProfile e = new EmployeeProfile();
 		e.setFirstName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getFirstName()));
 		e.setLastName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLastName()));
@@ -159,16 +164,27 @@ public class EmployeeProfileMapper {
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		
 		e.setCurp(StringTrim.trimAndRemoveDiacriticalMarks(entity.getCurp()));
-		e.setMaritalStatus(entity.getMaritalStatus());
-		e.setGender(entity.getGender());
+		if (entity.getMaritalStatus() != null) {
+	        e.setMaritalStatus(this.modelMapper.map(entity.getMaritalStatus(), MaritalStatus.class));
+	    }
+		if (entity.getGender() != null) {
+	        e.setGender(this.modelMapper.map(entity.getGender(), Gender.class));
+	    }
 		
 		e.setDateBirth(entity.getDateBirth());
 		e.setEmployeeAddress(entity.getEmployeeAddress());
-		e.setEmployeePosition(entity.getEmployeePosition());
-		e.setEmployeePositionProfile(entity.getEmployeePositionProfile());
+		if (entity.getEmployeePosition() != null) {
+	        e.setEmployeePosition(this.modelMapper.map(entity.getEmployeePosition(), EmployeePosition.class));
+	    }
+		if (entity.getEmployeePositionProfile() != null) {
+	        e.setEmployeePositionProfile(this.modelMapper.map(entity.getEmployeePositionProfile(), 
+	        		EmployeePositionProfile.class));
+	    }
+		
 		//Adm
 		if (entity.getEmployeeArea() != null) {
-			e.setEmployeeArea(entity.getEmployeeArea());
+			e.setEmployeeArea(this.modelMapper.map(entity.getEmployeeArea(), 
+					EmployeeArea.class));
 		}
 		if (entity.getEmployeeClinicalData() != null) {
 		    e.setEmployeeClinicalData(employeeClinicalDataMapper.
@@ -190,7 +206,7 @@ public class EmployeeProfileMapper {
 		return e;
 	}
 	
-	public EmployeeProfile toEditEntity(EmployeeProfile e, EmployeeProfile entity) {
+	public EmployeeProfile toEditEntity(EmployeeProfile e, EmployeeProfileDTO entity) {
 		e.setFirstName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getFirstName()));
 		e.setLastName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLastName()));
 		e.setLastNameSecond(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLastNameSecond()));
@@ -201,33 +217,43 @@ public class EmployeeProfileMapper {
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		
 		e.setCurp(StringTrim.trimAndRemoveDiacriticalMarks(entity.getCurp()));
-		e.setMaritalStatus(entity.getMaritalStatus());
-		e.setGender(entity.getGender());
+		if (entity.getMaritalStatus() != null) {
+	        e.setMaritalStatus(this.modelMapper.map(entity.getMaritalStatus(), MaritalStatus.class));
+	    }
+		if (entity.getGender() != null) {
+	        e.setGender(this.modelMapper.map(entity.getGender(), Gender.class));
+	    }
 		
 		e.setDateBirth(entity.getDateBirth());
 		e.setEmployeeAddress(entity.getEmployeeAddress());
-		e.setEmployeePosition(entity.getEmployeePosition());
-		e.setEmployeePositionProfile(entity.getEmployeePositionProfile());
+		if (entity.getEmployeePosition() != null) {
+	        e.setEmployeePosition(this.modelMapper.map(entity.getEmployeePosition(), EmployeePosition.class));
+	    }
+		if (entity.getEmployeePositionProfile() != null) {
+	        e.setEmployeePositionProfile(this.modelMapper.map(entity.getEmployeePositionProfile(), 
+	        		EmployeePositionProfile.class));
+	    }
 		e.setDateEmployment(entity.getDateEmployment());
 		//Adm
 		if (entity.getEmployeeArea() != null) {
-			e.setEmployeeArea(entity.getEmployeeArea());
+			e.setEmployeeArea(this.modelMapper.map(entity.getEmployeeArea(), 
+					EmployeeArea.class));
 		}
 		if (entity.getEmployeeClinicalData() != null) {
-			e.setEmployeeClinicalData(employeeClinicalDataMapper.
-					toEditEntity(e.getEmployeeClinicalData(), entity.getEmployeeClinicalData()));
+		    e.setEmployeeClinicalData(employeeClinicalDataMapper.
+		    		toSaveEntity(entity.getEmployeeClinicalData()));
 		}
 		if (entity.getEmployeeGeneralData() != null) {
 		    e.setEmployeeGeneralData(employeeGeneralDataMapper.
-		    		toEditEntity(e.getEmployeeGeneralData(), entity.getEmployeeGeneralData()));
+		    		toSaveEntity(entity.getEmployeeGeneralData()));
 		}
-		if (entity.getEmployeeLaborData() != null) {
+		if (entity.getEmployeeLaborData() != null) {		    
 		    e.setEmployeeLaborData(employeeLaborDataMapper.
-		    		toEditEntity(e.getEmployeeLaborData(), entity.getEmployeeLaborData()));
+		    		toSaveEntity(entity.getEmployeeLaborData()));
 		}
 		if (entity.getEmployeePayroll() != null) {
-			e.setEmployeePayroll(this.employeePayrollMapper.
-					toEditEntity(e.getEmployeePayroll(), entity.getEmployeePayroll()));
+			e.setEmployeePayroll(employeePayrollMapper.
+					toSaveEntity(entity.getEmployeePayroll()));
 		}
 		
 		return e;

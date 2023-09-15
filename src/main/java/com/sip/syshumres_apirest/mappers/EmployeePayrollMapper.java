@@ -1,14 +1,27 @@
 package com.sip.syshumres_apirest.mappers;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.sip.syshumres_entities.EmployeePayroll;
+import com.sip.syshumres_entities.DinningRoom;
+import com.sip.syshumres_entities.EmployeeBank;
+import com.sip.syshumres_entities.InvoicedResourceType;
+import com.sip.syshumres_entities.FactorDiscountInfonavit;
+import com.sip.syshumres_entities.PayrollType;
+import com.sip.syshumres_entities.TypeHiring;
+import com.sip.syshumres_entities.dtos.EmployeePayrollDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 public class EmployeePayrollMapper {
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	public EmployeePayrollMapper() {
 	}
 	
-	public EmployeePayroll toSaveEntity(EmployeePayroll entity) {
+	public EmployeePayroll toSaveEntity(EmployeePayrollDTO entity) {
 		EmployeePayroll e = new EmployeePayroll();
 		e.setAmountAlimony(entity.getAmountAlimony());
 		e.setAmountFactorDiscountFonacot(entity.getAmountFactorDiscountFonacot());
@@ -21,8 +34,10 @@ public class EmployeePayrollMapper {
 				trimAndRemoveDiacriticalMarks(entity.getClabe()));
 		
 		e.setCreditNumberInfonavit(StringTrim.
-				trimAndRemoveDiacriticalMarks(entity.getCreditNumberInfonavit()));
-		e.setDinningRoom(entity.getDinningRoom());
+				trimAndRemoveDiacriticalMarks(entity.getCreditNumberInfonavit()));		
+		if (entity.getDinningRoom() != null) {
+	        e.setDinningRoom(this.modelMapper.map(entity.getDinningRoom(), DinningRoom.class));
+	    }
 		
 		//EmployeeAddressFiscal
 		e.getEmployeeAddressFiscal().
@@ -51,22 +66,32 @@ public class EmployeePayrollMapper {
 			setZip(StringTrim.trimAndRemoveDiacriticalMarks(entity.
 					getEmployeeAddressFiscal().getZip()));
 		///////////
-		
-		e.setEmployeeBank(entity.getEmployeeBank());
-		e.setFactorDiscountInfonavit(entity.getFactorDiscountInfonavit());
+		if (entity.getEmployeeBank() != null) {
+	        e.setEmployeeBank(this.modelMapper.map(entity.getEmployeeBank(), EmployeeBank.class));
+	    }		
+		if (entity.getFactorDiscountInfonavit() != null) {
+	        e.setFactorDiscountInfonavit(this.modelMapper.map(entity.getFactorDiscountInfonavit(), 
+	        		FactorDiscountInfonavit.class));
+	    }
 		e.setHaveAlimony(entity.getHaveAlimony());
 		
 		e.setHaveFonacotCredit(entity.getHaveFonacotCredit());
 		e.setHaveInfonavitCredit(entity.getHaveInfonavitCredit());
-		e.setHaveSgmm(entity.getHaveSgmm());
+		e.setHaveSgmm(entity.getHaveSgmm());		
+		if (entity.getInvoicedResourceType() != null) {
+	        e.setInvoicedResourceType(this.modelMapper.map(entity.getInvoicedResourceType(), 
+	        		InvoicedResourceType.class));
+	    }
 		
-		e.setInvoicedResourceType(entity.getInvoicedResourceType());
 		e.setNss(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getNss()));
 		e.setNumberFonacotCredit(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getNumberFonacotCredit()));
+		if (entity.getPayrollType() != null) {
+	        e.setPayrollType(this.modelMapper.map(entity.getPayrollType(), 
+	        		PayrollType.class));
+	    }
 		
-		e.setPayrollType(entity.getPayrollType());
 		e.setRfc(entity.getRfc());
 		e.setSalaryMonthly(entity.getSalaryMonthly());
 		
@@ -74,8 +99,10 @@ public class EmployeePayrollMapper {
 				trimAndRemoveDiacriticalMarks(entity.getSalaryMonthlyLetter()));
 		e.setSdb(entity.getSdb());
 		e.setSdi(entity.getSdi());
-		
-		e.setTypeHiring(entity.getTypeHiring());
+		if (entity.getTypeHiring() != null) {
+	        e.setTypeHiring(this.modelMapper.map(entity.getTypeHiring(), 
+	        		TypeHiring.class));
+	    }
 		
 		return e;
 	}

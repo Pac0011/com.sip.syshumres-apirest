@@ -63,26 +63,30 @@ public class ModuleCustomMapper {
 		return this.modelMapper.map(entity, EntitySelectDTO.class);
 	}
 	
-	public Module toSaveEntity(Module entity) {
+	public Module toSaveEntity(ModuleDTO entity) {
 		Module e = new Module();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setDetail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDetail()));
 		e.setUrl(StringTrim.trimAndRemoveDiacriticalMarks(entity.getUrl()));
 		e.setUrlMenu(StringTrim.trimAndRemoveDiacriticalMarks(entity.getUrlMenu()));
 		e.setIcon(StringTrim.trimAndRemoveDiacriticalMarks(entity.getIcon()));
-		e.setFather(entity.getFather());
+		if (entity.getFather() != null) {
+	        e.setFather(this.modelMapper.map(entity.getFather(), Module.class));
+	    }
 		e.setEnabled(entity.isEnabled());
 		
 		return e;
 	}
 	
-	public Module toEditEntity(Module e, Module entity) {
+	public Module toEditEntity(Module e, ModuleDTO entity) {
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setDetail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDetail()));
 		e.setUrl(StringTrim.trimAndRemoveDiacriticalMarks(entity.getUrl()));
 		e.setUrlMenu(StringTrim.trimAndRemoveDiacriticalMarks(entity.getUrlMenu()));
 		e.setIcon(StringTrim.trimAndRemoveDiacriticalMarks(entity.getIcon()));
-		e.setFather(entity.getFather());
+		if (entity.getFather() != null) {
+	        e.setFather(this.modelMapper.map(entity.getFather(), Module.class));
+	    }
 		e.setEnabled(entity.isEnabled());
 		
 		return e;

@@ -126,7 +126,7 @@ public class ManagingCompanyController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody ManagingCompany entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody ManagingCompanyDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
@@ -149,7 +149,7 @@ public class ManagingCompanyController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody ManagingCompany entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody ManagingCompanyDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);

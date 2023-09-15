@@ -128,7 +128,7 @@ public class EmployeePositionController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody EmployeePosition entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody EmployeePosition entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}

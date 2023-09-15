@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sip.syshumres_entities.ManagingCompany;
+import com.sip.syshumres_entities.TypeHiring;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_entities.dtos.ManagingCompanyDTO;
 import com.sip.syshumres_utils.StringTrim;
@@ -55,7 +56,7 @@ public class ManagingCompanyMapper {
 		return dto;
 	}
 	
-	public ManagingCompany toSaveEntity(ManagingCompany entity) {
+	public ManagingCompany toSaveEntity(ManagingCompanyDTO entity) {
 		ManagingCompany e = new ManagingCompany();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setCompanyName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getCompanyName()));
@@ -65,8 +66,10 @@ public class ManagingCompanyMapper {
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
 		e.setRfc(StringTrim.trimAndRemoveDiacriticalMarks(entity.getRfc()));
 		e.setEmployerRegistration(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmployerRegistration()));
-		e.setLegalRepresentative(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLegalRepresentative()));
-		e.setTypeHiring(entity.getTypeHiring());
+		e.setLegalRepresentative(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLegalRepresentative()));		
+		if (entity.getTypeHiring() != null) {
+	        e.setTypeHiring(this.modelMapper.map(entity.getTypeHiring(), TypeHiring.class));
+	    }
 		e.setAddress(entity.getAddress());
 		e.setAddressFiscal(entity.getAddressFiscal());
 		//e.setBranchOffices(entity.getBranchOffices());
@@ -75,7 +78,7 @@ public class ManagingCompanyMapper {
 		return e;
 	}
 	
-	public ManagingCompany toEditEntity(ManagingCompany e, ManagingCompany entity) {
+	public ManagingCompany toEditEntity(ManagingCompany e, ManagingCompanyDTO entity) {
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setCompanyName(StringTrim.trimAndRemoveDiacriticalMarks(entity.getCompanyName()));
 		e.setPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getPhoneNumber()));
@@ -85,7 +88,9 @@ public class ManagingCompanyMapper {
 		e.setRfc(StringTrim.trimAndRemoveDiacriticalMarks(entity.getRfc()));
 		e.setEmployerRegistration(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmployerRegistration()));
 		e.setLegalRepresentative(StringTrim.trimAndRemoveDiacriticalMarks(entity.getLegalRepresentative()));
-		e.setTypeHiring(entity.getTypeHiring());
+		if (entity.getTypeHiring() != null) {
+	        e.setTypeHiring(this.modelMapper.map(entity.getTypeHiring(), TypeHiring.class));
+	    }
 		e.setAddress(entity.getAddress());
 		e.setAddressFiscal(entity.getAddressFiscal());
 		//e.setBranchOffices(entity.getBranchOffices());

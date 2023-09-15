@@ -146,18 +146,19 @@ public class EmployeeProfileController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody EmployeeProfile entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody EmployeeProfileDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
-		Map<String, Object> errorsCustomFields = this.service.validEntity(entity, 0L);
+		EmployeeProfile employeeProfile = customMapper.toSaveEntity(entity);
+		Map<String, Object> errorsCustomFields = this.service.validEntity(employeeProfile, 0L);
 		if (errorsCustomFields != null) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toSaveEntity(entity)));
+				body(service.save(employeeProfile));
 	}
 	
 	@GetMapping(ID)
@@ -175,7 +176,7 @@ public class EmployeeProfileController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody EmployeeProfile entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody EmployeeProfileDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
@@ -192,13 +193,16 @@ public class EmployeeProfileController {
 			throw new EntityIdNotFoundException("Id Empleado " + id + " no encontrado");
 		}
 		
-		Map<String, Object> errorsCustomFields = this.service.validEntity(entity, id);
+		EmployeeProfile entityDb = o.get();
+		entityDb = customMapper.toEditEntity(entityDb, entity);
+		
+		Map<String, Object> errorsCustomFields = this.service.validEntity(entityDb, id);
 		if (errorsCustomFields != null) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(o.get(), entity)));
+				body(this.service.save(entityDb));
 	}
 	
 	@PutMapping(ID + UPLOADFILE)

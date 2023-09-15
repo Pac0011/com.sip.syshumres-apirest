@@ -124,7 +124,7 @@ public class ModuleController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody Module entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody ModuleDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
@@ -148,7 +148,7 @@ public class ModuleController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody Module entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<?> edit(@Valid @RequestBody ModuleDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, IllegalArgumentException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);

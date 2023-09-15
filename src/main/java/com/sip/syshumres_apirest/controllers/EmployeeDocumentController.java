@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sip.syshumres_entities.EmployeeDocument;
+import com.sip.syshumres_entities.dtos.EmployeeDocumentDTO;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.TypeHiringDocumentNotExistException;
@@ -36,18 +38,22 @@ public class EmployeeDocumentController {
 	public static final String IDUPLOADFILE = "/{idEmployeeProfile}/upload-file";
 	
     private EmployeeDocumentService service;
+    
+    private ModelMapper modelMapper;
 	
 	@Autowired
-	public EmployeeDocumentController(EmployeeDocumentService service) {
+	public EmployeeDocumentController(EmployeeDocumentService service, 
+			ModelMapper modelMapper) {
 		this.service = service;
+		this.modelMapper = modelMapper;
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody EmployeeDocument entity, BindingResult result) {
+	public ResponseEntity<?> create(@Valid @RequestBody EmployeeDocumentDTO entity, BindingResult result) {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
-		EmployeeDocument s = service.save(entity);
+		EmployeeDocument s = service.save(this.modelMapper.map(entity, EmployeeDocument.class));
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(s);
 	}

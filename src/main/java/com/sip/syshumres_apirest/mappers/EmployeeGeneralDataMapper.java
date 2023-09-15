@@ -1,27 +1,43 @@
 package com.sip.syshumres_apirest.mappers;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.sip.syshumres_entities.EmployeeGeneralData;
+import com.sip.syshumres_entities.ExpertType;
+import com.sip.syshumres_entities.SchoolGrade;
+import com.sip.syshumres_entities.SchoolGradeComplete;
+import com.sip.syshumres_entities.DriverLicenseType;
+import com.sip.syshumres_entities.DriverLicenseValidity;
+import com.sip.syshumres_entities.dtos.EmployeeGeneralDataDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 public class EmployeeGeneralDataMapper {
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	public EmployeeGeneralDataMapper() {
 	}
 	
-	public EmployeeGeneralData toSaveEntity(EmployeeGeneralData entity) {
+	public EmployeeGeneralData toSaveEntity(EmployeeGeneralDataDTO entity) {
 		EmployeeGeneralData e = new EmployeeGeneralData();
 		e.setAmountDebt(entity.getAmountDebt());
-		e.setAmountRent(entity.getAmountRent());
-		e.setBasicSecurity(entity.getBasicSecurity());
-		
+		e.setAmountRent(entity.getAmountRent());		
+		if (entity.getBasicSecurity() != null) {
+	        e.setBasicSecurity(this.modelMapper.map(entity.getBasicSecurity(), ExpertType.class));
+	    }
 		e.setBornIn(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getBornIn()));
 		e.setDriverLicenseDate(entity.getDriverLicenseDate());
 		e.setDriverLicenseNumber(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getDriverLicenseNumber()));
-		
-		e.setDriverLicenseType(entity.getDriverLicenseType());
-		e.setDriverLicenseValidity(entity.getDriverLicenseValidity());
+		if (entity.getDriverLicenseType() != null) {
+	        e.setDriverLicenseType(this.modelMapper.map(entity.getDriverLicenseType(), DriverLicenseType.class));
+	    }
+		if (entity.getDriverLicenseValidity() != null) {
+	        e.setDriverLicenseValidity(this.modelMapper.map(entity.getDriverLicenseValidity(), DriverLicenseValidity.class));
+	    }
 		e.setGeneralReferences(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getGeneralReferences()));
 		
@@ -31,10 +47,15 @@ public class EmployeeGeneralDataMapper {
 		
 		e.setHaveEconomicDependents(entity.isHaveEconomicDependents());
 		e.setHaveHouse(entity.isHaveHouse());
-		e.setHowManyChildren(entity.getHowManyChildren());
-		
-		e.setInductionBasicSystems(entity.getInductionBasicSystems());
-		e.setInductionRecord(entity.getInductionRecord());
+		e.setHowManyChildren(entity.getHowManyChildren());		
+		if (entity.getInductionBasicSystems() != null) {
+	        e.setInductionBasicSystems(this.modelMapper.map(entity.getInductionBasicSystems(), 
+	        		ExpertType.class));
+	    }
+		if (entity.getInductionRecord() != null) {
+	        e.setInductionRecord(this.modelMapper.map(entity.getInductionRecord(), 
+	        		ExpertType.class));
+	    }
 		e.setIne(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getIne()));
 		
@@ -42,8 +63,10 @@ public class EmployeeGeneralDataMapper {
 				trimAndRemoveDiacriticalMarks(entity.getLanguagesSpeak()));
 		e.setLiveWith(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getLiveWith()));
-		e.setManagementTonfaPr24(entity.getManagementTonfaPr24());
-		
+		if (entity.getManagementTonfaPr24() != null) {
+	        e.setManagementTonfaPr24(this.modelMapper.map(entity.getManagementTonfaPr24(), 
+	        		ExpertType.class));
+	    }	
 		e.setMilitaryCertificate(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getMilitaryCertificate()));
 		e.setMonthlyExpenses(entity.getMonthlyExpenses());
@@ -71,15 +94,22 @@ public class EmployeeGeneralDataMapper {
 				trimAndRemoveDiacriticalMarks(entity.getPhoneReferences2()));
 		
 		e.setPhoneReferences3(StringTrim.
-				trimAndRemoveDiacriticalMarks(entity.getPhoneReferences3()));
-		e.setPreventiveReactiveManagement(entity.getPreventiveReactiveManagement());
+				trimAndRemoveDiacriticalMarks(entity.getPhoneReferences3()));		
+		if (entity.getPreventiveReactiveManagement() != null) {
+	        e.setPreventiveReactiveManagement(this.modelMapper.map(entity.getPreventiveReactiveManagement(), 
+	        		ExpertType.class));
+	    }
 		e.setRelationshipReferences1(entity.getRelationshipReferences1());
-		
 		e.setRelationshipReferences2(entity.getRelationshipReferences2());
 		e.setRelationshipReferences3(entity.getRelationshipReferences3());
-		e.setSchoolGrade(entity.getSchoolGrade());
-		
-		e.setSchoolGradeComplete(entity.getSchoolGradeComplete());
+		if (entity.getSchoolGrade() != null) {
+	        e.setSchoolGrade(this.modelMapper.map(entity.getSchoolGrade(), 
+	        		SchoolGrade.class));
+	    }		
+		if (entity.getSchoolGradeComplete() != null) {
+	        e.setSchoolGradeComplete(this.modelMapper.map(entity.getSchoolGradeComplete(), 
+	        		SchoolGradeComplete.class));
+	    }
 		e.setSkills(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getSkills()));
 		

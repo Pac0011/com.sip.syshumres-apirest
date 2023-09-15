@@ -1,14 +1,22 @@
 package com.sip.syshumres_apirest.mappers;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.sip.syshumres_entities.EmployeeLaborData;
+import com.sip.syshumres_entities.ReasonQuitJob;
+import com.sip.syshumres_entities.dtos.EmployeeLaborDataDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 public class EmployeeLaborDataMapper {
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	public EmployeeLaborDataMapper() {
 	}
 	
-	public EmployeeLaborData toSaveEntity(EmployeeLaborData entity) {
+	public EmployeeLaborData toSaveEntity(EmployeeLaborDataDTO entity) {
 		EmployeeLaborData e = new EmployeeLaborData();
 		e.setActivitiesLastJob(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getActivitiesLastJob()));
@@ -37,10 +45,17 @@ public class EmployeeLaborDataMapper {
 		e.setPhoneLastJob(entity.getPhoneLastJob());
 		e.setPhonePenultimate2Job(entity.getPhonePenultimate2Job());
 		e.setPhonePenultimateJob(entity.getPhoneLastJob());
-		
-		e.setReasonQuitJobLastJob(entity.getReasonQuitJobLastJob());
-		e.setReasonQuitJobPenultimate2Job(entity.getReasonQuitJobPenultimate2Job());
-		e.setReasonQuitJobPenultimateJob(entity.getReasonQuitJobPenultimateJob());
+				
+		if (entity.getReasonQuitJobLastJob() != null) {
+	        e.setReasonQuitJobLastJob(this.modelMapper.map(entity.getReasonQuitJobLastJob(), ReasonQuitJob.class));
+	    }
+		if (entity.getReasonQuitJobPenultimate2Job() != null) {
+	        e.setReasonQuitJobPenultimate2Job(this.modelMapper.map(entity.getReasonQuitJobPenultimate2Job(), ReasonQuitJob.class));
+	    }
+		if (entity.getReasonQuitJobPenultimateJob() != null) {
+	        e.setReasonQuitJobPenultimateJob(this.modelMapper.map(entity.getReasonQuitJobPenultimateJob(), 
+	        		ReasonQuitJob.class));
+	    }
 		
 		e.setSalaryLastJob(entity.getSalaryLastJob());
 		e.setSalaryPenultimate2Job(entity.getSalaryPenultimate2Job());
