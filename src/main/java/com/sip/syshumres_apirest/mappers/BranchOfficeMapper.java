@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sip.syshumres_apirest.aspects.LogCreateEntity;
 import com.sip.syshumres_apirest.aspects.LogEditEntity;
+import com.sip.syshumres_entities.Address;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.BranchOfficeType;
 import com.sip.syshumres_entities.CostCenter;
 import com.sip.syshumres_entities.Region;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.AddressDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 public class BranchOfficeMapper {
@@ -58,8 +60,9 @@ public class BranchOfficeMapper {
 		}
 		childsDTO.sort(Comparator.comparing(EntitySelectDTO::getDescription));
 		dto.setChilds(childsDTO);
-		
-		dto.setAddress(entity.getAddress());
+		if (entity.getAddress() != null) {
+			dto.setAddress(this.modelMapper.map(entity.getAddress(), AddressDTO.class));
+		}
 		dto.setEnabled(entity.isEnabled());
 		//e.setManagingCompanies(null);
 		
@@ -78,7 +81,9 @@ public class BranchOfficeMapper {
 		e.setExtPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getExtPhoneNumber()));
 		e.setShortPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getShortPhoneNumber()));
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
-		e.setAddress(entity.getAddress());
+		if (entity.getAddress() != null) {
+			e.setAddress(this.modelMapper.map(entity.getAddress(), Address.class));
+		}
 		if (entity.getBranchOfficeType() != null) {
 	        e.setBranchOfficeType(this.modelMapper.map(entity.getBranchOfficeType(), BranchOfficeType.class));
 	    }
@@ -105,7 +110,9 @@ public class BranchOfficeMapper {
 		e.setExtPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getExtPhoneNumber()));
 		e.setShortPhoneNumber(StringTrim.trimAndRemoveDiacriticalMarks(entity.getShortPhoneNumber()));
 		e.setEmail(StringTrim.trimAndRemoveDiacriticalMarks(entity.getEmail()));
-		e.setAddress(entity.getAddress());
+		if (entity.getAddress() != null) {
+		   e.setAddress(this.modelMapper.map(entity.getAddress(), Address.class));
+		}
 		if (entity.getBranchOfficeType() != null) {
 	        e.setBranchOfficeType(this.modelMapper.map(entity.getBranchOfficeType(), BranchOfficeType.class));
 	    }

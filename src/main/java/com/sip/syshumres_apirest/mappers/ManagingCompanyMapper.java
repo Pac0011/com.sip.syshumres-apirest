@@ -6,10 +6,12 @@ import java.util.Comparator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sip.syshumres_entities.Address;
 import com.sip.syshumres_entities.ManagingCompany;
 import com.sip.syshumres_entities.TypeHiring;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_entities.dtos.ManagingCompanyDTO;
+import com.sip.syshumres_entities.dtos.AddressDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 
@@ -49,8 +51,12 @@ public class ManagingCompanyMapper {
 		}
 		officesDTO.sort(Comparator.comparing(EntitySelectDTO::getDescription));
 		dto.setBranchOffices(officesDTO);
-		dto.setAddress(entity.getAddress());
-	    dto.setAddressFiscal(entity.getAddressFiscal());
+		if (entity.getAddress() != null) {
+			dto.setAddress(this.modelMapper.map(entity.getAddress(), AddressDTO.class));
+		}
+		if (entity.getAddressFiscal() != null) {
+			dto.setAddressFiscal(this.modelMapper.map(entity.getAddressFiscal(), AddressDTO.class));
+		}
 		dto.setEnabled(entity.isEnabled());
 		
 		return dto;
@@ -70,8 +76,12 @@ public class ManagingCompanyMapper {
 		if (entity.getTypeHiring() != null) {
 	        e.setTypeHiring(this.modelMapper.map(entity.getTypeHiring(), TypeHiring.class));
 	    }
-		e.setAddress(entity.getAddress());
-		e.setAddressFiscal(entity.getAddressFiscal());
+		if (entity.getAddress() != null) {
+			e.setAddress(this.modelMapper.map(entity.getAddress(), Address.class));
+		}
+		if (entity.getAddressFiscal() != null) {
+			e.setAddressFiscal(this.modelMapper.map(entity.getAddressFiscal(), Address.class));
+		}
 		//e.setBranchOffices(entity.getBranchOffices());
 		e.setEnabled(entity.isEnabled());
 		
@@ -91,8 +101,12 @@ public class ManagingCompanyMapper {
 		if (entity.getTypeHiring() != null) {
 	        e.setTypeHiring(this.modelMapper.map(entity.getTypeHiring(), TypeHiring.class));
 	    }
-		e.setAddress(entity.getAddress());
-		e.setAddressFiscal(entity.getAddressFiscal());
+		if (entity.getAddress() != null) {
+			e.setAddress(this.modelMapper.map(entity.getAddress(), Address.class));
+		}
+		if (entity.getAddressFiscal() != null) {
+			e.setAddressFiscal(this.modelMapper.map(entity.getAddressFiscal(), Address.class));
+		}
 		//e.setBranchOffices(entity.getBranchOffices());
 		e.setEnabled(entity.isEnabled());
 		

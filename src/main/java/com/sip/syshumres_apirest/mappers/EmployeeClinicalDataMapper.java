@@ -36,7 +36,7 @@ public class EmployeeClinicalDataMapper {
 	        e.setEmployeeTypeHealth(this.modelMapper.map(entity.getEmployeeTypeHealth(), EmployeeTypeHealth.class));
 	    }
 		e.setHeight(entity.getHeight());
-		e.setVaccinated(entity.isVaccinated());
+		e.setVaccinated(entity.getIsVaccinated());
 		e.setMedicalAssistance(entity.getMedicalAssistance());
 		e.setObservations(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getObservations()));
@@ -62,7 +62,7 @@ public class EmployeeClinicalDataMapper {
 		e.setEmployeeTypeHealth(entity.getEmployeeTypeHealth());
 		e.setHeight(entity.getHeight());
 		
-		e.setVaccinated(entity.isVaccinated());
+		e.setVaccinated(entity.getVaccinated());
 		e.setMedicalAssistance(entity.getMedicalAssistance());
 		e.setObservations(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getObservations()));

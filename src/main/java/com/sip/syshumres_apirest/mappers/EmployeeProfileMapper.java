@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sip.syshumres_entities.EmployeeAddress;
 import com.sip.syshumres_entities.EmployeeArea;
 import com.sip.syshumres_entities.EmployeePosition;
 import com.sip.syshumres_entities.EmployeePositionProfile;
@@ -20,6 +21,7 @@ import com.sip.syshumres_entities.dtos.EmployeePayrollDTO;
 import com.sip.syshumres_entities.dtos.EmployeeProfileDTO;
 import com.sip.syshumres_entities.dtos.EmployeeProfileViewDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.EmployeeAddressDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 
@@ -128,7 +130,10 @@ public class EmployeeProfileMapper {
 	        dto.setBranchOffice(modelMapper.map(entity.getBranchOffice(), EntitySelectDTO.class));
 	    }
 	    dto.setDateBirth(entity.getDateBirth());
-	    dto.setEmployeeAddress(entity.getEmployeeAddress());
+	    if (entity.getEmployeeAddress() != null) {
+	    	dto.setEmployeeAddress(this.modelMapper.map(entity.getEmployeeAddress(), EmployeeAddressDTO.class));
+	    }
+	    
 	    if (entity.getEmployeeClinicalData() != null) {
 	    	//Te mapea un objeto con varios campos siempre y cuando los nombres coincidan
 	    	dto.setEmployeeClinicalData(modelMapper.map(entity.getEmployeeClinicalData(), EmployeeClinicalDataDTO.class));
@@ -172,7 +177,10 @@ public class EmployeeProfileMapper {
 	    }
 		
 		e.setDateBirth(entity.getDateBirth());
-		e.setEmployeeAddress(entity.getEmployeeAddress());
+		if (entity.getEmployeeAddress() != null) {
+			e.setEmployeeAddress(this.modelMapper.map(entity.getEmployeeAddress(), EmployeeAddress.class));
+		}
+		
 		if (entity.getEmployeePosition() != null) {
 	        e.setEmployeePosition(this.modelMapper.map(entity.getEmployeePosition(), EmployeePosition.class));
 	    }
@@ -225,7 +233,9 @@ public class EmployeeProfileMapper {
 	    }
 		
 		e.setDateBirth(entity.getDateBirth());
-		e.setEmployeeAddress(entity.getEmployeeAddress());
+		if (entity.getEmployeeAddress() != null) {
+			e.setEmployeeAddress(this.modelMapper.map(entity.getEmployeeAddress(), EmployeeAddress.class));
+		}
 		if (entity.getEmployeePosition() != null) {
 	        e.setEmployeePosition(this.modelMapper.map(entity.getEmployeePosition(), EmployeePosition.class));
 	    }

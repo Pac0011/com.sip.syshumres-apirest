@@ -41,12 +41,12 @@ public class EmployeeGeneralDataMapper {
 		e.setGeneralReferences(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getGeneralReferences()));
 		
-		e.setHaveCar(entity.isHaveCar());
-		e.setHaveChildren(entity.isHaveChildren());
-		e.setHaveDebts(entity.isHaveDebts());
+		e.setHaveCar(entity.getHaveCar());
+		e.setHaveChildren(entity.getHaveChildren());
+		e.setHaveDebts(entity.getHaveDebts());
 		
-		e.setHaveEconomicDependents(entity.isHaveEconomicDependents());
-		e.setHaveHouse(entity.isHaveHouse());
+		e.setHaveEconomicDependents(entity.getHaveEconomicDependents());
+		e.setHaveHouse(entity.getHaveHouse());
 		e.setHowManyChildren(entity.getHowManyChildren());		
 		if (entity.getInductionBasicSystems() != null) {
 	        e.setInductionBasicSystems(this.modelMapper.map(entity.getInductionBasicSystems(), 
@@ -84,7 +84,7 @@ public class EmployeeGeneralDataMapper {
 				trimAndRemoveDiacriticalMarks(entity.getParticularReferences2()));
 		e.setParticularReferences3(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getParticularReferences3()));
-		e.setPayRent(entity.isPayRent());
+		e.setPayRent(entity.getPayRent());
 		
 		e.setPhoneForMessages(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getPhoneForMessages()));
@@ -132,12 +132,12 @@ public class EmployeeGeneralDataMapper {
 		e.setGeneralReferences(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getGeneralReferences()));
 		
-		e.setHaveCar(entity.isHaveCar());
-		e.setHaveChildren(entity.isHaveChildren());
-		e.setHaveDebts(entity.isHaveDebts());
+		e.setHaveCar(entity.getHaveCar());
+		e.setHaveChildren(entity.getHaveChildren());
+		e.setHaveDebts(entity.getHaveDebts());
 		
-		e.setHaveEconomicDependents(entity.isHaveEconomicDependents());
-		e.setHaveHouse(entity.isHaveHouse());
+		e.setHaveEconomicDependents(entity.getHaveEconomicDependents());
+		e.setHaveHouse(entity.getHaveHouse());
 		e.setHowManyChildren(entity.getHowManyChildren());
 		
 		e.setInductionBasicSystems(entity.getInductionBasicSystems());
@@ -168,7 +168,7 @@ public class EmployeeGeneralDataMapper {
 				trimAndRemoveDiacriticalMarks(entity.getParticularReferences2()));
 		e.setParticularReferences3(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getParticularReferences3()));
-		e.setPayRent(entity.isPayRent());
+		e.setPayRent(entity.getPayRent());
 		
 		e.setPhoneForMessages(StringTrim.
 				trimAndRemoveDiacriticalMarks(entity.getPhoneForMessages()));

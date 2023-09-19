@@ -40,7 +40,7 @@ public class EmployeeLaborDataMapper {
 		
 		e.setEndDatePenultimate2Job(entity.getEndDatePenultimate2Job());
 		e.setEndDatePenultimateJob(entity.getEndDatePenultimateJob());
-		e.setHaveExperienceSecurity(entity.isHaveExperienceSecurity());
+		e.setHaveExperienceSecurity(entity.getHaveExperienceSecurity());
 		
 		e.setPhoneLastJob(entity.getPhoneLastJob());
 		e.setPhonePenultimate2Job(entity.getPhonePenultimate2Job());
@@ -94,7 +94,7 @@ public class EmployeeLaborDataMapper {
 		
 		e.setEndDatePenultimate2Job(entity.getEndDatePenultimate2Job());
 		e.setEndDatePenultimateJob(entity.getEndDatePenultimateJob());
-		e.setHaveExperienceSecurity(entity.isHaveExperienceSecurity());
+		e.setHaveExperienceSecurity(entity.getHaveExperienceSecurity());
 		
 		e.setPhoneLastJob(entity.getPhoneLastJob());
 		e.setPhonePenultimate2Job(entity.getPhonePenultimate2Job());
