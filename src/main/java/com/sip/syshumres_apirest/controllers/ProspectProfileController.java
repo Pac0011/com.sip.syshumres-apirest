@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
 import com.sip.syshumres_apirest.mappers.ProspectProfileMapper;
 import com.sip.syshumres_apirest.producer.JmsProducer;
 import com.sip.syshumres_entities.BranchOffice;
@@ -31,6 +33,7 @@ import com.sip.syshumres_entities.EmployeeStatus;
 import com.sip.syshumres_entities.ProspectProfile;
 import com.sip.syshumres_entities.ProspectStatus;
 import com.sip.syshumres_entities.User;
+import com.sip.syshumres_entities.dtos.EmployeeProfileDTO;
 import com.sip.syshumres_entities.dtos.ProspectProfileDTO;
 import com.sip.syshumres_entities.enums.EmployeeStatusEnum;
 import com.sip.syshumres_entities.enums.ProspectStatusEnum;
@@ -53,23 +56,17 @@ import com.sip.syshumres_utils.StringTrim;
 
 @RestController
 @RequestMapping(ProspectProfileController.URLENDPOINT)
-public class ProspectProfileController {
+public class ProspectProfileController extends CommonController {
 	
 	public static final String URLENDPOINT = "prospect-profiles";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	public static final String NEWHIRE = "/new-hire";
 	
 	private ProspectProfileService service;
 	
 	private ProspectProfileMapper customMapper;
 		
-	private String filter;
-	
+	private EmployeeProfileMapper customMapper2;
+		
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;
 	
@@ -86,7 +83,9 @@ public class ProspectProfileController {
 	@Autowired
 	public ProspectProfileController(ProspectProfileService service, ProspectStatusService serviceS, 
 			BranchOfficeService serviceB, EmployeeProfileService serviceP, EmployeeStatusService serviceES, 
-			ProspectProfileMapper customMapper, JmsProducer jmsProducer) {
+			ProspectProfileMapper customMapper, 
+			EmployeeProfileMapper customMapper2, 
+			JmsProducer jmsProducer) {
 		this.service = service;
 		this.serviceS = serviceS;
 		this.serviceB = serviceB;
@@ -95,6 +94,7 @@ public class ProspectProfileController {
 		this.jmsProducer = jmsProducer;
 		this.filter = "";
 		this.customMapper = customMapper;
+		this.customMapper2 = customMapper2;
 	}
 	
 	/*
@@ -181,8 +181,9 @@ public class ProspectProfileController {
 		ProspectProfile prospectProfile = customMapper.toSaveEntity(entity);
 		this.service.validEntity(prospectProfile, 0L);
 
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(prospectProfile, optionalB.get(), optional.get()));
+		ProspectProfile e = this.service.save(prospectProfile, optionalB.get(), optional.get());
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ID)
@@ -222,12 +223,13 @@ public class ProspectProfileController {
 		
 		this.service.validEntity(entityDb, id);
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(entityDb));
+		ProspectProfile e = this.service.save(entityDb);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@PutMapping(ID + NEWHIRE)
-	public ResponseEntity<EmployeeProfile> hire(@RequestBody ProspectProfile entity, @PathVariable Long id) 
+	public ResponseEntity<EmployeeProfileDTO> hire(@RequestBody ProspectProfileDTO entity, @PathVariable Long id) 
 		throws IdsEntityNotEqualsException, EntityIdNotFoundException, StatusCatalogNotFoundException, 
 		CreateEmployeeProfileException, IllegalArgumentException {
 		if (id <= 0) {
@@ -263,8 +265,8 @@ public class ProspectProfileController {
 		
 		//Send message to Queue
 		//jmsProducer.sendMessage(c);
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body(e);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper2.toDto(e));
 	}
 
 }

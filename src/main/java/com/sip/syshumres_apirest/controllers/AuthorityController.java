@@ -24,11 +24,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.AuthorityMapper;
+import com.sip.syshumres_apirest.mappers.ListMapper;
+import com.sip.syshumres_apirest.mappers.ModuleCustomMapper;
 import com.sip.syshumres_entities.Module;
 import com.sip.syshumres_entities.Authority;
 import com.sip.syshumres_entities.dtos.AuthorityDTO;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.ModuleDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.MalFormedHeaderException;
@@ -42,31 +46,30 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @RestController
 @RequestMapping(AuthorityController.URLENDPOINT)
-public class AuthorityController {
+public class AuthorityController extends CommonController {
 	
 	public static final String URLENDPOINT = "authorities";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	public static final String MODULES = "/modules";
 	public static final String AMODULES = "/assign-modules";
 	public static final String RMODULE = "/remove-module";
-	public static final String ERROR = "/error";
 	
     private AuthorityService service;
     
     private AuthorityMapper customMapper;
-		
-    private String filter;
+    
+    private ModuleCustomMapper customMapper2;
+    
+    private ListMapper listMapper;
     
     @Autowired
 	public AuthorityController(AuthorityService service, 
-			AuthorityMapper customMapper) {
+			AuthorityMapper customMapper,
+			ModuleCustomMapper customMapper2,
+			ListMapper listMapper) {
 		this.service = service;
 		this.customMapper = customMapper;
+		this.customMapper2 = customMapper2;
+		this.listMapper = listMapper;
 		this.filter = "";
 	}
 	
@@ -142,8 +145,10 @@ public class AuthorityController {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
+
 		Authority e = service.save(customMapper.toSaveEntity(entity));
-		return ResponseEntity.status(HttpStatus.CREATED).body(e);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ID)
@@ -179,12 +184,13 @@ public class AuthorityController {
 			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(o.get(), entity)));
+		Authority e = this.service.save(customMapper.toEditEntity(o.get(), entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@PatchMapping(ID + AMODULES)
-	public ResponseEntity<Authority> assignModules(@RequestBody List<Module> modules, @PathVariable Long id) 
+	public ResponseEntity<AuthorityDTO> assignModules(@RequestBody List<ModuleDTO> modules, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IllegalArgumentException {
 		if (id <= 0) {
 			throw new IllegalArgumentException("Id no puede ser cero o negativo");
@@ -194,12 +200,13 @@ public class AuthorityController {
 			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.assignModules(o.get(), modules));
+		Authority e = this.service.assignModules(o.get(), listMapper.mapList(modules, Module.class));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@PatchMapping(ID + RMODULE)
-	public ResponseEntity<Authority> removeModule(@RequestBody Module module, @PathVariable Long id) 
+	public ResponseEntity<AuthorityDTO> removeModule(@RequestBody ModuleDTO module, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IllegalArgumentException {
 		if (id <= 0) {
 			throw new IllegalArgumentException("Id no puede ser cero o negativo");
@@ -209,8 +216,9 @@ public class AuthorityController {
 			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.removeModule(o.get(), module));
+		Authority e = this.service.removeModule(o.get(), customMapper2.toEntity(module));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ERROR + ID)

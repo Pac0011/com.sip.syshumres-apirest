@@ -1,32 +1,65 @@
 package com.sip.syshumres_apirest.controllers;
 
+import java.util.Objects;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonCatalogController;
+import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_entities.OtherReasonQuitJob;
+import com.sip.syshumres_entities.dtos.OtherReasonQuitJobDTO;
+import com.sip.syshumres_exceptions.EntityIdNotFoundException;
+import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.OtherReasonQuitJobService;
 import com.sip.syshumres_utils.StringTrim;
 
 
 @RestController
 @RequestMapping(OtherReasonQuitJobController.URLENDPOINT)
-public class OtherReasonQuitJobController extends CommonCatalogController<OtherReasonQuitJob, 
-	OtherReasonQuitJobService> {
+public class OtherReasonQuitJobController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "other-reason-quit-job";
 	
+	private OtherReasonQuitJobService service;
+	
+	@Autowired
+	public OtherReasonQuitJobController(OtherReasonQuitJobService service, 
+			ModelMapper modelMapper,
+			ListMapper listMapper) {
+		this.service = service;
+		this.modelMapper = modelMapper;
+		this.listMapper = listMapper;
+	}
+	
 	@GetMapping(PAGE)
-	public ResponseEntity<Page<OtherReasonQuitJob>> list(Pageable pageable) {
+	public ResponseEntity<Page<OtherReasonQuitJobDTO>> list(Pageable pageable) {
 		Page<OtherReasonQuitJob> entities = this.service.findByFilterSession(this.filter, pageable);
+		
+		Page<OtherReasonQuitJobDTO> entitiesPageDTO = entities.map(entity -> {
+			OtherReasonQuitJobDTO dto = modelMapper.map(entity, OtherReasonQuitJobDTO.class);
+		    return dto;
+		});
 
-		return ResponseEntity.ok().body(entities);
+		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
 	
 	/**
@@ -36,7 +69,7 @@ public class OtherReasonQuitJobController extends CommonCatalogController<OtherR
      * @return Page object with entitys after sorting
      */
 	@GetMapping(PAGEORDER)
-	public ResponseEntity<Page<OtherReasonQuitJob>> list(Pageable pageable, Sort sort) {
+	public ResponseEntity<Page<OtherReasonQuitJobDTO>> list(Pageable pageable, Sort sort) {
 		this.filter = "";
 		return this.list(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
 	}
@@ -48,7 +81,7 @@ public class OtherReasonQuitJobController extends CommonCatalogController<OtherR
      * @return Page object with entitys after filtering
      */
 	@GetMapping(PAGEFILTER)
-	public ResponseEntity<Page<OtherReasonQuitJob>> list(String text, Pageable pageable) {
+	public ResponseEntity<Page<OtherReasonQuitJobDTO>> list(String text, Pageable pageable) {
 		this.filter = StringTrim.trimAndRemoveDiacriticalMarks(text);
 		return this.list(pageable);
 	}
@@ -61,9 +94,65 @@ public class OtherReasonQuitJobController extends CommonCatalogController<OtherR
      * @return Page object with entitys after filtering and sorting
      */
 	@GetMapping(PAGEFILTERORDER)
-	public ResponseEntity<Page<OtherReasonQuitJob>> list(String text, Pageable pageable, Sort sort) {
+	public ResponseEntity<Page<OtherReasonQuitJobDTO>> list(String text, Pageable pageable, Sort sort) {
 		Pageable pageableOrder = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 		return this.list(text, pageableOrder);
+	}
+	
+	@PostMapping
+	public ResponseEntity<?> create(@Valid @RequestBody OtherReasonQuitJobDTO entity, BindingResult result) {
+		if (result.hasErrors()) {
+			return ErrorsBindingFields.validate(result);
+		}
+		
+		OtherReasonQuitJob e = new OtherReasonQuitJob();
+		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
+		e.setEnabled(entity.isEnabled());
+		OtherReasonQuitJob e2 = this.service.save(e);
+		
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(modelMapper.map(e2, OtherReasonQuitJobDTO.class));
+	}
+	
+	@GetMapping(ID)
+	public ResponseEntity<OtherReasonQuitJobDTO> formEdit(@PathVariable Long id) 
+			throws EntityIdNotFoundException, IllegalArgumentException {
+		if (id <= 0) {
+			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+		}
+		Optional<OtherReasonQuitJob> entity = this.service.findById(id);
+		if(entity.isEmpty()) {
+			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
+		}
+		
+		return ResponseEntity.ok(modelMapper.map(entity.get(), OtherReasonQuitJobDTO.class));
+	}
+	
+	@PutMapping(ID)
+	public ResponseEntity<?> edit(@Valid @RequestBody OtherReasonQuitJobDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+		if (result.hasErrors()) {
+			return ErrorsBindingFields.validate(result);
+		}
+		
+		if (id <= 0) {
+			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+		}
+		if(!Objects.equals(id, entity.getId())){
+			throw new IdsEntityNotEqualsException("Ids de documento de contratación no coinciden para actualización");
+        }
+		Optional<OtherReasonQuitJob> o = this.service.findById(id);
+		if (!o.isPresent()) {
+			throw new EntityIdNotFoundException("Id documento de contratación " + id + " no encontrado");
+		}
+		
+		OtherReasonQuitJob e = o.get();
+		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
+		e.setEnabled(entity.isEnabled());
+		OtherReasonQuitJob e2 = this.service.save(e);
+		
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(modelMapper.map(e2, OtherReasonQuitJobDTO.class));
 	}
 
 }

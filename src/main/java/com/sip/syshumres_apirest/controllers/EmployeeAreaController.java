@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.EmployeeAreaMapper;
 import com.sip.syshumres_entities.EmployeeArea;
 import com.sip.syshumres_entities.dtos.EmployeeAreaDTO;
@@ -37,22 +38,14 @@ import com.sip.syshumres_utils.StringTrim;
 
 @RestController
 @RequestMapping(EmployeeAreaController.URLENDPOINT)
-public class EmployeeAreaController {
+public class EmployeeAreaController extends CommonController {
 	
 	public static final String URLENDPOINT = "employee-areas";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	
     private EmployeeAreaService service;
     
     private EmployeeAreaMapper customMapper;
 		
-	private String filter;
-
 	@Autowired
 	public EmployeeAreaController(EmployeeAreaService service, 
 			EmployeeAreaMapper customMapper) {
@@ -121,8 +114,10 @@ public class EmployeeAreaController {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toSaveEntity(entity)));
+		
+		EmployeeArea e = service.save(customMapper.toSaveEntity(entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ID)
@@ -162,8 +157,9 @@ public class EmployeeAreaController {
 			throw new FatherAssignException("El padre del area no puede ser ella misma");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(e, entity)));
+		EmployeeArea e2 = this.service.save(customMapper.toEditEntity(e, entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e2));
 	}
 
 }

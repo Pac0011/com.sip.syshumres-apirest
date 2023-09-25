@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.ModuleCustomMapper;
 import com.sip.syshumres_entities.Module;
 import com.sip.syshumres_entities.dtos.EntitySelectDTO;
@@ -38,22 +39,14 @@ import com.sip.syshumres_utils.StringTrim;
 
 @RestController
 @RequestMapping(ModuleController.URLENDPOINT)
-public class ModuleController {
+public class ModuleController extends CommonController {
 	
 	public static final String URLENDPOINT = "modules";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	
 	private ModuleService service;
 	
 	private ModuleCustomMapper customMapper;
 		
-	private String filter;
-
 	@Autowired
 	public ModuleController(ModuleService service, 
 			ModuleCustomMapper customMapper) {
@@ -129,8 +122,9 @@ public class ModuleController {
 			return ErrorsBindingFields.validate(result);
 		}
 		
+		Module e = service.save(customMapper.toSaveEntity(entity));
 		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toSaveEntity(entity)));
+				body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ID)
@@ -170,8 +164,9 @@ public class ModuleController {
 			throw new FatherAssignException("El padre del modulo no puede ser el mismo");
 		}
 
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(entityDb, entity)));
+		Module e = this.service.save(customMapper.toEditEntity(entityDb, entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 
 }

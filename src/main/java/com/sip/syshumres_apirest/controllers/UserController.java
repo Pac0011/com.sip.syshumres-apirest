@@ -26,9 +26,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.mappers.AuthorityMapper;
+import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_apirest.mappers.UserMapper;
 import com.sip.syshumres_entities.Authority;
 import com.sip.syshumres_entities.User;
+import com.sip.syshumres_entities.dtos.AuthorityDTO;
 import com.sip.syshumres_entities.dtos.UserDTO;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
@@ -45,15 +49,9 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = "UserController", description = "REST APIs related to User Entity")
 @RestController
 @RequestMapping(UserController.URLENDPOINT)
-public class UserController {
+public class UserController extends CommonController {
 	
 	public static final String URLENDPOINT = "users";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	public static final String CHANGE = "/change-password";
 	public static final String AUTHORITIES = "/authorities";
 	public static final String AAUTHORITIES = "/assign-authorities";
@@ -62,14 +60,20 @@ public class UserController {
 	private UserService service;
 	
 	private UserMapper customMapper;
-		
-	private String filter;
 	
+	private AuthorityMapper customMapper2;
+	
+	private ListMapper listMapper;
+			
 	@Autowired
 	public UserController(UserService service, 
-			UserMapper customMapper) {
+			UserMapper customMapper,
+			AuthorityMapper customMapper2,
+			ListMapper listMapper) {
 		this.service = service;
 		this.customMapper = customMapper;
+		this.customMapper2 = customMapper2;
+		this.listMapper = listMapper;
 		this.filter = "";
 	}
 	
@@ -142,8 +146,9 @@ public class UserController {
 		//valid password and encode
 		entity.setPassword(this.service.encodePassword(entity.getPassword()));
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(user));
+		User e = service.save(user);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@ApiOperation(value = "Form to edit User", response = Iterable.class, tags = "formEdit")
@@ -192,8 +197,9 @@ public class UserController {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(entityDb));
+		User e = this.service.save(entityDb);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@PatchMapping(ID + CHANGE)
@@ -240,7 +246,7 @@ public class UserController {
 	}
 	
 	@PatchMapping(ID + AAUTHORITIES)
-	public ResponseEntity<User> assignAuthorities(@RequestBody List<Authority> authorities, @PathVariable Long id) 
+	public ResponseEntity<UserDTO> assignAuthorities(@RequestBody List<AuthorityDTO> authorities, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IllegalArgumentException {
 		if (id <= 0) {
 			throw new IllegalArgumentException("Id no puede ser cero o negativo");
@@ -250,11 +256,13 @@ public class UserController {
 			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.assignAuthorities(o.get(), authorities) );
+		User e = this.service.assignAuthorities(o.get(), listMapper.mapList(authorities, Authority.class));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@PatchMapping(ID + RAUTHORITY)
-	public ResponseEntity<User> removeAuthority(@RequestBody Authority authority, @PathVariable Long id) 
+	public ResponseEntity<UserDTO> removeAuthority(@RequestBody AuthorityDTO authority, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IllegalArgumentException {
 		if (id <= 0) {
 			throw new IllegalArgumentException("Id no puede ser cero o negativo");
@@ -264,7 +272,9 @@ public class UserController {
 			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
 		}
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.removeAuthority(o.get(), authority));
+		User e = this.service.removeAuthority(o.get(), customMapper2.toEntity(authority));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 
 }

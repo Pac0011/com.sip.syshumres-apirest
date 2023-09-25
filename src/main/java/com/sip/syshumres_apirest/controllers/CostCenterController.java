@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.CostCenterMapper;
 import com.sip.syshumres_entities.CostCenter;
 import com.sip.syshumres_entities.dtos.CostCenterDTO;
@@ -36,22 +37,14 @@ import com.sip.syshumres_utils.StringTrim;
 
 @RestController
 @RequestMapping(CostCenterController.URLENDPOINT)
-public class CostCenterController {
+public class CostCenterController extends CommonController {
 	
 	public static final String URLENDPOINT = "cost-centers";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	
 	private CostCenterService service;
 	
 	private CostCenterMapper customMapper;
-	
-	private String filter;
-	
+		
 	@Autowired
 	public CostCenterController(CostCenterService service, CostCenterMapper customMapper) {
 		this.service = service;
@@ -119,8 +112,10 @@ public class CostCenterController {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toSaveEntity(entity)));
+		
+		CostCenter e = service.save(customMapper.toSaveEntity(entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@PutMapping(ID)
@@ -141,8 +136,9 @@ public class CostCenterController {
 			throw new EntityIdNotFoundException("Id centro de costos " + id + " no encontrado");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(o.get(), entity)));
+		CostCenter e = this.service.save(customMapper.toEditEntity(o.get(), entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 
 }

@@ -23,9 +23,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.mappers.BranchOfficeMapper;
+import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_apirest.mappers.ManagingCompanyMapper;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.ManagingCompany;
+import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
 import com.sip.syshumres_entities.dtos.ManagingCompanyDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
@@ -36,15 +40,9 @@ import com.sip.syshumres_utils.StringTrim;
 
 @RestController
 @RequestMapping(ManagingCompanyController.URLENDPOINT)
-public class ManagingCompanyController {
+public class ManagingCompanyController extends CommonController {
 	
 	public static final String URLENDPOINT = "managing-companies";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	public static final String BRANCHOFFICES = "/branch-offices";
 	public static final String ABRANCHOFFICES = "/assign-branch-offices";
 	public static final String RBRANCHOFFICE = "/remove-branch-office";
@@ -52,14 +50,20 @@ public class ManagingCompanyController {
 	private ManagingCompanyService service;
 	
 	private ManagingCompanyMapper customMapper;
+	
+	private BranchOfficeMapper customMapper2;
+	
+	private ListMapper listMapper;
 		
-	private String filter;
-
 	@Autowired
 	public ManagingCompanyController(ManagingCompanyService service, 
-			ManagingCompanyMapper customMapper) {
+			ManagingCompanyMapper customMapper,
+			BranchOfficeMapper customMapper2,
+			ListMapper listMapper) {
 		this.service = service;
 		this.customMapper = customMapper;
+		this.customMapper2 = customMapper2;
+		this.listMapper = listMapper;
 		this.filter = "";
 	}
 	
@@ -130,8 +134,10 @@ public class ManagingCompanyController {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toSaveEntity(entity)));
+		
+		ManagingCompany e = service.save(customMapper.toSaveEntity(entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ID)
@@ -166,12 +172,13 @@ public class ManagingCompanyController {
 			throw new EntityIdNotFoundException("Id administradora " + id + " no encontrado");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(o.get(), entity)));
+		ManagingCompany e = this.service.save(customMapper.toEditEntity(o.get(), entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@PatchMapping(ID + ABRANCHOFFICES)
-	public ResponseEntity<ManagingCompany> assignBranchOffices(@RequestBody List<BranchOffice> branchOffices, @PathVariable Long id) 
+	public ResponseEntity<ManagingCompanyDTO> assignBranchOffices(@RequestBody List<BranchOfficeDTO> branchOffices, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IllegalArgumentException {
 		if (id <= 0) {
 			throw new IllegalArgumentException("Id no puede ser cero o negativo");
@@ -181,12 +188,13 @@ public class ManagingCompanyController {
 			throw new EntityIdNotFoundException("Id administradora " + id + " no encontrado");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.assignBranchOffices(o.get(), branchOffices));
+		ManagingCompany e = this.service.assignBranchOffices(o.get(), listMapper.mapList(branchOffices, BranchOffice.class));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@PatchMapping(ID + RBRANCHOFFICE)
-	public ResponseEntity<ManagingCompany> removeBranchOffice(@RequestBody BranchOffice branchOffice, @PathVariable Long id) 
+	public ResponseEntity<ManagingCompanyDTO> removeBranchOffice(@RequestBody BranchOfficeDTO branchOffice, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IllegalArgumentException {
 		if (id <= 0) {
 			throw new IllegalArgumentException("Id no puede ser cero o negativo");
@@ -196,8 +204,9 @@ public class ManagingCompanyController {
 			throw new EntityIdNotFoundException("Id administradora " + id + " no encontrado");
 		}
 
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.removeBranchOffice(o.get(), branchOffice));
+		ManagingCompany e = this.service.removeBranchOffice(o.get(), customMapper2.toEntity(branchOffice));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 
 }

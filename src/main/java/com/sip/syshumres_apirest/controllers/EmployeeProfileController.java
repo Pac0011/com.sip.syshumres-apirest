@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
 import com.sip.syshumres_entities.EmployeeProfile;
 import com.sip.syshumres_entities.User;
@@ -53,17 +54,12 @@ import org.springframework.core.io.Resource;
 
 @RestController
 @RequestMapping(EmployeeProfileController.URLENDPOINT)
-public class EmployeeProfileController {
+public class EmployeeProfileController extends CommonController {
 	
 	public static final String URLENDPOINT = "employee-profiles";
-	public static final String ACTIVE = "/active";
 	public static final String PAGE = "/page";
 	public static final String OPER = "/oper";
 	public static final String ADM = "/adm";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	public static final String UPLOADFILE = "/upload-file";
 	public static final String DOCUMENT = "/document";
 	public static final String FILTER = "/filter";
@@ -72,9 +68,7 @@ public class EmployeeProfileController {
     private EmployeeProfileService service;
     
     private EmployeeProfileMapper customMapper;
-		
-	private String filter;
-	
+			
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;
 	
@@ -157,8 +151,8 @@ public class EmployeeProfileController {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(employeeProfile));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(service.save(employeeProfile)));
 	}
 	
 	@GetMapping(ID)
@@ -201,8 +195,8 @@ public class EmployeeProfileController {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(entityDb));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(this.service.save(entityDb)));
 	}
 	
 	@PutMapping(ID + UPLOADFILE)
@@ -302,7 +296,7 @@ public class EmployeeProfileController {
 	}
 	
 	@GetMapping(FILTER)
-	public ResponseEntity<Page<EmployeeProfile>> list(@RequestParam Long idEmployeeType, Pageable pageable, HttpSession session) 
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> list(@RequestParam Long idEmployeeType, Pageable pageable, HttpSession session) 
 			throws UserSessionNotFoundException {
 		User userSession = (User) session.getAttribute(this.sessionUserName);
 		//System.out.println(branchOfficeSession.getDescription());
@@ -310,9 +304,17 @@ public class EmployeeProfileController {
 			throw new UserSessionNotFoundException();
 		}
 		if (userSession.isSeeAllBranchs()) {
-			return ResponseEntity.ok(service.listEmployeeType(idEmployeeType, pageable));
+			Page<EmployeeProfileViewDTO> entitiesPageDTO =  service.listEmployeeType(idEmployeeType, pageable)
+				.map(entity -> {
+			    return customMapper.toViewDto(entity);
+			});
+			return ResponseEntity.ok(entitiesPageDTO);
 		}
-		return ResponseEntity.ok(service.listEmployeeType(userSession.getBranchOffice().getId(), idEmployeeType, pageable));
+		Page<EmployeeProfileViewDTO> entitiesPageDTO =  service.listEmployeeType(userSession.getBranchOffice().getId(), idEmployeeType, pageable)
+			.map(entity -> {
+		    return customMapper.toViewDto(entity);
+		});
+		return ResponseEntity.ok(entitiesPageDTO);
 	}
 	
 	@GetMapping(SEARCHNAMERELATIONSHIP)

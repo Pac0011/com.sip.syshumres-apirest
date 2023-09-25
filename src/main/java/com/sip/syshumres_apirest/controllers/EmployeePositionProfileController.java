@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.EmployeePositionProfileMapper;
 import com.sip.syshumres_entities.EmployeePositionProfile;
 import com.sip.syshumres_entities.dtos.EmployeePositionProfileDTO;
@@ -36,22 +37,14 @@ import com.sip.syshumres_utils.StringTrim;
 
 @RestController
 @RequestMapping(EmployeePositionProfileController.URLENDPOINT)
-public class EmployeePositionProfileController {
+public class EmployeePositionProfileController extends CommonController {
 	
 	public static final String URLENDPOINT = "employee-position-profiles";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
 	
 	private EmployeePositionProfileService service;
 	
 	private EmployeePositionProfileMapper customMapper;
-	
-	private String filter;
-	
+		
 	@Autowired
 	public EmployeePositionProfileController(EmployeePositionProfileService service, 
 			EmployeePositionProfileMapper customMapper) {
@@ -121,8 +114,9 @@ public class EmployeePositionProfileController {
 			return ErrorsBindingFields.validate(result);
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toSaveEntity(entity)));
+		EmployeePositionProfile e = service.save(customMapper.toSaveEntity(entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ID)
@@ -157,8 +151,9 @@ public class EmployeePositionProfileController {
 			throw new EntityIdNotFoundException("Id perfil puesto " + id + " no encontrado");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(o.get(), entity)));
+		EmployeePositionProfile e = this.service.save(customMapper.toEditEntity(o.get(), entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 
 }

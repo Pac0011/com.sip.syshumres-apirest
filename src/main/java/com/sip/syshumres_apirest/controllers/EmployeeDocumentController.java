@@ -53,9 +53,10 @@ public class EmployeeDocumentController {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
-		EmployeeDocument s = service.save(this.modelMapper.map(entity, EmployeeDocument.class));
+		EmployeeDocument e = service.save(this.modelMapper.map(entity, EmployeeDocument.class));
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(s);
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(this.modelMapper.map(e, EmployeeDocumentDTO.class));
 	}
 	
 	@PutMapping(IDUPLOADFILE)

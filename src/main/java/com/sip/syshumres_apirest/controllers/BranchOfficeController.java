@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.BranchOfficeMapper;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
@@ -40,22 +41,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping(BranchOfficeController.URLENDPOINT)
-public class BranchOfficeController {
+public class BranchOfficeController extends CommonController {
 	
 	public static final String URLENDPOINT = "branch-offices";
-	public static final String ACTIVE = "/active";
-	public static final String PAGE = "/page";
-	public static final String PAGEORDER = "/page-order";
-	public static final String PAGEFILTER = "/page-filter";
-	public static final String PAGEFILTERORDER = "/page-filter-order";
-	public static final String ID = "/{id}";
-	public static final String ERROR = "/error";
 	
 	private BranchOfficeService service;
 	
 	private BranchOfficeMapper customMapper;
-	
-	private String filter;
 
 	@Autowired
 	public BranchOfficeController(BranchOfficeService service, 
@@ -125,8 +117,10 @@ public class BranchOfficeController {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(service.save(customMapper.toCreateEntity(entity)));
+		
+		BranchOffice e = service.save(customMapper.toCreateEntity(entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ID)
@@ -166,8 +160,9 @@ public class BranchOfficeController {
 			throw new FatherAssignException("El padre de la sucursal no puede ser ella misma");
 		}
 		
-		return ResponseEntity.status(HttpStatus.CREATED).
-				body(this.service.save(customMapper.toEditEntity(entityDb, entity)));
+		BranchOffice e = this.service.save(customMapper.toEditEntity(entityDb, entity));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(customMapper.toDto(e));
 	}
 	
 	@GetMapping(ERROR + ID)
