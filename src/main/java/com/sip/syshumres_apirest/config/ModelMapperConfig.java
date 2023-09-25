@@ -15,6 +15,7 @@ import com.sip.syshumres_apirest.mappers.EmployeePayrollMapper;
 import com.sip.syshumres_apirest.mappers.EmployeePositionMapper;
 import com.sip.syshumres_apirest.mappers.EmployeePositionProfileMapper;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
+import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_apirest.mappers.ManagingCompanyMapper;
 import com.sip.syshumres_apirest.mappers.ModuleCustomMapper;
 import com.sip.syshumres_apirest.mappers.ProspectProfileMapper;
@@ -26,6 +27,11 @@ public class ModelMapperConfig {
 	@Bean
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
+	}
+	
+	@Bean
+	public ListMapper listMapper() {
+		return new ListMapper();
 	}
 	
 	@Bean

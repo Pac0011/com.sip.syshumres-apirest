@@ -19,6 +19,10 @@ public class ModuleCustomMapper {
 	public ModuleCustomMapper() {
 	}
 	
+	public Module toEntity(ModuleDTO entity) {
+		return modelMapper.map(entity, Module.class);
+	}
+	
 	public ModuleDTO toDto(Module entity) {
 		ModuleDTO dto = new ModuleDTO();
 		

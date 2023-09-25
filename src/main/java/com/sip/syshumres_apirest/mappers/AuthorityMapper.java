@@ -19,6 +19,10 @@ public class AuthorityMapper {
 	public AuthorityMapper() {
 	}
 	
+	public Authority toEntity(AuthorityDTO entity) {
+		return modelMapper.map(entity, Authority.class);
+	}
+	
 	public AuthorityDTO toDto(Authority entity) {
 		AuthorityDTO dto = new AuthorityDTO();
 		dto.setId(entity.getId());

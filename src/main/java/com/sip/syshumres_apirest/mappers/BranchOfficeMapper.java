@@ -26,6 +26,10 @@ public class BranchOfficeMapper {
 	public BranchOfficeMapper() {
 	}
 	
+	public BranchOffice toEntity(BranchOfficeDTO entity) {
+		return modelMapper.map(entity, BranchOffice.class);
+	}
+	
 	public BranchOfficeDTO toDto(BranchOffice entity) {
 		BranchOfficeDTO dto = new BranchOfficeDTO();
 		dto.setId(entity.getId());
