@@ -10,6 +10,7 @@ import com.sip.syshumres_entities.InvoicedResourceType;
 import com.sip.syshumres_entities.FactorDiscountInfonavit;
 import com.sip.syshumres_entities.PayrollType;
 import com.sip.syshumres_entities.TypeHiring;
+import com.sip.syshumres_entities.AddressState;
 import com.sip.syshumres_entities.dtos.EmployeePayrollDTO;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -40,8 +41,11 @@ public class EmployeePayrollMapper {
 	    }
 		
 		//EmployeeAddressFiscal
-		e.getEmployeeAddressFiscal().
-			setAddressState(entity.getEmployeeAddressFiscal().getAddressState());
+		if (entity.getEmployeeAddressFiscal().getAddressState() != null) {
+			e.getEmployeeAddressFiscal().setAddressState(this.modelMapper
+					.map(entity.getEmployeeAddressFiscal().getAddressState(), 
+							AddressState.class));
+		}
 		e.getEmployeeAddressFiscal().
 			setCity(StringTrim.trimAndRemoveDiacriticalMarks(entity.
 					getEmployeeAddressFiscal().getCity()));
