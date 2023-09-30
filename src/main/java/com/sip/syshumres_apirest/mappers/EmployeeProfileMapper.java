@@ -20,7 +20,7 @@ import com.sip.syshumres_entities.dtos.EmployeeLaborDataDTO;
 import com.sip.syshumres_entities.dtos.EmployeePayrollDTO;
 import com.sip.syshumres_entities.dtos.EmployeeProfileDTO;
 import com.sip.syshumres_entities.dtos.EmployeeProfileViewDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_entities.dtos.EmployeeAddressDTO;
 import com.sip.syshumres_utils.StringTrim;
 

@@ -27,7 +27,7 @@ import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.BranchOfficeMapper;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.FatherAssignException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;

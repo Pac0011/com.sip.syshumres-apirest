@@ -27,7 +27,7 @@ import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.EmployeeAreaMapper;
 import com.sip.syshumres_entities.EmployeeArea;
 import com.sip.syshumres_entities.dtos.EmployeeAreaDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.FatherAssignException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sip.syshumres_entities.EmployeePosition;
 import com.sip.syshumres_entities.EmployeeType;
 import com.sip.syshumres_entities.dtos.EmployeePositionDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 

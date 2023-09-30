@@ -24,10 +24,10 @@ import com.sip.syshumres_apirest.controllers.common.CommonCatalogController;
 import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_entities.InvoicedResourceType;
 import com.sip.syshumres_entities.dtos.InvoicedResourceTypeDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_services.InvoicedResourceTypeService;
 import com.sip.syshumres_utils.StringTrim;
 

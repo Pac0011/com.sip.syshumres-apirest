@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sip.syshumres_entities.CostCenter;
 import com.sip.syshumres_entities.EmployeeArea;
 import com.sip.syshumres_entities.dtos.EmployeeAreaDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 

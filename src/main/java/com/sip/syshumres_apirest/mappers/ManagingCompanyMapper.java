@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sip.syshumres_entities.Address;
 import com.sip.syshumres_entities.ManagingCompany;
 import com.sip.syshumres_entities.TypeHiring;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
 import com.sip.syshumres_entities.dtos.ManagingCompanyDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_entities.dtos.AddressDTO;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -32,7 +32,6 @@ public class ManagingCompanyMapper {
 		dto.setPhoneNumber(entity.getPhoneNumber());
 	    dto.setExtPhoneNumber(entity.getExtPhoneNumber());
 	    dto.setShortPhoneNumber(entity.getShortPhoneNumber());
-	    dto.setFullPhoneNumber(entity.getFullPhoneNumber());
 	    dto.setEmail(entity.getEmail());
 	    
 		dto.setCompanyName(entity.getCompanyName());

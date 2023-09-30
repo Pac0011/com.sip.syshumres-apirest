@@ -14,7 +14,7 @@ import com.sip.syshumres_entities.BranchOfficeType;
 import com.sip.syshumres_entities.CostCenter;
 import com.sip.syshumres_entities.Region;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_entities.dtos.AddressDTO;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -34,7 +34,6 @@ public class BranchOfficeMapper {
 		BranchOfficeDTO dto = new BranchOfficeDTO();
 		dto.setId(entity.getId());
 		dto.setDescription(entity.getDescription());
-		dto.setFullPhoneNumber(entity.getFullPhoneNumber());
 		dto.setPhoneNumber(entity.getPhoneNumber());
 	    dto.setExtPhoneNumber(entity.getExtPhoneNumber());
 	    dto.setShortPhoneNumber(entity.getShortPhoneNumber());

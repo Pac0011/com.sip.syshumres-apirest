@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sip.syshumres_entities.Authority;
 import com.sip.syshumres_entities.dtos.AuthorityDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 public class AuthorityMapper {

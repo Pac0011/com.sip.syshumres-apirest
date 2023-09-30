@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sip.syshumres_entities.ProspectProfile;
 import com.sip.syshumres_entities.ProspectStatus;
 import com.sip.syshumres_entities.dtos.ProspectProfileDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 

@@ -27,7 +27,7 @@ import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.EmployeePositionProfileMapper;
 import com.sip.syshumres_entities.EmployeePositionProfile;
 import com.sip.syshumres_entities.dtos.EmployeePositionProfileDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;

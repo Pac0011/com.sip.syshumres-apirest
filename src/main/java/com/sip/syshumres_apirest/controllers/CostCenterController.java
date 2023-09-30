@@ -27,7 +27,7 @@ import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.CostCenterMapper;
 import com.sip.syshumres_entities.CostCenter;
 import com.sip.syshumres_entities.dtos.CostCenterDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.UserDTO;
-import com.sip.syshumres_entities.dtos.EntitySelectDTO;
+import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_utils.StringTrim;
 
 public class UserMapper {
