@@ -20,7 +20,7 @@ import com.sip.syshumres_services.BranchOfficeService;
 @SpringBootTest
 @TestPropertySource(locations = "/application-test.properties")
 @AutoConfigureMockMvc(addFilters = false)//no aplica filtros de autenticacion
-public class BranchOfficeTest {
+public class BranchOfficeServiceIT {
 	
 	  @Autowired
 	  private BranchOfficeService service;
