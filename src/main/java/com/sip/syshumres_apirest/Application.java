@@ -15,7 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = {"com.sip.syshumres_repositories"})
 @SpringBootApplication(scanBasePackages = {
 		"com.sip.syshumres_exceptions", 
-		"com.sip.syshumres-utils",
+		"com.sip.syshumres_utils",
 		"com.sip.syshumres_services", 
 		"com.sip.syshumres_apirest"})
 @EnableAspectJAutoProxy(proxyTargetClass=true)

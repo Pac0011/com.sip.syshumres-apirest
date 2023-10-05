@@ -147,7 +147,7 @@ public class BranchOfficeController extends CommonController {
 		if (id <= 0) {
 			throw new IllegalArgumentException("Id no puede ser cero o negativo");
 		}
-		if(!Objects.equals(id, entity.getId())){
+		if (!Objects.equals(id, entity.getId())) {
 			throw new IdsEntityNotEqualsException("Ids de sucursal no coinciden para actualización");
         }
 		Optional<BranchOffice> o = this.service.findById(id);
