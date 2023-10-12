@@ -38,7 +38,7 @@ public class DriverLicenseTypeController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "driver-license-types";
 	
-	private DriverLicenseTypeService service;
+	private final DriverLicenseTypeService service;
 	
 	@Autowired
 	public DriverLicenseTypeController(DriverLicenseTypeService service, 

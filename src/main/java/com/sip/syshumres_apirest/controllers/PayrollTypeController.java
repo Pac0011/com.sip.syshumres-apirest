@@ -39,7 +39,7 @@ public class PayrollTypeController extends CommonCatalogController {
 	public static final String URLENDPOINT = "payroll-types";
 	public static final String NORMAL = "/normal";
 	
-	private PayrollTypeService service;
+	private final PayrollTypeService service;
 	
 	@Autowired
 	public PayrollTypeController(PayrollTypeService service, 

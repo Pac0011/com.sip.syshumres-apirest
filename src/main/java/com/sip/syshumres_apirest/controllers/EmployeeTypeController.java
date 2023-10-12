@@ -36,7 +36,7 @@ public class EmployeeTypeController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "employee-types";
 	
-	private EmployeeTypeService service;
+	private final EmployeeTypeService service;
 	
 	@Autowired
 	public EmployeeTypeController(EmployeeTypeService service, 

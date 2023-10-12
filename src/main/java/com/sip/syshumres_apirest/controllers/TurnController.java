@@ -36,7 +36,7 @@ public class TurnController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "turns";
 	
-	private TurnService service;
+	private final TurnService service;
 	
 	@Autowired
 	public TurnController(TurnService service, 

@@ -43,7 +43,7 @@ public class HiringDocumentsController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "hiring-documents";
 	
-	private HiringDocumentsService service;
+	private final HiringDocumentsService service;
 	
 	@Autowired
 	public HiringDocumentsController(HiringDocumentsService service, 

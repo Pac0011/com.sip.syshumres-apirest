@@ -47,13 +47,13 @@ public class ManagingCompanyController extends CommonController {
 	public static final String ABRANCHOFFICES = "/assign-branch-offices";
 	public static final String RBRANCHOFFICE = "/remove-branch-office";
 	
-	private ManagingCompanyService service;
+	private final ManagingCompanyService service;
 	
-	private ManagingCompanyMapper customMapper;
+	private final ManagingCompanyMapper customMapper;
 	
-	private BranchOfficeMapper customMapper2;
+	private final BranchOfficeMapper customMapper2;
 	
-	private ListMapper listMapper;
+	private final ListMapper listMapper;
 		
 	@Autowired
 	public ManagingCompanyController(ManagingCompanyService service, 

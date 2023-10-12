@@ -38,7 +38,7 @@ public class GenderController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "genders";
 	
-	private GenderService service;
+	private final GenderService service;
 	
 	@Autowired
 	public GenderController(GenderService service, 

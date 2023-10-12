@@ -41,7 +41,7 @@ public class BranchOfficeTypeController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "branch-offices-types";
 	
-	private BranchOfficeTypeService service;
+	private final BranchOfficeTypeService service;
 	
 	@Autowired
 	public BranchOfficeTypeController(BranchOfficeTypeService service, 

@@ -37,7 +37,7 @@ public class ReasonQuitJobController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "reason-quit-job";
 	
-	private ReasonQuitJobService service;
+	private final ReasonQuitJobService service;
 	
 	@Autowired
 	public ReasonQuitJobController(ReasonQuitJobService service, 

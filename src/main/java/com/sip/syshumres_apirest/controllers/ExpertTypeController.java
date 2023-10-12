@@ -38,7 +38,7 @@ public class ExpertTypeController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "expert-types";
 	
-	private ExpertTypeService service;
+	private final ExpertTypeService service;
 	
 	@Autowired
 	public ExpertTypeController(ExpertTypeService service, 

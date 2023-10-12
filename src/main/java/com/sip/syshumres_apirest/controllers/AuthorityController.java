@@ -53,13 +53,13 @@ public class AuthorityController extends CommonController {
 	public static final String AMODULES = "/assign-modules";
 	public static final String RMODULE = "/remove-module";
 	
-    private AuthorityService service;
+    private final AuthorityService service;
     
-    private AuthorityMapper customMapper;
+    private final AuthorityMapper customMapper;
     
-    private ModuleCustomMapper customMapper2;
+    private final ModuleCustomMapper customMapper2;
     
-    private ListMapper listMapper;
+    private final ListMapper listMapper;
     
     @Autowired
 	public AuthorityController(AuthorityService service, 

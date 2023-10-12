@@ -38,7 +38,7 @@ public class EmployeeTypeHealthController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "employee-types-health";
 	
-	private EmployeeTypeHealthService service;
+	private final EmployeeTypeHealthService service;
 	
 	@Autowired
 	public EmployeeTypeHealthController(EmployeeTypeHealthService service, 

@@ -43,9 +43,9 @@ public class ModuleController extends CommonController {
 	
 	public static final String URLENDPOINT = "modules";
 	
-	private ModuleService service;
+	private final ModuleService service;
 	
-	private ModuleCustomMapper customMapper;
+	private final ModuleCustomMapper customMapper;
 		
 	@Autowired
 	public ModuleController(ModuleService service, 

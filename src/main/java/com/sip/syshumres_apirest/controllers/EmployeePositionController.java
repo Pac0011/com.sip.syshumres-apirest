@@ -44,9 +44,9 @@ public class EmployeePositionController extends CommonController {
 	public static final String ADM = "/adm";
 	public static final String OPER = "/oper";
 	
-	private EmployeePositionService service;
+	private final EmployeePositionService service;
 	
-	private EmployeePositionMapper customMapper;
+	private final EmployeePositionMapper customMapper;
 	
 	@Autowired
 	public EmployeePositionController(EmployeePositionService service, 

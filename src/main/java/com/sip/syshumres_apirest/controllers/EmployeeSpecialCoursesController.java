@@ -36,7 +36,7 @@ public class EmployeeSpecialCoursesController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "employee-special-courses";
 	
-	private EmployeeSpecialCoursesService service;
+	private final EmployeeSpecialCoursesService service;
 	
 	@Autowired
 	public EmployeeSpecialCoursesController(EmployeeSpecialCoursesService service, 

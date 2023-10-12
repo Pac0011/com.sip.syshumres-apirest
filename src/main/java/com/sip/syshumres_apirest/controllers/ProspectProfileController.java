@@ -61,22 +61,22 @@ public class ProspectProfileController extends CommonController {
 	public static final String URLENDPOINT = "prospect-profiles";
 	public static final String NEWHIRE = "/new-hire";
 	
-	private ProspectProfileService service;
+	private final ProspectProfileService service;
 	
-	private ProspectProfileMapper customMapper;
+	private final ProspectProfileMapper customMapper;
 		
-	private EmployeeProfileMapper customMapper2;
+	private final EmployeeProfileMapper customMapper2;
 		
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;
 	
-	private ProspectStatusService serviceS;
+	private final ProspectStatusService serviceS;
 	
-	private EmployeeStatusService serviceES;
+	private final EmployeeStatusService serviceES;
 	
-	private BranchOfficeService serviceB;
+	private final BranchOfficeService serviceB;
 	
-	private EmployeeProfileService serviceP;
+	private final EmployeeProfileService serviceP;
 	
     private JmsProducer jmsProducer;
 	

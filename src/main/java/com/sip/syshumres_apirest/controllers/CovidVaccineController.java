@@ -38,7 +38,7 @@ public class CovidVaccineController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "covid-vaccines";
 	
-	private CovidVaccineService service;
+	private final CovidVaccineService service;
 	
 	@Autowired
 	public CovidVaccineController(CovidVaccineService service, 

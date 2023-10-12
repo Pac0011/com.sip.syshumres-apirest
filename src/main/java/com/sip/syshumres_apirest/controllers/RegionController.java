@@ -38,7 +38,7 @@ public class RegionController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "regions";
 	
-	private RegionService service;
+	private final RegionService service;
 	
 	@Autowired
 	public RegionController(RegionService service, 

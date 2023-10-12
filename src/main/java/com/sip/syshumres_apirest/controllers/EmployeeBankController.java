@@ -38,7 +38,7 @@ public class EmployeeBankController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "employee-banks";
 	
-	private EmployeeBankService service;
+	private final EmployeeBankService service;
 	
 	@Autowired
 	public EmployeeBankController(EmployeeBankService service, 

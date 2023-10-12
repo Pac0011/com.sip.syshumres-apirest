@@ -45,9 +45,9 @@ public class BranchOfficeController extends CommonController {
 	
 	public static final String URLENDPOINT = "branch-offices";
 	
-	private BranchOfficeService service;
+	private final BranchOfficeService service;
 	
-	private BranchOfficeMapper customMapper;
+	private final BranchOfficeMapper customMapper;
 
 	@Autowired
 	public BranchOfficeController(BranchOfficeService service, 

@@ -41,11 +41,11 @@ public class PasswordRecoveryController {
 	public static final String UUID = "/{uuid}";
 	public static final String CHANGE = "/change-password";
 	
-	private PasswordRecoveryService service;
+	private final PasswordRecoveryService service;
 	
-	private UserService serviceU;
+	private final UserService serviceU;
 	
-	private EmailService serviceEmail;
+	private final EmailService serviceEmail;
 	
 	@Autowired
 	public PasswordRecoveryController(PasswordRecoveryService service, UserService serviceU,

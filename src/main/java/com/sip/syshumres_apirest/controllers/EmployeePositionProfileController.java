@@ -41,9 +41,9 @@ public class EmployeePositionProfileController extends CommonController {
 	
 	public static final String URLENDPOINT = "employee-position-profiles";
 	
-	private EmployeePositionProfileService service;
+	private final EmployeePositionProfileService service;
 	
-	private EmployeePositionProfileMapper customMapper;
+	private final EmployeePositionProfileMapper customMapper;
 		
 	@Autowired
 	public EmployeePositionProfileController(EmployeePositionProfileService service, 

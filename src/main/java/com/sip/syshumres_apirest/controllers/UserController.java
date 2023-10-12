@@ -57,13 +57,13 @@ public class UserController extends CommonController {
 	public static final String AAUTHORITIES = "/assign-authorities";
 	public static final String RAUTHORITY = "/remove-authority";
 	
-	private UserService service;
+	private final UserService service;
 	
-	private UserMapper customMapper;
+	private final UserMapper customMapper;
 	
-	private AuthorityMapper customMapper2;
+	private final AuthorityMapper customMapper2;
 	
-	private ListMapper listMapper;
+	private final ListMapper listMapper;
 			
 	@Autowired
 	public UserController(UserService service, 

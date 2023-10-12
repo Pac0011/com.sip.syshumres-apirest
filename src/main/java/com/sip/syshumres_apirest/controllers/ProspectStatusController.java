@@ -38,7 +38,7 @@ public class ProspectStatusController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "prospect-status";
 	
-	private ProspectStatusService service;
+	private final ProspectStatusService service;
 	
 	@Autowired
 	public ProspectStatusController(ProspectStatusService service, 

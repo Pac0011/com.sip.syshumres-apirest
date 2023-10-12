@@ -38,7 +38,7 @@ public class MaritalStatusController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "marital-status";
 	
-	private MaritalStatusService service;
+	private final MaritalStatusService service;
 	
 	@Autowired
 	public MaritalStatusController(MaritalStatusService service, 

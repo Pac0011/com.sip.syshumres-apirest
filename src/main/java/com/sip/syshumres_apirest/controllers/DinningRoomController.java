@@ -37,7 +37,7 @@ public class DinningRoomController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "dinning-room";
 	
-	private DinningRoomService service;
+	private final DinningRoomService service;
 	
 	@Autowired
 	public DinningRoomController(DinningRoomService service, 

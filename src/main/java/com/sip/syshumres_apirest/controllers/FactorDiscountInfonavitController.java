@@ -38,7 +38,7 @@ public class FactorDiscountInfonavitController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "factors-discount-infonavit";
 	
-	private FactorDiscountInfonavitService service;
+	private final FactorDiscountInfonavitService service;
 	
 	@Autowired
 	public FactorDiscountInfonavitController(FactorDiscountInfonavitService service, 

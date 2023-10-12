@@ -27,7 +27,7 @@ public class UserSettingsController {
 	public static final String URLENDPOINT = "user-settings";
 	public static final String CHANGE = "/change-password";
 	
-	private UserService service;
+	private final UserService service;
 	
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;

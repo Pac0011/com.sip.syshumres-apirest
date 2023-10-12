@@ -37,7 +37,7 @@ public class BloodTypeController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "blood-type";
 	
-	private BloodTypeService service;
+	private final BloodTypeService service;
 	
 	@Autowired
 	public BloodTypeController(BloodTypeService service, 

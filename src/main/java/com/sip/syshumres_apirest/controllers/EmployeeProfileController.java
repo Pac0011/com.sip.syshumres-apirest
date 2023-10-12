@@ -65,9 +65,9 @@ public class EmployeeProfileController extends CommonController {
 	public static final String FILTER = "/filter";
 	public static final String SEARCHNAMERELATIONSHIP = "/search-name-relationship";
 	
-    private EmployeeProfileService service;
+    private final EmployeeProfileService service;
     
-    private EmployeeProfileMapper customMapper;
+    private final EmployeeProfileMapper customMapper;
 			
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;

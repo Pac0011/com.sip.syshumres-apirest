@@ -38,7 +38,7 @@ public class AddressStateController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "addresses-states";
 	
-	private AddressStateService service;
+	private final AddressStateService service;
 	
 	@Autowired
 	public AddressStateController(AddressStateService service, 

@@ -38,7 +38,7 @@ public class DriverLicenseValidityController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "driver-license-validity";
 	
-	private DriverLicenseValidityService service;
+	private final DriverLicenseValidityService service;
 	
 	@Autowired
 	public DriverLicenseValidityController(DriverLicenseValidityService service, 

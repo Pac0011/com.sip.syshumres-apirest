@@ -38,7 +38,7 @@ public class InvoicedResourceTypeController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "invoiced-resource-types";
 	
-	private InvoicedResourceTypeService service;
+	private final InvoicedResourceTypeService service;
 	
 	@Autowired
 	public InvoicedResourceTypeController(InvoicedResourceTypeService service, 

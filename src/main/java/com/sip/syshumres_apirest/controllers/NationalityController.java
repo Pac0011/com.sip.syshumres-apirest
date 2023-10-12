@@ -36,7 +36,7 @@ public class NationalityController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "nationality";
 	
-	private NationalityService service;
+	private final NationalityService service;
 	
 	@Autowired
 	public NationalityController(NationalityService service, 

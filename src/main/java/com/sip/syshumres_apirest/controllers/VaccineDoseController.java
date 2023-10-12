@@ -38,7 +38,7 @@ public class VaccineDoseController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "vaccine-dose";
 	
-	private VaccineDoseService service;
+	private final VaccineDoseService service;
 	
 	@Autowired
 	public VaccineDoseController(VaccineDoseService service, 

@@ -38,7 +38,7 @@ public class SchoolGradeCompleteController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "school-grades-complete";
 	
-	private SchoolGradeCompleteService service;
+	private final SchoolGradeCompleteService service;
 	
 	@Autowired
 	public SchoolGradeCompleteController(SchoolGradeCompleteService service, 

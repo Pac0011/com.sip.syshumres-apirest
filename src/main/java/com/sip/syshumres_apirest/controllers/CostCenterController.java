@@ -41,9 +41,9 @@ public class CostCenterController extends CommonController {
 	
 	public static final String URLENDPOINT = "cost-centers";
 	
-	private CostCenterService service;
+	private final CostCenterService service;
 	
-	private CostCenterMapper customMapper;
+	private final CostCenterMapper customMapper;
 		
 	@Autowired
 	public CostCenterController(CostCenterService service, CostCenterMapper customMapper) {

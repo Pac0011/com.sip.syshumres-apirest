@@ -36,7 +36,7 @@ public class EmployeeStatusController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "employee-status";
 	
-	private EmployeeStatusService service;
+	private final EmployeeStatusService service;
 	
 	@Autowired
 	public EmployeeStatusController(EmployeeStatusService service, 

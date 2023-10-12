@@ -38,7 +38,7 @@ public class TypeStaffController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "types-staff";
 	
-	private TypeStaffService service;
+	private final TypeStaffService service;
 	
 	@Autowired
 	public TypeStaffController(TypeStaffService service, 

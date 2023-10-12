@@ -39,7 +39,7 @@ public class OtherReasonQuitJobController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "other-reason-quit-job";
 	
-	private OtherReasonQuitJobService service;
+	private final OtherReasonQuitJobService service;
 	
 	@Autowired
 	public OtherReasonQuitJobController(OtherReasonQuitJobService service, 

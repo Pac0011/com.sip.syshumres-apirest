@@ -42,9 +42,9 @@ public class EmployeeAreaController extends CommonController {
 	
 	public static final String URLENDPOINT = "employee-areas";
 	
-    private EmployeeAreaService service;
+    private final EmployeeAreaService service;
     
-    private EmployeeAreaMapper customMapper;
+    private final EmployeeAreaMapper customMapper;
 		
 	@Autowired
 	public EmployeeAreaController(EmployeeAreaService service, 

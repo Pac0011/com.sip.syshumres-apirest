@@ -37,9 +37,9 @@ public class EmployeeDocumentController {
 	public static final String URLENDPOINT = "employee-documents";
 	public static final String IDUPLOADFILE = "/{idEmployeeProfile}/upload-file";
 	
-    private EmployeeDocumentService service;
+    private final EmployeeDocumentService service;
     
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 	
 	@Autowired
 	public EmployeeDocumentController(EmployeeDocumentService service, 

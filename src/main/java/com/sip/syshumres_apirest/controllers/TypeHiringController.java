@@ -38,7 +38,7 @@ public class TypeHiringController extends CommonCatalogController {
 	
 	public static final String URLENDPOINT = "type-hiring";
 	
-	private TypeHiringService service;
+	private final TypeHiringService service;
 	
 	@Autowired
 	public TypeHiringController(TypeHiringService service, 

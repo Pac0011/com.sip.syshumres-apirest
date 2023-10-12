@@ -23,7 +23,7 @@ public class LogoutController {
 	
 	public static final String LOGOUT = "logout";
 	
-	private UserService service;
+	private final UserService service;
 	
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;
