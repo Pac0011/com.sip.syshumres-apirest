@@ -11,10 +11,10 @@ public class JmsConsumer {
 	public void consumeMessage(String message) {
 		try{
             //do additional processing
-           //log.info("Received Message: "+ prospect.toString());
+           //log.info("Received Message: "+ prospect.toString())
            System.out.println("Received Message: "+ message);
         } catch(Exception e) {
-           //log.error("Received Exception : "+ e);
+           //log.error("Received Exception : "+ e)
            System.out.println("Error " + e.getMessage());
         }
 	}

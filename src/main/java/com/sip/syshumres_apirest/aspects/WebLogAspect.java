@@ -19,15 +19,16 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.core.annotation.Order;
 
-//import com.alibaba.fastjson.JSON;
-//import org.springframework.core.annotation.Order;
 
 @Aspect
 @Component
 @Order(3)
 public class WebLogAspect {
-	private final static Logger logger = LoggerFactory.getLogger(WebLogAspect.class);
-	ThreadLocal<Long> timeThreadLocal = new ThreadLocal<Long>();
+	private static final Logger logger = LoggerFactory.getLogger(WebLogAspect.class);
+	private static final String MSG_BEFORE = "Before method: ";
+	private static final String MSG_FORMAT_OUTPUT = "user:{}, ip:{}, url-{}";
+	
+	ThreadLocal<Long> timeThreadLocal = new ThreadLocal<>();
 	
 	@Pointcut("@annotation(LogWeb)")  
     public void logPointcut() {  
@@ -51,15 +52,20 @@ public class WebLogAspect {
 		}
 		HttpServletRequest request = attributes.getRequest();
 		logger.info("=========oo===========");
-		logger.info("Before method: " + joinPoint.getSignature());
-		logger.info("user:{}, ip:{}, url-{}", getUserName(), getIpAddr(request), request.getRequestURL().toString());
-		Object[] signatureArgs = joinPoint.getArgs();
-		   for (Object signatureArg: signatureArgs) {
-			   logger.info("Arg: " + signatureArg);
+		if (joinPoint != null && joinPoint.getSignature() != null) {
+		    logger.info(String.format("%1$s %2$s", MSG_BEFORE, joinPoint.getSignature()));
 		}
-		//String qualifiedName = joinPoint.getSignature().getDeclaringTypeName().concat(".")
-		//		+ joinPoint.getSignature().getName().concat("()");
-		//logger.info("{},args:{}",qualifiedName, JSON.toJSONString(joinPoint.getArgs()));
+		if (request.getRequestURL() != null) {
+		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request), request.getRequestURL().toString());
+		}
+		try {
+			Object[] signatureArgs = joinPoint.getArgs();
+			for (Object signatureArg: signatureArgs) {
+				logger.info(String.format("Arg: %1$s", signatureArg));
+			}
+		} catch (NullPointerException ex) {
+			logger.error(ex.getMessage());
+		}
 		logger.info("================ooo=======================");
     }
 	
@@ -73,9 +79,11 @@ public class WebLogAspect {
 		}
 		HttpServletRequest request = attributes.getRequest();
 		logger.info("=========Create entity===========");
-		logger.info("Before method: " + joinPoint.getSignature());
-		logger.info("user:{}, ip:{}, url-{}", getUserName(), getIpAddr(request), request.getRequestURL().toString());
-		logger.info("New: " + newEntity);
+		logger.info(String.format("%1$s %2$s", MSG_BEFORE, joinPoint.getSignature()));
+		if (request != null) {
+		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request), request.getRequestURL().toString());
+		}
+		logger.info(String.format("New: %1$s", newEntity));
 		logger.info("================End create=======================");
     }
 	
@@ -90,26 +98,14 @@ public class WebLogAspect {
 		}
 		HttpServletRequest request = attributes.getRequest();
 		logger.info("=========Edit entity===========");
-		logger.info("Before method: " + joinPoint.getSignature());
-		logger.info("user:{}, ip:{}, url-{}", getUserName(), getIpAddr(request), request.getRequestURL().toString());
-		logger.info("Original: " + originalEntity);
-		logger.info("New: " + newEntity);
+		logger.info(String.format("%1$s %2$s", MSG_BEFORE, joinPoint.getSignature()));
+		if (request != null) {
+		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request), request.getRequestURL().toString());
+		}
+		logger.info(String.format("Original: %1$s", originalEntity));
+		logger.info(String.format("New: %1$s", newEntity));
 		logger.info("================End edit=======================");
     }
-	
-   /* @Before("execution(* com.sip.sysrh.hiring.controller.AuthorityController.*(..))")
-	public void beforeAdvice(JoinPoint joinPoint) {
-		
-		System.out.println("\n====================");
-		System.out.println("Before method: " + joinPoint.getSignature());
-		System.out.println("User: " + this.getUserName() );
-		Object[] signatureArgs = joinPoint.getArgs();
-		   for (Object signatureArg: signatureArgs) {
-		      System.out.println("Arg: " + signatureArg);
-		    
-		}
-		System.out.println("=======================================\n");
-	}*/
 	
 	@AfterReturning("logPointcut()")
 	public void doAfterReturning(JoinPoint joinPoint) throws Throwable {
@@ -125,31 +121,33 @@ public class WebLogAspect {
 		return null;
 	}
 	
-	private String getIpAddr(HttpServletRequest request){
+	private String getIpAddr(HttpServletRequest request) {
 		String ipAddress = request.getHeader("x-forwarded-for");
-		if(ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+		String searchUnknown = "unknown";
+		if (ipAddress == null || ipAddress.length() == 0 || searchUnknown.equalsIgnoreCase(ipAddress)) {
 			ipAddress = request.getHeader("Proxy-Client-IP");
 		}
-		if(ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+		if (ipAddress == null || ipAddress.length() == 0 || searchUnknown.equalsIgnoreCase(ipAddress)) {
 			ipAddress = request.getHeader("WL-Proxy-Client-IP");
 		}
-		if(ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+		if (ipAddress == null || ipAddress.length() == 0 || searchUnknown.equalsIgnoreCase(ipAddress)) {
 			ipAddress = request.getRemoteAddr();
-			if(ipAddress.equals("127.0.0.1") || ipAddress.equals("0:0:0:0:0:0:0:1")){
-				InetAddress inet=null;
+			if (ipAddress.equals("127.0.0.1") || ipAddress.equals("0:0:0:0:0:0:0:1")) {
+				InetAddress inet = null;
 				try {
 					inet = InetAddress.getLocalHost();
+					if (inet != null) {
+						ipAddress= inet.getHostAddress();
+				    }
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				}
-				ipAddress= inet.getHostAddress();
 			}
 		}
-		if(ipAddress!=null && ipAddress.length()>15){
-			if(ipAddress.indexOf(",")>0){
-				ipAddress = ipAddress.substring(0,ipAddress.indexOf(","));
-			}
+		if (ipAddress != null && ipAddress.length() > 15 && ipAddress.indexOf(",") >= 0) {
+			ipAddress = ipAddress.substring(0,ipAddress.indexOf(","));
 		}
+		
 		return ipAddress; 
 	}
 

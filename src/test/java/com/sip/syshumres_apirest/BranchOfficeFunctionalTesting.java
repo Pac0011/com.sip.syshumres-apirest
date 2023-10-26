@@ -165,8 +165,8 @@ public class BranchOfficeFunctionalTesting {
 			.get().builder();
 	    });
 		
-		//Recupera BadRequest y en el mensaje viene el json del la Exception IllegalArgumentException
-		assertTrue(exception.getMessage().indexOf("IllegalArgumentException") > 0); 
+		//Recupera BadRequest y en el mensaje viene el json del la Exception InvalidIdException
+		assertTrue(exception.getMessage().indexOf("InvalidIdException") > 0); 
 	}
 	
 	private List<EntitySelectDTO> mapToEntity(String body) throws JsonMappingException, JsonProcessingException {

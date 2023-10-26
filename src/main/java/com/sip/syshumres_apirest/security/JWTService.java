@@ -51,12 +51,12 @@ public class JWTService {
 		Map<String, Object> extra = new HashMap<>();
 		extra.put("branchOffice", userSession == null?"":userSession.getBranchOffice().getDescription());
 		
-		List<MenuDTO> listMenus = new ArrayList<MenuDTO>();
+		List<MenuDTO> listMenus = new ArrayList<>();
 		List<Module> modulesChilds = userDetailServiceImpl.findModulesChildByUsername(username);
 		List<Module> modules = userDetailServiceImpl.findModulesFatherByUsername(username);
 		if (modules != null) {
 			modules.stream().forEach(m -> {
-				List<MenuDTO> listMenusChilds = new ArrayList<MenuDTO>();
+				List<MenuDTO> listMenusChilds = new ArrayList<>();
 				m.getChilds().forEach(c -> {
 					if (modulesChilds.contains(c)) {
 					    listMenusChilds.add(new MenuDTO(c.getDescription(), c.getUrlMenu(), c.getIcon()));

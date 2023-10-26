@@ -32,6 +32,8 @@ public class WebSecurityConfig {
 	@Value("${URL.PASSWORD.RECOVERY}")
 	private String urlRecovery;
 	
+	private static final String ROLE_ADMIN = "ROLE_ADMIN";
+	
 	@Autowired
 	public WebSecurityConfig(UserDetailsService userDetailsService, 
 			JWTAuthorizationFilter jwtAuthorizationFilter,
@@ -72,9 +74,9 @@ public class WebSecurityConfig {
 			        		"/swagger-resources/**", "/swagger-resources", "/v2/api-docs/**", 
 			        		"/proxy/**")
 			        .permitAll()
-					.antMatchers("/users/**").hasAnyAuthority("ROLE_ADMIN")
-					.antMatchers("/modules/**").hasAnyAuthority("ROLE_ADMIN")
-					.antMatchers("/authorities/**").hasAnyAuthority("ROLE_ADMIN")
+					.antMatchers("/users/**").hasAnyAuthority(ROLE_ADMIN)
+					.antMatchers("/modules/**").hasAnyAuthority(ROLE_ADMIN)
+					.antMatchers("/authorities/**").hasAnyAuthority(ROLE_ADMIN)
 					.anyRequest()
 						.authenticated()
 					.and()

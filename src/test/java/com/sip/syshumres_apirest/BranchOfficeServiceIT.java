@@ -14,6 +14,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import com.sip.syshumres_apirest.controllers.BranchOfficeController;
 import com.sip.syshumres_entities.BranchOffice;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_services.BranchOfficeService;
 
 
@@ -51,7 +52,7 @@ public class BranchOfficeServiceIT {
 	  
 	  @Test
 	  void error() {
-		  assertThrows(IllegalArgumentException.class, () -> {
+		  assertThrows(InvalidIdException.class, () -> {
 			  controller.formEdit(0L);
 		  });
 	  }
