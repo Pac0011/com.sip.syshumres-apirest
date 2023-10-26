@@ -226,7 +226,7 @@ public class AuthorityController extends CommonController {
 	
 	@GetMapping(ERROR + ID)
 	public AuthorityDTO errorTest(@RequestHeader String authorization, @PathVariable Long id) 
-			throws EntityIdNotFoundException, MalFormedHeaderException, UnauthorizedException, InvalidIdException {
+			throws EntityIdNotFoundException, MalFormedHeaderException, InvalidIdException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}

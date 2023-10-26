@@ -55,9 +55,9 @@ public class OtherReasonQuitJobController extends CommonCatalogController {
 	public ResponseEntity<Page<OtherReasonQuitJobDTO>> list(Pageable pageable) {
 		Page<OtherReasonQuitJob> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<OtherReasonQuitJobDTO> entitiesPageDTO = entities.map(entity -> {
-			return modelMapper.map(entity, OtherReasonQuitJobDTO.class);
-		});
+		Page<OtherReasonQuitJobDTO> entitiesPageDTO = entities.map(entity -> 
+			modelMapper.map(entity, OtherReasonQuitJobDTO.class)
+		);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}

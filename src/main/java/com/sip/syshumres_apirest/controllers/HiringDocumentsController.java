@@ -65,9 +65,9 @@ public class HiringDocumentsController extends CommonCatalogController {
 	public ResponseEntity<Page<HiringDocumentsDTO>> list(Pageable pageable) {
 		Page<HiringDocuments> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<HiringDocumentsDTO> entitiesPageDTO = entities.map(entity -> {
-			return modelMapper.map(entity, HiringDocumentsDTO.class);
-		});
+		Page<HiringDocumentsDTO> entitiesPageDTO = entities.map(entity -> 
+			modelMapper.map(entity, HiringDocumentsDTO.class)
+		);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}

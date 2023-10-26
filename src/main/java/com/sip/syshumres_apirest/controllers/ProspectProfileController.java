@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
 import com.sip.syshumres_apirest.mappers.ProspectProfileMapper;
-import com.sip.syshumres_apirest.producer.JmsProducer;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.EmployeeProfile;
 import com.sip.syshumres_entities.EmployeeStatus;
@@ -109,9 +108,7 @@ public class ProspectProfileController extends CommonController {
 		
 		Page<ProspectProfile> entities = this.service.findByFilterSession(this.filter, userSession, pageable);
 		
-		Page<ProspectProfileDTO> entitiesPageDTO = entities.map(entity -> {
-		    return customMapper.toDto(entity);
-		});
+		Page<ProspectProfileDTO> entitiesPageDTO = entities.map(customMapper::toDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}

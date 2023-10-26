@@ -58,13 +58,11 @@ public class WebLogAspect {
 		if (request.getRequestURL() != null) {
 		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request), request.getRequestURL().toString());
 		}
-		try {
+		if (joinPoint != null && joinPoint.getArgs() != null) {
 			Object[] signatureArgs = joinPoint.getArgs();
 			for (Object signatureArg: signatureArgs) {
 				logger.info(String.format("Arg: %1$s", signatureArg));
 			}
-		} catch (NullPointerException ex) {
-			logger.error(ex.getMessage());
 		}
 		logger.info("================ooo=======================");
     }
@@ -80,8 +78,9 @@ public class WebLogAspect {
 		HttpServletRequest request = attributes.getRequest();
 		logger.info("=========Create entity===========");
 		logger.info(String.format("%1$s %2$s", MSG_BEFORE, joinPoint.getSignature()));
-		if (request != null) {
-		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request), request.getRequestURL().toString());
+		if (request.getRequestURL() != null) {
+		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request)
+		    		, request.getRequestURL().toString());
 		}
 		logger.info(String.format("New: %1$s", newEntity));
 		logger.info("================End create=======================");
@@ -99,8 +98,9 @@ public class WebLogAspect {
 		HttpServletRequest request = attributes.getRequest();
 		logger.info("=========Edit entity===========");
 		logger.info(String.format("%1$s %2$s", MSG_BEFORE, joinPoint.getSignature()));
-		if (request != null) {
-		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request), request.getRequestURL().toString());
+		if (request.getRequestURL() != null) {
+		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request)
+		    		, request.getRequestURL().toString());
 		}
 		logger.info(String.format("Original: %1$s", originalEntity));
 		logger.info(String.format("New: %1$s", newEntity));

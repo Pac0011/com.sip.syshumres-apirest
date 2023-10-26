@@ -216,7 +216,8 @@ public class EmployeeProfileController extends CommonController {
 	
 	@GetMapping(ID + DOCUMENT)
 	public ResponseEntity<Resource> getFileEmployee(@PathVariable Long id, 
-			@RequestParam String nameInput) throws EntityIdNotFoundException, InvalidIdException {
+			@RequestParam String nameInput) throws EntityIdNotFoundException, InvalidIdException
+	, IOException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}

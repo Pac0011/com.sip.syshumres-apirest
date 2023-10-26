@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class JWTService {
-	private final static String ACCESS_TOKEN_SECRET = "sjkdhfjisd8726347jJHHHSDhsgdfhsgdfh";
+	private static final String ACCESS_TOKEN_SECRET = "sjkdhfjisd8726347jJHHHSDhsgdfhsgdfh";
 	
 	private UserDetailServiceImpl userDetailServiceImpl;
 	

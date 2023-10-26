@@ -61,16 +61,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
 	
 	@Transactional(readOnly = true)
 	public List<Module> findModulesFatherByUsername(String username) {
-		List<Module> modules = moduleRepository.findModulesFatherByUsername(username);
-		
-	    return modules;
+		return moduleRepository.findModulesFatherByUsername(username);
 	}
 	
 	@Transactional(readOnly = true)
 	public List<Module> findModulesChildByUsername(String username) {
-		List<Module> modules = moduleRepository.findModulesChildByUsername(username);
-		
-	    return modules;
+		return moduleRepository.findModulesChildByUsername(username);
 	}
 
 }

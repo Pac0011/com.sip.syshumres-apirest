@@ -25,6 +25,7 @@ import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.TypeHiringDocumentNotExistException;
+import com.sip.syshumres_exceptions.UploadFileException;
 import com.sip.syshumres_exceptions.UploadFormatsAllowException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.EmployeeDocumentService;
@@ -62,8 +63,9 @@ public class EmployeeDocumentController {
 	@PutMapping(IDUPLOADFILE)
 	public ResponseEntity<Map<String, Object>> uploadFileNew(@PathVariable Long idEmployeeProfile, 
 			@RequestParam("nameInput") Long idHiringDocument,
-			@RequestParam MultipartFile fileUpload) throws IOException, UploadFormatsAllowException, 
-			EntityIdNotFoundException, TypeHiringDocumentNotExistException, CreateRegisterException, InvalidIdException {
+			@RequestParam MultipartFile fileUpload) throws IOException, UploadFormatsAllowException
+	, EntityIdNotFoundException, TypeHiringDocumentNotExistException, CreateRegisterException
+	, InvalidIdException, UploadFileException {
 		if (idEmployeeProfile <= 0) {
 			throw new InvalidIdException();
 		}
