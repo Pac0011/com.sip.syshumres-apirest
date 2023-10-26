@@ -37,6 +37,7 @@ import com.sip.syshumres_entities.dtos.UserDTO;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.UserService;
 import com.sip.syshumres_utils.StringTrim;
@@ -56,6 +57,9 @@ public class UserController extends CommonController {
 	public static final String AUTHORITIES = "/authorities";
 	public static final String AAUTHORITIES = "/assign-authorities";
 	public static final String RAUTHORITY = "/remove-authority";
+	
+	private static final String MSG_ID = "Id usuario ";
+	private static final String MSG_NOT_FOUND = " no encontrado";
 	
 	private final UserService service;
 	
@@ -81,9 +85,7 @@ public class UserController extends CommonController {
 	public ResponseEntity<Page<UserDTO>> list(Pageable pageable) {
 		Page<User> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<UserDTO> entitiesPageDTO = entities.map(entity -> {
-		    return customMapper.toDto(entity);
-		});
+		Page<UserDTO> entitiesPageDTO = entities.map(customMapper::toDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
@@ -139,7 +141,7 @@ public class UserController extends CommonController {
 		User user = customMapper.toSaveEntity(entity);
 		
 		Map<String, Object> errorsCustomFields = this.service.validEntity(user, 0L);
-		if (errorsCustomFields != null) {
+		if (!errorsCustomFields.isEmpty()) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
@@ -159,13 +161,13 @@ public class UserController extends CommonController {
 	      @ApiResponse(code = 404, message = "not found!!!") })
 	@GetMapping(ID)
 	public ResponseEntity<UserDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<User> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -173,27 +175,23 @@ public class UserController extends CommonController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody UserDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
-		//Se quito validacion ya que el password se actualiza de forma independiente.
-		//if (result.hasErrors()) {
-		//	return this.validate(result);
-		//}
-		
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+		//Se quito validacion if (result.hasErrors()) ya que el password se actualiza de forma independiente.
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de usuario no coinciden para actualización");
         }
 		Optional<User> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		User entityDb = o.get(); 
 		entityDb = customMapper.toEditEntity(entityDb, entity);
 		
 		Map<String, Object> errorsCustomFields = this.service.validEntity(entityDb, id);
-		if (errorsCustomFields != null) {
+		if (!errorsCustomFields.isEmpty()) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
@@ -206,19 +204,19 @@ public class UserController extends CommonController {
 	public ResponseEntity<Map<String, Object>> changePassword(@PathVariable Long id,
 			@RequestParam String passwordNew, 
 			@RequestParam String passwordNewConfirm) 
-					throws EntityIdNotFoundException, CreateRegisterException, IllegalArgumentException {
+					throws EntityIdNotFoundException, CreateRegisterException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<User> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		String passN = StringTrim.trimAndRemoveDiacriticalMarks(passwordNew);
 		String passC = StringTrim.trimAndRemoveDiacriticalMarks(passwordNewConfirm);
 		Map<String, Object> errorsCustomFields = this.service.validNewPassword(passN, passC);
-		if (errorsCustomFields != null) {
+		if (!errorsCustomFields.isEmpty()) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
@@ -233,13 +231,13 @@ public class UserController extends CommonController {
 	
 	@GetMapping(ID + AUTHORITIES)
 	public ResponseEntity<UserDTO> getAuthorities(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<User> entity = service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 				
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -247,13 +245,13 @@ public class UserController extends CommonController {
 	
 	@PatchMapping(ID + AAUTHORITIES)
 	public ResponseEntity<UserDTO> assignAuthorities(@RequestBody List<AuthorityDTO> authorities, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<User> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		User e = this.service.assignAuthorities(o.get(), listMapper.mapList(authorities, Authority.class));
@@ -263,13 +261,13 @@ public class UserController extends CommonController {
 	
 	@PatchMapping(ID + RAUTHORITY)
 	public ResponseEntity<UserDTO> removeAuthority(@RequestBody AuthorityDTO authority, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<User> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id usuario " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 
 		User e = this.service.removeAuthority(o.get(), customMapper2.toEntity(authority));

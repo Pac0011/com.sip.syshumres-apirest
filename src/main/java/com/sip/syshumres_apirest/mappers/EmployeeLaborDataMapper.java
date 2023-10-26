@@ -13,7 +13,7 @@ public class EmployeeLaborDataMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public EmployeeLaborDataMapper() {
+	public EmployeeLaborDataMapper() {// Noncompliant - method is empty
 	}
 	
 	public EmployeeLaborData toSaveEntity(EmployeeLaborDataDTO entity) {

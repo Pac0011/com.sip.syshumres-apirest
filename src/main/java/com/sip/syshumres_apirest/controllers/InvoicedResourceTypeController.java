@@ -3,7 +3,6 @@ package com.sip.syshumres_apirest.controllers;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -53,7 +52,7 @@ public class InvoicedResourceTypeController extends CommonCatalogController {
 	public ResponseEntity<List<EntitySelectDTO>> listActive() {
 		return ResponseEntity.ok().body(service.findByEnabledTrueOrderByDescription().stream()
 				.map(entity -> modelMapper.map(entity, EntitySelectDTO.class))
-				.collect(Collectors.toList()));
+				.toList());
 	}
 	
 	@GetMapping

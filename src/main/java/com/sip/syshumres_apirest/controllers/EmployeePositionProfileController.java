@@ -3,7 +3,6 @@ package com.sip.syshumres_apirest.controllers;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -30,6 +29,7 @@ import com.sip.syshumres_entities.dtos.EmployeePositionProfileDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.EmployeePositionProfileService;
 import com.sip.syshumres_utils.StringTrim;
@@ -56,17 +56,15 @@ public class EmployeePositionProfileController extends CommonController {
 	@GetMapping(ACTIVE)
 	public ResponseEntity<List<EntitySelectDTO>> listActive() {
 		return ResponseEntity.ok().body(service.findByEnabledTrueOrderByDescription().stream()
-				.map(entity -> customMapper.toSelectDto(entity))
-				.collect(Collectors.toList()));
+				.map(customMapper::toSelectDto)
+				.toList());
 	}
 	
 	@GetMapping(PAGE)
 	public ResponseEntity<Page<EmployeePositionProfileDTO>> list(Pageable pageable) {
 		Page<EmployeePositionProfile> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<EmployeePositionProfileDTO> entitiesPageDTO = entities.map(entity -> {
-			return customMapper.toDto(entity);
-		});
+		Page<EmployeePositionProfileDTO> entitiesPageDTO = entities.map(customMapper::toDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
@@ -121,9 +119,9 @@ public class EmployeePositionProfileController extends CommonController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<EmployeePositionProfileDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<EmployeePositionProfile> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
@@ -135,13 +133,13 @@ public class EmployeePositionProfileController extends CommonController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody EmployeePositionProfileDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de perfil puesto no coinciden para actualización");

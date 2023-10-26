@@ -3,7 +3,6 @@ package com.sip.syshumres_apirest.controllers;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -55,17 +54,15 @@ public class CostCenterController extends CommonController {
 	@GetMapping(ACTIVE)
 	public ResponseEntity<List<EntitySelectDTO>> listActive() {
 		return ResponseEntity.ok().body(service.findByEnabledTrueOrderByDescription().stream()
-				.map(entity -> customMapper.toSelectDto(entity))
-				.collect(Collectors.toList()));
+				.map(customMapper::toSelectDto)
+				.toList());
 	}
 	
 	@GetMapping(PAGE)
 	public ResponseEntity<Page<CostCenterDTO>> list(Pageable pageable) {
 		Page<CostCenter> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<CostCenterDTO> entitiesPageDTO = entities.map(entity -> {
-		    return customMapper.toDto(entity);
-		});
+		Page<CostCenterDTO> entitiesPageDTO = entities.map(customMapper::toDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}

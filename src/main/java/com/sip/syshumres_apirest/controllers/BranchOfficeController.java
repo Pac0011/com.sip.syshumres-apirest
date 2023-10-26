@@ -3,7 +3,6 @@ package com.sip.syshumres_apirest.controllers;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -31,6 +30,7 @@ import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.FatherAssignException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.MalFormedHeaderException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.BranchOfficeService;
@@ -44,6 +44,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class BranchOfficeController extends CommonController {
 	
 	public static final String URLENDPOINT = "branch-offices";
+	
+	private static final String MSG_ID = "Id sucursal ";
+	private static final String MSG_NOT_FOUND = " no encontrado";
 	
 	private final BranchOfficeService service;
 	
@@ -60,17 +63,15 @@ public class BranchOfficeController extends CommonController {
 	@GetMapping(ACTIVE)
 	public ResponseEntity<List<EntitySelectDTO>> listActive() {
 		return ResponseEntity.ok().body(service.findByEnabledTrueOrderByDescription().stream()
-				.map(entity -> customMapper.toSelectDto(entity))
-				.collect(Collectors.toList()));
+				.map(customMapper::toSelectDto)
+				.toList());
 	}
 	
 	@GetMapping(PAGE)
 	public ResponseEntity<Page<BranchOfficeDTO>> list(Pageable pageable) {
 		Page<BranchOffice> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<BranchOfficeDTO> entitiesPageDTO = entities.map(entity -> {
-		    return customMapper.toDto(entity);
-		});
+		Page<BranchOfficeDTO> entitiesPageDTO = entities.map(customMapper::toDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
@@ -125,13 +126,13 @@ public class BranchOfficeController extends CommonController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<BranchOfficeDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<BranchOffice> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id sucursal " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -139,24 +140,24 @@ public class BranchOfficeController extends CommonController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody BranchOfficeDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if (!Objects.equals(id, entity.getId())) {
 			throw new IdsEntityNotEqualsException("Ids de sucursal no coinciden para actualización");
         }
 		Optional<BranchOffice> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id sucursal " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		BranchOffice entityDb = o.get();
-		if (entity.getFather() != null && entityDb.getId() == entity.getFather().getId()) {
+		if (entity.getFather() != null && entityDb.getId().equals(entity.getFather().getId())) {
 			throw new FatherAssignException("El padre de la sucursal no puede ser ella misma");
 		}
 		
@@ -166,18 +167,18 @@ public class BranchOfficeController extends CommonController {
 	}
 	
 	@GetMapping(ERROR + ID)
-	public BranchOfficeDTO error(@RequestHeader String Authorization, @PathVariable Long id) 
-			throws EntityIdNotFoundException, MalFormedHeaderException, IllegalArgumentException {
+	public BranchOfficeDTO errorTest(@RequestHeader String authorization, @PathVariable Long id) 
+			throws EntityIdNotFoundException, MalFormedHeaderException, InvalidIdException {
 		if(id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
-		if(Authorization.equals("kk")) {
-			throw new MalFormedHeaderException("token: " + Authorization);
+		if(authorization.equals("kk")) {
+			throw new MalFormedHeaderException("token: " + authorization);
 		}
 		
 		Optional<BranchOffice> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id sucursal " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		return customMapper.toDto(entity.get());

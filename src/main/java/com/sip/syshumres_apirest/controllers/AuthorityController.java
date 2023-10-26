@@ -3,7 +3,6 @@ package com.sip.syshumres_apirest.controllers;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -35,6 +34,7 @@ import com.sip.syshumres_entities.dtos.ModuleDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.MalFormedHeaderException;
 import com.sip.syshumres_exceptions.UnauthorizedException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
@@ -52,6 +52,9 @@ public class AuthorityController extends CommonController {
 	public static final String MODULES = "/modules";
 	public static final String AMODULES = "/assign-modules";
 	public static final String RMODULE = "/remove-module";
+	
+	private static final String MSG_ID = "Id rol ";
+	private static final String MSG_NOT_FOUND = " no encontrado";
 	
     private final AuthorityService service;
     
@@ -76,8 +79,8 @@ public class AuthorityController extends CommonController {
 	@GetMapping(ACTIVE)
 	public ResponseEntity<List<EntitySelectDTO>> listActive() {
 		return ResponseEntity.ok().body(service.findByEnabledTrueOrderByDescription().stream()
-				.map(entity -> customMapper.toSelectDto(entity))
-				.collect(Collectors.toList()));
+				.map(customMapper::toSelectDto)
+				.toList());
 	}
 	
 	@GetMapping(PAGE)
@@ -134,7 +137,7 @@ public class AuthorityController extends CommonController {
 	public ResponseEntity<AuthorityDTO> getModules(@PathVariable Long id) throws EntityIdNotFoundException {
 		Optional<Authority> entity = service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 	
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -153,13 +156,13 @@ public class AuthorityController extends CommonController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<AuthorityDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<Authority> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -168,20 +171,20 @@ public class AuthorityController extends CommonController {
 	//@LogWeb
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody AuthorityDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de rol no coinciden para actualización");
         }
 		Optional<Authority> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		Authority e = this.service.save(customMapper.toEditEntity(o.get(), entity));
@@ -191,13 +194,13 @@ public class AuthorityController extends CommonController {
 	
 	@PatchMapping(ID + AMODULES)
 	public ResponseEntity<AuthorityDTO> assignModules(@RequestBody List<ModuleDTO> modules, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<Authority> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		Authority e = this.service.assignModules(o.get(), listMapper.mapList(modules, Module.class));
@@ -207,13 +210,13 @@ public class AuthorityController extends CommonController {
 	
 	@PatchMapping(ID + RMODULE)
 	public ResponseEntity<AuthorityDTO> removeModule(@RequestBody ModuleDTO module, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<Authority> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		Authority e = this.service.removeModule(o.get(), customMapper2.toEntity(module));
@@ -222,18 +225,18 @@ public class AuthorityController extends CommonController {
 	}
 	
 	@GetMapping(ERROR + ID)
-	public AuthorityDTO error(@RequestHeader String Authorization, @PathVariable Long id) 
-			throws EntityIdNotFoundException, MalFormedHeaderException, UnauthorizedException, IllegalArgumentException {
+	public AuthorityDTO errorTest(@RequestHeader String authorization, @PathVariable Long id) 
+			throws EntityIdNotFoundException, MalFormedHeaderException, UnauthorizedException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
-		if(Authorization.equals("kk")) {
-			throw new MalFormedHeaderException("token: " + Authorization);
+		if(authorization.equals("kk")) {
+			throw new MalFormedHeaderException("token: " + authorization);
 		}
 		
 		Optional<Authority> entity = this.service.findById(id);
 		if (!entity.isPresent()) {
-			throw new EntityIdNotFoundException("Id rol " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		return customMapper.toDto(entity.get());

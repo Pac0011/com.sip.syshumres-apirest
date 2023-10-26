@@ -16,7 +16,7 @@ public class EmployeeClinicalDataMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	  	
-	public EmployeeClinicalDataMapper() {
+	public EmployeeClinicalDataMapper() {// Noncompliant - method is empty
 	}
 	
 	public EmployeeClinicalData toSaveEntity(EmployeeClinicalDataDTO entity) {

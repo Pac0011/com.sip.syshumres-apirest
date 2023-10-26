@@ -28,6 +28,7 @@ import com.sip.syshumres_entities.OtherReasonQuitJob;
 import com.sip.syshumres_entities.dtos.OtherReasonQuitJobDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.OtherReasonQuitJobService;
 import com.sip.syshumres_utils.StringTrim;
@@ -55,8 +56,7 @@ public class OtherReasonQuitJobController extends CommonCatalogController {
 		Page<OtherReasonQuitJob> entities = this.service.findByFilterSession(this.filter, pageable);
 		
 		Page<OtherReasonQuitJobDTO> entitiesPageDTO = entities.map(entity -> {
-			OtherReasonQuitJobDTO dto = modelMapper.map(entity, OtherReasonQuitJobDTO.class);
-		    return dto;
+			return modelMapper.map(entity, OtherReasonQuitJobDTO.class);
 		});
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
@@ -116,9 +116,9 @@ public class OtherReasonQuitJobController extends CommonCatalogController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<OtherReasonQuitJobDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<OtherReasonQuitJob> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
@@ -130,13 +130,13 @@ public class OtherReasonQuitJobController extends CommonCatalogController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody OtherReasonQuitJobDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de documento de contratación no coinciden para actualización");

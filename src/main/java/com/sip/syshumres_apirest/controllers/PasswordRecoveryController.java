@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.mail.MessagingException;
-//import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +40,9 @@ public class PasswordRecoveryController {
 	public static final String UUID = "/{uuid}";
 	public static final String CHANGE = "/change-password";
 	
+	private static final String MSG_NOT_EXIST = " no existe";
+	private static final String MSG_RESPONSE = "response";
+	
 	private final PasswordRecoveryService service;
 	
 	private final UserService serviceU;
@@ -59,7 +61,7 @@ public class PasswordRecoveryController {
 	public ResponseEntity<Map<String, Object>> passwordRecovery(@RequestParam String email) 
 			throws EmailUserNotFoundException, CreateRegisterException, SendEmailException {
 		Map<String, Object> response = new HashMap<>();
-		response.put("response", "Se envió un email con una liga para que pueda cambiar su contraseña, valide sus bandejas de entrada");
+		response.put(MSG_RESPONSE, "Se envió un email con una liga para que pueda cambiar su contraseña, valide sus bandejas de entrada");
 		
 		Optional<User> o = this.serviceU.findOneByEmail(StringTrim.trimAndRemoveDiacriticalMarks(email));
 		if (!o.isPresent()) {
@@ -77,7 +79,7 @@ public class PasswordRecoveryController {
 		
 		try {
 			String link = this.serviceEmail.sendHtmlEmailRecoveryPassword(email, "Recuperación contraseña Sysrh", e);
-			response.replace("response", link);
+			response.replace(MSG_RESPONSE, link);
 		} catch (MessagingException ex) {
 			throw new SendEmailException("No se pudo enviar el email con la liga de recuperación, valide con el administrador");
 		}
@@ -95,7 +97,7 @@ public class PasswordRecoveryController {
 		
 		Optional<PasswordRecovery> o = this.service.findOneByUuidAndEnabledTrue(tmp);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("La cadena de recuperación " + tmp + " no existe");
+			throw new EntityIdNotFoundException("La cadena de recuperación " + tmp + MSG_NOT_EXIST);
 		}
 		PasswordRecovery passwordRecovery = o.get();
 		if (this.service.expirationLinkRecovery(passwordRecovery)) {
@@ -112,7 +114,7 @@ public class PasswordRecoveryController {
 			HttpSession session) throws EntityIdNotFoundException, EmailUserNotFoundException, InvalidFieldException, 
 			CreateRegisterException {
 		Map<String, Object> response = new HashMap<>();
-		response.put("response", "La contraseña fue actualizada con éxito");
+		response.put(MSG_RESPONSE, "La contraseña fue actualizada con éxito");
 		
 		String tmp = StringTrim.trimAndRemoveDiacriticalMarks(uuid);
 		if (tmp.equals("")) {
@@ -120,13 +122,13 @@ public class PasswordRecoveryController {
 		}
 		Optional<PasswordRecovery> o = this.service.findOneByUuidAndEnabledTrue(tmp);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("La cadena de recuperación " + tmp + " no existe");
+			throw new EntityIdNotFoundException("La cadena de recuperación " + tmp + MSG_NOT_EXIST);
 		}
 		PasswordRecovery passwordRecovery = o.get();
 		
 		Optional<User> o2 = this.serviceU.findOneByEmail(passwordRecovery.getEmail());
 		if (!o2.isPresent()) {
-			throw new EmailUserNotFoundException("El email de recuperación " + passwordRecovery.getEmail() + " no existe");
+			throw new EmailUserNotFoundException("El email de recuperación " + passwordRecovery.getEmail() + MSG_NOT_EXIST);
 		}
 		User user = o2.get();
 		

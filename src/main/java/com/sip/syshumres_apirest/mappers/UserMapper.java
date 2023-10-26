@@ -17,7 +17,7 @@ public class UserMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public UserMapper() {
+	public UserMapper() {// Noncompliant - method is empty
 	}
 
 	public UserDTO toDto(User entity) {
@@ -32,7 +32,7 @@ public class UserMapper {
 	        dto.setBranchOffice(modelMapper.map(entity.getBranchOffice(), EntitySelectDTO.class));
 	    }
 		
-		ArrayList<EntitySelectDTO> authoritiesDTO = new ArrayList<EntitySelectDTO>();
+		ArrayList<EntitySelectDTO> authoritiesDTO = new ArrayList<>();
 		if (entity.getAuthorities() != null) {
 			entity.getAuthorities().forEach(authority -> {
 				EntitySelectDTO dtoE = new EntitySelectDTO();

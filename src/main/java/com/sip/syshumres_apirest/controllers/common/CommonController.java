@@ -19,10 +19,5 @@ public class CommonController {
 	public static final String FILTERTERM = "/filter/{term}";
 	
     protected String filter;
-	
-	/*@DeleteMapping("/{id}")
-	public ResponseEntity<?> delete(@PathVariable Long id) {
-		service.deleteById(id);
-		return ResponseEntity.noContent().build();
-	}*/
+    
 }

@@ -42,6 +42,7 @@ import com.sip.syshumres_exceptions.CreateEmployeeProfileException;
 import com.sip.syshumres_exceptions.EmployeeFieldsAlreadyExistException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.ProspectFieldsAlreadyExistException;
 import com.sip.syshumres_exceptions.StatusCatalogNotFoundException;
 import com.sip.syshumres_exceptions.UserSessionNotFoundException;
@@ -61,6 +62,8 @@ public class ProspectProfileController extends CommonController {
 	public static final String URLENDPOINT = "prospect-profiles";
 	public static final String NEWHIRE = "/new-hire";
 	
+	private static final String MSG_NOT_FOUND = "Id Prospecto no encontrado";
+	
 	private final ProspectProfileService service;
 	
 	private final ProspectProfileMapper customMapper;
@@ -77,21 +80,17 @@ public class ProspectProfileController extends CommonController {
 	private final BranchOfficeService serviceB;
 	
 	private final EmployeeProfileService serviceP;
-	
-    private JmsProducer jmsProducer;
-	
+		
 	@Autowired
 	public ProspectProfileController(ProspectProfileService service, ProspectStatusService serviceS, 
 			BranchOfficeService serviceB, EmployeeProfileService serviceP, EmployeeStatusService serviceES, 
 			ProspectProfileMapper customMapper, 
-			EmployeeProfileMapper customMapper2, 
-			JmsProducer jmsProducer) {
+			EmployeeProfileMapper customMapper2) {
 		this.service = service;
 		this.serviceS = serviceS;
 		this.serviceB = serviceB;
 		this.serviceP = serviceP;
 		this.serviceES = serviceES;
-		this.jmsProducer = jmsProducer;
 		this.filter = "";
 		this.customMapper = customMapper;
 		this.customMapper2 = customMapper2;
@@ -188,13 +187,13 @@ public class ProspectProfileController extends CommonController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<ProspectProfileDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<ProspectProfile> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id Prospecto no encontrado");
+			throw new EntityIdNotFoundException(MSG_NOT_FOUND);
 		}
 		
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -203,20 +202,20 @@ public class ProspectProfileController extends CommonController {
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody ProspectProfileDTO entity, BindingResult result, @PathVariable Long id) 
 			throws IdsEntityNotEqualsException, EntityIdNotFoundException, ProspectFieldsAlreadyExistException, 
-			EmployeeFieldsAlreadyExistException, IllegalArgumentException {
+			EmployeeFieldsAlreadyExistException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if (!Objects.equals(id, entity.getId())) {
 			throw new IdsEntityNotEqualsException("Ids de Prospecto no coinciden para actualización");
         }
 		Optional<ProspectProfile> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id Prospecto no encontrado");
+			throw new EntityIdNotFoundException(MSG_NOT_FOUND);
 		}
 		ProspectProfile entityDb = o.get();
 		entityDb = customMapper.toEditEntity(entityDb, entity);
@@ -231,20 +230,20 @@ public class ProspectProfileController extends CommonController {
 	@PutMapping(ID + NEWHIRE)
 	public ResponseEntity<EmployeeProfileDTO> hire(@RequestBody ProspectProfileDTO entity, @PathVariable Long id) 
 		throws IdsEntityNotEqualsException, EntityIdNotFoundException, StatusCatalogNotFoundException, 
-		CreateEmployeeProfileException, IllegalArgumentException {
+		CreateEmployeeProfileException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if (!Objects.equals(id, entity.getId())) {
 			throw new IdsEntityNotEqualsException("Ids de Prospecto no coinciden para actualización");
         }
 		Optional<ProspectProfile> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id Prospecto no encontrado");
+			throw new EntityIdNotFoundException(MSG_NOT_FOUND);
 		}
 		
 		ProspectProfile p = o.get();
-		//this.service.validEntity(c, id);
+		//this.service.validEntity(c, id)
 		
 		Optional<ProspectStatus> optional = this.serviceS.findById(ProspectStatusEnum.CONTRATADO.getValue());
 		if(optional.isEmpty()) {
@@ -257,14 +256,14 @@ public class ProspectProfileController extends CommonController {
 		
 		//Generate employee number
 		String employeeNumber = this.serviceP.generateEmployeeNumber(p.getEmployeePosition());
-		//System.out.println("employeeNumber:" + employeeNumber);
+		//System.out.println("employeeNumber:" + employeeNumber)
 		EmployeeProfile e = this.service.saveNewHire(p, employeeNumber, optional.get(), optional2.get());
 		if (e == null) {
 			throw new CreateEmployeeProfileException("No se pudo crear Empleado desde el Prospecto, valide la info");
 		}
 		
 		//Send message to Queue
-		//jmsProducer.sendMessage(c);
+		//jmsProducer.sendMessage(c)
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(customMapper2.toDto(e));
 	}

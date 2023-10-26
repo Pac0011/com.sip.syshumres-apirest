@@ -3,7 +3,6 @@ package com.sip.syshumres_apirest.controllers;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -31,6 +30,7 @@ import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.FatherAssignException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.ModuleService;
 import com.sip.syshumres_utils.StringTrim;
@@ -58,8 +58,8 @@ public class ModuleController extends CommonController {
 	@GetMapping(ACTIVE)
 	public ResponseEntity<List<EntitySelectDTO>> listActive() {
 		return ResponseEntity.ok().body(service.findByEnabledTrueOrderByDescription().stream()
-				.map(entity -> customMapper.toSelectDto(entity))
-				.collect(Collectors.toList()));
+				.map(customMapper::toSelectDto)
+				.toList());
 	}
 	
 	/**
@@ -71,9 +71,7 @@ public class ModuleController extends CommonController {
 	public ResponseEntity<Page<ModuleDTO>> list(Pageable pageable) {
 		Page<Module> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<ModuleDTO> entitiesPageDTO = entities.map(entity -> {
-		    return customMapper.toDto(entity);
-		});
+		Page<ModuleDTO> entitiesPageDTO = entities.map(customMapper::toDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
@@ -129,9 +127,9 @@ public class ModuleController extends CommonController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<ModuleDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<Module> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
@@ -143,13 +141,13 @@ public class ModuleController extends CommonController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody ModuleDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de modulo no coinciden para actualización");
@@ -160,7 +158,7 @@ public class ModuleController extends CommonController {
 		}
 		
 		Module entityDb = o.get();
-		if (entity.getFather() != null && entityDb.getId() == entity.getFather().getId()) {
+		if (entity.getFather() != null && entityDb.getId().equals(entity.getFather().getId())) {
 			throw new FatherAssignException("El padre del modulo no puede ser el mismo");
 		}
 

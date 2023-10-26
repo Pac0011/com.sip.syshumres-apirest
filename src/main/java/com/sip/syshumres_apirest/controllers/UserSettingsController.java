@@ -52,7 +52,7 @@ public class UserSettingsController {
 		String passConfirm = StringTrim.trimAndRemoveDiacriticalMarks(passwordNewConfirm);
 		Map<String, Object> errorsCustomFields = this.service.validChangePassword(userSession.getPassword(), passOld, 
 				passNew, passConfirm);
-		if (errorsCustomFields != null) {
+		if (!errorsCustomFields.isEmpty()) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		

@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +38,7 @@ import com.sip.syshumres_entities.enums.EmployeeTypeEnum;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.UnknownOptionException;
 import com.sip.syshumres_exceptions.UploadFileException;
 import com.sip.syshumres_exceptions.UploadFormatsAllowException;
@@ -62,8 +62,11 @@ public class EmployeeProfileController extends CommonController {
 	public static final String ADM = "/adm";
 	public static final String UPLOADFILE = "/upload-file";
 	public static final String DOCUMENT = "/document";
-	public static final String FILTER = "/filter";
+	public static final String SEARCHSTRING = "/filter";
 	public static final String SEARCHNAMERELATIONSHIP = "/search-name-relationship";
+	
+	private static final String MSG_ID = "Id empleado ";
+	private static final String MSG_NOT_FOUND = " no encontrado";
 	
     private final EmployeeProfileService service;
     
@@ -91,13 +94,11 @@ public class EmployeeProfileController extends CommonController {
 		if (userSession == null) {
 			throw new UserSessionNotFoundException();
 		}
-		//System.out.println("branchOfficeSession: " + userSession.getBranchOffice().getDescription());
+		//System.out.println("branchOfficeSession: " + userSession.getBranchOffice().getDescription())
 		Page<EmployeeProfile> entities = this.service.findByFilterSession(this.filter, 
 			 userSession, EmployeeTypeEnum.OPER.getValue(), pageable);
 		
-		Page<EmployeeProfileViewDTO> entitiesPageDTO = entities.map(entity -> {
-		    return customMapper.toViewDto(entity);
-		});
+		Page<EmployeeProfileViewDTO> entitiesPageDTO = entities.map(customMapper::toViewDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
@@ -147,7 +148,7 @@ public class EmployeeProfileController extends CommonController {
 		
 		EmployeeProfile employeeProfile = customMapper.toSaveEntity(entity);
 		Map<String, Object> errorsCustomFields = this.service.validEntity(employeeProfile, 0L);
-		if (errorsCustomFields != null) {
+		if (!errorsCustomFields.isEmpty()) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
@@ -157,13 +158,13 @@ public class EmployeeProfileController extends CommonController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<EmployeeProfileDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<EmployeeProfile> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id Empleado " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -171,27 +172,27 @@ public class EmployeeProfileController extends CommonController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody EmployeeProfileDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de Empleado no coinciden para actualización");
         }
 		Optional<EmployeeProfile> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id Empleado " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		EmployeeProfile entityDb = o.get();
 		entityDb = customMapper.toEditEntity(entityDb, entity);
 		
 		Map<String, Object> errorsCustomFields = this.service.validEntity(entityDb, id);
-		if (errorsCustomFields != null) {
+		if (!errorsCustomFields.isEmpty()) {
 			return ResponseEntity.badRequest().body(errorsCustomFields);
 		}
 		
@@ -200,31 +201,28 @@ public class EmployeeProfileController extends CommonController {
 	}
 	
 	@PutMapping(ID + UPLOADFILE)
-	public ResponseEntity<Map<String, Object>> uploadFile(@PathVariable Long id, 
+	public ResponseEntity<Map<String, Object>> uploadFileProfile(@PathVariable Long id, 
 			@RequestParam String nameInput, 
 			@RequestParam MultipartFile fileUpload) 
 					throws IOException, EntityIdNotFoundException, UploadFormatsAllowException, 
-					UploadFileException, UnknownOptionException, CreateRegisterException, IllegalArgumentException {
-		Map<String, Object> response = new HashMap<>();
-		
+					UploadFileException, UnknownOptionException, CreateRegisterException, InvalidIdException {		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
-		
-		response = this.service.uploadFile(id, nameInput, fileUpload);
-		
-		return ResponseEntity.ok().body(response);
+				
+		return ResponseEntity.ok()
+				.body(this.service.uploadFile(id, nameInput, fileUpload));
 	}
 	
 	@GetMapping(ID + DOCUMENT)
 	public ResponseEntity<Resource> getFileEmployee(@PathVariable Long id, 
-			@RequestParam String nameInput) throws EntityIdNotFoundException, IllegalArgumentException {
+			@RequestParam String nameInput) throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<EmployeeProfile> o = this.service.findById(id);
 		if (!o.isPresent()) {	
-			throw new EntityIdNotFoundException("Id Empleado " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		if (o.get().getFileCurp() == null) {	
 			throw new EntityIdNotFoundException("Archivo de la Curp no encontrado de empleado id " + id);
@@ -244,16 +242,14 @@ public class EmployeeProfileController extends CommonController {
 	public ResponseEntity<Page<EmployeeProfileViewDTO>> listEmployeeTypeAdm(Pageable pageable, HttpSession session) 
 			throws UserSessionNotFoundException {		
 		User userSession = (User) session.getAttribute(this.sessionUserName);
-		//System.out.println(branchOfficeSession.getDescription());
+		//System.out.println(branchOfficeSession.getDescription())
 		if (userSession == null) {
 			throw new UserSessionNotFoundException();
 		}
 		Page<EmployeeProfile> entities = this.service.findByFilterSession(this.filter, 
 				 userSession, EmployeeTypeEnum.ADM.getValue(), pageable);
 		
-		Page<EmployeeProfileViewDTO> entitiesPageDTO = entities.map(entity -> {
-		    return customMapper.toViewDto(entity);
-		});
+		Page<EmployeeProfileViewDTO> entitiesPageDTO = entities.map(customMapper::toViewDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
@@ -295,30 +291,26 @@ public class EmployeeProfileController extends CommonController {
 		return this.listAdm(text, pageableOrder, session);
 	}
 	
-	@GetMapping(FILTER)
+	@GetMapping(SEARCHSTRING)
 	public ResponseEntity<Page<EmployeeProfileViewDTO>> list(@RequestParam Long idEmployeeType, Pageable pageable, HttpSession session) 
 			throws UserSessionNotFoundException {
 		User userSession = (User) session.getAttribute(this.sessionUserName);
-		//System.out.println(branchOfficeSession.getDescription());
+		//System.out.println(branchOfficeSession.getDescription())
 		if (userSession == null) {
 			throw new UserSessionNotFoundException();
 		}
 		if (userSession.isSeeAllBranchs()) {
 			Page<EmployeeProfileViewDTO> entitiesPageDTO =  service.listEmployeeType(idEmployeeType, pageable)
-				.map(entity -> {
-			    return customMapper.toViewDto(entity);
-			});
+				.map(customMapper::toViewDto);
 			return ResponseEntity.ok(entitiesPageDTO);
 		}
 		Page<EmployeeProfileViewDTO> entitiesPageDTO =  service.listEmployeeType(userSession.getBranchOffice().getId(), idEmployeeType, pageable)
-			.map(entity -> {
-		    return customMapper.toViewDto(entity);
-		});
+			.map(customMapper::toViewDto);
 		return ResponseEntity.ok(entitiesPageDTO);
 	}
 	
 	@GetMapping(SEARCHNAMERELATIONSHIP)
-	public ResponseEntity<Map<String, Object>> searchNameRelationship(@RequestParam String lastName,
+	public ResponseEntity<Map<String, Object>> searchNameRelationshipEmployee(@RequestParam String lastName,
 			@RequestParam String lastNameSecond) {
 		Map<String, Object> response = new HashMap<>();
 		response.put("name", "");

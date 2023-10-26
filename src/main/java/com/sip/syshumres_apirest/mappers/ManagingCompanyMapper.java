@@ -20,7 +20,7 @@ public class ManagingCompanyMapper {
 	@Autowired
     private ModelMapper modelMapper;
 	
-	public ManagingCompanyMapper() {
+	public ManagingCompanyMapper() {// Noncompliant - method is empty
 	}
 	
 	public ManagingCompanyDTO toDto(ManagingCompany entity) {
@@ -42,11 +42,11 @@ public class ManagingCompanyMapper {
 		if (entity.getTypeHiring() != null) {
 	        dto.setTypeHiring(modelMapper.map(entity.getTypeHiring(), EntitySelectDTO.class));
 	    }
-		ArrayList<EntitySelectDTO> officesDTO = new ArrayList<EntitySelectDTO>();
+		ArrayList<EntitySelectDTO> officesDTO = new ArrayList<>();
 		if (entity.getBranchOffices() != null) {
-			entity.getBranchOffices().forEach(child -> {
-				officesDTO.add(new EntitySelectDTO(child.getId(), child.getDescription()));
-			});
+			entity.getBranchOffices().forEach(child -> 
+				officesDTO.add(new EntitySelectDTO(child.getId(), child.getDescription()))
+			);
 		}
 		officesDTO.sort(Comparator.comparing(EntitySelectDTO::getDescription));
 		dto.setBranchOffices(officesDTO);
@@ -81,7 +81,7 @@ public class ManagingCompanyMapper {
 		if (entity.getAddressFiscal() != null) {
 			e.setAddressFiscal(this.modelMapper.map(entity.getAddressFiscal(), Address.class));
 		}
-		//e.setBranchOffices(entity.getBranchOffices());
+		//e.setBranchOffices(entity.getBranchOffices())
 		e.setEnabled(entity.isEnabled());
 		
 		return e;
@@ -106,7 +106,7 @@ public class ManagingCompanyMapper {
 		if (entity.getAddressFiscal() != null) {
 			e.setAddressFiscal(this.modelMapper.map(entity.getAddressFiscal(), Address.class));
 		}
-		//e.setBranchOffices(entity.getBranchOffices());
+		//e.setBranchOffices(entity.getBranchOffices())
 		e.setEnabled(entity.isEnabled());
 		
 		return e;

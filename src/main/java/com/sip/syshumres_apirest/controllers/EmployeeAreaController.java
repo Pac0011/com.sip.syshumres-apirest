@@ -3,7 +3,6 @@ package com.sip.syshumres_apirest.controllers;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -57,17 +56,15 @@ public class EmployeeAreaController extends CommonController {
 	@GetMapping(ACTIVE)
 	public ResponseEntity<List<EntitySelectDTO>> listActive() {
 		return ResponseEntity.ok().body(service.findByEnabledTrueOrderByDescription().stream()
-				.map(entity -> customMapper.toSelectDto(entity))
-				.collect(Collectors.toList()));
+				.map(customMapper::toSelectDto)
+				.toList());
 	}
 	
 	@GetMapping(PAGE)
 	public ResponseEntity<Page<EmployeeAreaDTO>> list(Pageable pageable) {
 		Page<EmployeeArea> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<EmployeeAreaDTO> entitiesPageDTO = entities.map(entity -> {
-			return customMapper.toDto(entity);
-		});
+		Page<EmployeeAreaDTO> entitiesPageDTO = entities.map(customMapper::toDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
@@ -153,7 +150,7 @@ public class EmployeeAreaController extends CommonController {
 		}
 		
 		EmployeeArea e = o.get();
-		if (entity.getFather() != null && e.getId() == entity.getFather().getId()) {
+		if (entity.getFather() != null && e.getId().equals(entity.getFather().getId())) {
 			throw new FatherAssignException("El padre del area no puede ser ella misma");
 		}
 		

@@ -19,7 +19,7 @@ public class EmployeePayrollMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public EmployeePayrollMapper() {
+	public EmployeePayrollMapper() {// Noncompliant - method is empty
 	}
 	
 	public EmployeePayroll toSaveEntity(EmployeePayrollDTO entity) {

@@ -15,7 +15,7 @@ public class ProspectProfileMapper {
 	@Autowired
     private ModelMapper modelMapper;
 	
-	public ProspectProfileMapper() {
+	public ProspectProfileMapper() {// Noncompliant - method is empty
 	}
 
 	public ProspectProfileDTO toDto(ProspectProfile entity) {

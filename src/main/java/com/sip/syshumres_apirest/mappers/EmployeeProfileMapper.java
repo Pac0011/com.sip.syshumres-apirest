@@ -1,7 +1,6 @@
 package com.sip.syshumres_apirest.mappers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class EmployeeProfileMapper {
 	@Autowired
 	private EmployeeLaborDataMapper employeeLaborDataMapper;
   	
-	public EmployeeProfileMapper() {
+	public EmployeeProfileMapper() {// Noncompliant - method is empty
 	}
 	
 	public EmployeeProfileViewDTO toViewDto(EmployeeProfile entity) {
@@ -62,10 +61,9 @@ public class EmployeeProfileMapper {
 			    dto.setTypeHiring(entity.getEmployeePayroll().getTypeHiring().getDescription());
 			}
 		}
-		if (entity.getEmployeeOperation() != null) {
-			if (entity.getEmployeeOperation().getService() != null) {
-		        dto.setService(entity.getEmployeeOperation().getService().getCode());
-			}
+		if (entity.getEmployeeOperation() != null 
+				&& entity.getEmployeeOperation().getService() != null) {
+		    dto.setService(entity.getEmployeeOperation().getService().getCode());
 		}
 		if (entity.getEmployeeArea() != null) {
 	    	dto.setEmployeeArea(entity.getEmployeeArea().getDescription());
@@ -150,7 +148,7 @@ public class EmployeeProfileMapper {
 	    if (entity.getEmployeeDocuments() != null) {
 	    	List<EmployeeDocumentDTO> listDTO =  entity.getEmployeeDocuments().stream()
 			    .map(entityDoc -> modelMapper.map(entityDoc, EmployeeDocumentDTO.class))
-			    .collect(Collectors.toList());
+			    .toList();
 	    	dto.setEmployeeDocuments(listDTO);
 	    }
 		

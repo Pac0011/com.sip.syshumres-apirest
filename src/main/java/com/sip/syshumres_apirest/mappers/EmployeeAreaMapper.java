@@ -18,7 +18,7 @@ public class EmployeeAreaMapper {
 	@Autowired
 	private ModelMapper modelMapper;
   	
-	public EmployeeAreaMapper() {
+	public EmployeeAreaMapper() {// Noncompliant - method is empty
 	}
 	
 	public EmployeeAreaDTO toDto(EmployeeArea entity) {
@@ -32,7 +32,7 @@ public class EmployeeAreaMapper {
 	    if (entity.getFather() != null) {
 	        dto.setFather(modelMapper.map(entity.getFather(), EntitySelectDTO.class));
 	    }
-		ArrayList<EntitySelectDTO> childsDTO = new ArrayList<EntitySelectDTO>();
+		ArrayList<EntitySelectDTO> childsDTO = new ArrayList<>();
 		if (entity.getChilds() != null) {
 			entity.getChilds().forEach(child -> {
 				EntitySelectDTO dtoE = new EntitySelectDTO();
@@ -61,7 +61,7 @@ public class EmployeeAreaMapper {
 		if (entity.getFather() != null) {
 	        e.setFather(this.modelMapper.map(entity.getFather(), EmployeeArea.class));
 	    }
-		//e.setChilds(entity.getChilds());
+		//e.setChilds(entity.getChilds())
 		e.setEnabled(entity.isEnabled());
 	
 		return e;
@@ -75,7 +75,7 @@ public class EmployeeAreaMapper {
 		if (entity.getFather() != null) {
 	        e.setFather(this.modelMapper.map(entity.getFather(), EmployeeArea.class));
 	    }
-		//e.setChilds(entity.getChilds());
+		//e.setChilds(entity.getChilds())
 		e.setEnabled(entity.isEnabled());
 		
 		return e;

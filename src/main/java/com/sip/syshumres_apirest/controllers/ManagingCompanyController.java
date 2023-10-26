@@ -33,6 +33,7 @@ import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
 import com.sip.syshumres_entities.dtos.ManagingCompanyDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.ManagingCompanyService;
 import com.sip.syshumres_utils.StringTrim;
@@ -46,6 +47,9 @@ public class ManagingCompanyController extends CommonController {
 	public static final String BRANCHOFFICES = "/branch-offices";
 	public static final String ABRANCHOFFICES = "/assign-branch-offices";
 	public static final String RBRANCHOFFICE = "/remove-branch-office";
+	
+	private static final String MSG_ID = "Id administradora ";
+	private static final String MSG_NOT_FOUND = " no encontrado";
 	
 	private final ManagingCompanyService service;
 	
@@ -69,13 +73,13 @@ public class ManagingCompanyController extends CommonController {
 	
 	@GetMapping(ID + BRANCHOFFICES)
 	public ResponseEntity<ManagingCompanyDTO> getBranchOffices(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<ManagingCompany> entity = service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id administradora " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 				
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -85,9 +89,7 @@ public class ManagingCompanyController extends CommonController {
 	public ResponseEntity<Page<ManagingCompanyDTO>> list(Pageable pageable) {
 		Page<ManagingCompany> entities = this.service.findByFilterSession(this.filter, pageable);
 		
-		Page<ManagingCompanyDTO> entitiesPageDTO = entities.map(entity -> {
-		    return customMapper.toDto(entity);
-		});
+		Page<ManagingCompanyDTO> entitiesPageDTO = entities.map(customMapper::toDto);
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
 	}
@@ -142,13 +144,13 @@ public class ManagingCompanyController extends CommonController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<ManagingCompanyDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<ManagingCompany> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
-			throw new EntityIdNotFoundException("Id administradora " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		return ResponseEntity.ok(customMapper.toDto(entity.get()));
@@ -156,20 +158,20 @@ public class ManagingCompanyController extends CommonController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody ManagingCompanyDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de la administradora no coinciden para actualización");
         }
 		Optional<ManagingCompany> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id administradora " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		ManagingCompany e = this.service.save(customMapper.toEditEntity(o.get(), entity));
@@ -179,13 +181,13 @@ public class ManagingCompanyController extends CommonController {
 	
 	@PatchMapping(ID + ABRANCHOFFICES)
 	public ResponseEntity<ManagingCompanyDTO> assignBranchOffices(@RequestBody List<BranchOfficeDTO> branchOffices, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<ManagingCompany> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id administradora " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
 		ManagingCompany e = this.service.assignBranchOffices(o.get(), listMapper.mapList(branchOffices, BranchOffice.class));
@@ -195,13 +197,13 @@ public class ManagingCompanyController extends CommonController {
 	
 	@PatchMapping(ID + RBRANCHOFFICE)
 	public ResponseEntity<ManagingCompanyDTO> removeBranchOffice(@RequestBody BranchOfficeDTO branchOffice, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<ManagingCompany> o = this.service.findById(id);
 		if (!o.isPresent()) {
-			throw new EntityIdNotFoundException("Id administradora " + id + " no encontrado");
+			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 
 		ManagingCompany e = this.service.removeBranchOffice(o.get(), customMapper2.toEntity(branchOffice));

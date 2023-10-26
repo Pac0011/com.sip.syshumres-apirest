@@ -17,7 +17,7 @@ public class EmployeeGeneralDataMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public EmployeeGeneralDataMapper() {
+	public EmployeeGeneralDataMapper() {// Noncompliant - method is empty
 	}
 	
 	public EmployeeGeneralData toSaveEntity(EmployeeGeneralDataDTO entity) {

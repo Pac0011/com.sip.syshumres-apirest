@@ -16,7 +16,7 @@ public class ModuleCustomMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public ModuleCustomMapper() {
+	public ModuleCustomMapper() {// Noncompliant - method is empty
 	}
 	
 	public Module toEntity(ModuleDTO entity) {
@@ -36,7 +36,7 @@ public class ModuleCustomMapper {
 		if (entity.getFather() != null) {
 	        dto.setFather(modelMapper.map(entity.getFather(), EntitySelectDTO.class));
 	    }
-		ArrayList<EntitySelectDTO> childsDTO = new ArrayList<EntitySelectDTO>();
+		ArrayList<EntitySelectDTO> childsDTO = new ArrayList<>();
 		if (entity.getChilds() != null) {
 			entity.getChilds().forEach(child -> {
 				EntitySelectDTO dtoE = new EntitySelectDTO();
@@ -47,7 +47,7 @@ public class ModuleCustomMapper {
 		}
 		childsDTO.sort(Comparator.comparing(EntitySelectDTO::getDescription));
 		dto.setChilds(childsDTO);
-		ArrayList<EntitySelectDTO> authoritiesDTO = new ArrayList<EntitySelectDTO>();
+		ArrayList<EntitySelectDTO> authoritiesDTO = new ArrayList<>();
 		if (entity.getAuthorities() != null) {
 			entity.getAuthorities().forEach(module -> {
 				EntitySelectDTO dtoE = new EntitySelectDTO();

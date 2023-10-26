@@ -20,9 +20,10 @@ public class WebConfig implements WebMvcConfigurer{
 	@Value("${URL.DOCUMENTS.EMPLOYEES}")
 	private String urlDocuments;
 	
+	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		//pathImages = "/Users/prong/jobs/imgvacants/";
-		//System.out.println("Ruta con value: " + this.uploadDocuments);
+		//pathImages = "/Users/prong/jobs/imgvacants/"
+		//System.out.println("Ruta con value: " + this.uploadDocuments)
 		registry.addResourceHandler(urlDocuments + "**").addResourceLocations("file:" + this.uploadDocuments); // Linux
 		//registry.addResourceHandler("/cv/**").addResourceLocations("file:" + pathCv); // Linux
 		

@@ -16,7 +16,7 @@ public class AuthorityMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public AuthorityMapper() {
+	public AuthorityMapper() {// Noncompliant - method is empty
 	}
 	
 	public Authority toEntity(AuthorityDTO entity) {
@@ -30,19 +30,19 @@ public class AuthorityMapper {
 		dto.setDetail(entity.getDetail());
 		dto.setModulesDtos(null);
 		
-		ArrayList<EntitySelectDTO> usersDTO = new ArrayList<EntitySelectDTO>();
+		ArrayList<EntitySelectDTO> usersDTO = new ArrayList<>();
 		if (entity.getUsers() != null) {
-			entity.getUsers().forEach(user -> {
-				usersDTO.add(new EntitySelectDTO(user.getId(), user.getUsername()));
-			});
+			entity.getUsers().forEach(user -> 
+				usersDTO.add(new EntitySelectDTO(user.getId(), user.getUsername()))
+			);
 		}
 		dto.setUsers(usersDTO);
 		
-		ArrayList<EntitySelectDTO> modulesDTO = new ArrayList<EntitySelectDTO>();
+		ArrayList<EntitySelectDTO> modulesDTO = new ArrayList<>();
 		if (entity.getModules() != null) {
-			entity.getModules().forEach(module -> {
-				modulesDTO.add(new EntitySelectDTO(module.getId(), module.getDescription()));
-			});
+			entity.getModules().forEach(module -> 
+				modulesDTO.add(new EntitySelectDTO(module.getId(), module.getDescription()))
+			);
 		}
 		modulesDTO.sort(Comparator.comparing(EntitySelectDTO::getDescription));
 		dto.setModules(modulesDTO);

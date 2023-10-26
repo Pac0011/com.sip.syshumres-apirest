@@ -34,7 +34,7 @@ public class LogoutController {
 	}
 
 	@PostMapping(LOGOUT)
-	public ResponseEntity<Map<String, Object>> logout(HttpSession session) throws UsernameNotFoundException {
+	public ResponseEntity<Map<String, Object>> logoutUser(HttpSession session) throws UsernameNotFoundException {
 		Map<String, Object> response = new HashMap<>();
 		response.put("response", "Logout exitoso");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -44,12 +44,12 @@ public class LogoutController {
 			throw new UsernameNotFoundException();
 		}
         session = service.logout(session, sessionUserName);
-        //User e = entity.get();
-        //user.setOnline(false);
-        //userServ.saveUser(user);
+        //User e = entity.get()
+        //user.setOnline(false)
+        //userServ.saveUser(user)
         
-        //BranchOffice branchOfficeSession2 = (BranchOffice) session.getAttribute(this.sessionUserName);
-        //System.out.println("branchOfficeSession 2: " + branchOfficeSession2.getDescription());
+        //BranchOffice branchOfficeSession2 = (BranchOffice) session.getAttribute(this.sessionUserName)
+        //System.out.println("branchOfficeSession 2: " + branchOfficeSession2.getDescription())
         
         return ResponseEntity.ok().body(response);
     }

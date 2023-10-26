@@ -3,7 +3,6 @@ package com.sip.syshumres_apirest.controllers;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -32,6 +31,7 @@ import com.sip.syshumres_entities.dtos.HiringDocumentsDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.HiringDocumentsService;
 import com.sip.syshumres_utils.StringTrim;
@@ -58,7 +58,7 @@ public class HiringDocumentsController extends CommonCatalogController {
 	public ResponseEntity<List<EntitySelectDTO>> listActive() {
 		return ResponseEntity.ok().body(service.findByEnabledTrueOrderByDescription().stream()
 				.map(entity -> modelMapper.map(entity, EntitySelectDTO.class))
-				.collect(Collectors.toList()));
+				.toList());
 	}
 	
 	@GetMapping(PAGE)
@@ -66,8 +66,7 @@ public class HiringDocumentsController extends CommonCatalogController {
 		Page<HiringDocuments> entities = this.service.findByFilterSession(this.filter, pageable);
 		
 		Page<HiringDocumentsDTO> entitiesPageDTO = entities.map(entity -> {
-			HiringDocumentsDTO dto = modelMapper.map(entity, HiringDocumentsDTO.class);
-		    return dto;
+			return modelMapper.map(entity, HiringDocumentsDTO.class);
 		});
 
 		return ResponseEntity.ok().body(entitiesPageDTO);
@@ -131,9 +130,9 @@ public class HiringDocumentsController extends CommonCatalogController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<HiringDocumentsDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<HiringDocuments> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
@@ -145,13 +144,13 @@ public class HiringDocumentsController extends CommonCatalogController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody HiringDocumentsDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de documento de contratación no coinciden para actualización");

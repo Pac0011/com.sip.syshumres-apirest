@@ -15,7 +15,7 @@ public class EmployeePositionMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public EmployeePositionMapper() {
+	public EmployeePositionMapper() {// Noncompliant - method is empty
 	}
 	
 	public EntitySelectDTO toSelectDto(EmployeePosition entity) {

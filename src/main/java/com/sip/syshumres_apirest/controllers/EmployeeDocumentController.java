@@ -1,7 +1,6 @@
 package com.sip.syshumres_apirest.controllers;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -24,6 +23,7 @@ import com.sip.syshumres_entities.EmployeeDocument;
 import com.sip.syshumres_entities.dtos.EmployeeDocumentDTO;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.TypeHiringDocumentNotExistException;
 import com.sip.syshumres_exceptions.UploadFormatsAllowException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
@@ -63,16 +63,13 @@ public class EmployeeDocumentController {
 	public ResponseEntity<Map<String, Object>> uploadFileNew(@PathVariable Long idEmployeeProfile, 
 			@RequestParam("nameInput") Long idHiringDocument,
 			@RequestParam MultipartFile fileUpload) throws IOException, UploadFormatsAllowException, 
-			EntityIdNotFoundException, TypeHiringDocumentNotExistException, CreateRegisterException, IllegalArgumentException {
-		Map<String, Object> response = new HashMap<>();
-		
+			EntityIdNotFoundException, TypeHiringDocumentNotExistException, CreateRegisterException, InvalidIdException {
 		if (idEmployeeProfile <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		
-		response = this.service.uploadFile(idEmployeeProfile, idHiringDocument, fileUpload);
-		
-		return ResponseEntity.ok().body(response);
+		return ResponseEntity.ok().body(this.service
+				.uploadFile(idEmployeeProfile, idHiringDocument, fileUpload));
 	}
 
 }

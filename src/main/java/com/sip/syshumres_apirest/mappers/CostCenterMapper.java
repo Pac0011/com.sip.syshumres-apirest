@@ -14,7 +14,7 @@ public class CostCenterMapper {
 	@Autowired
 	private ModelMapper modelMapper;
   	
-	public CostCenterMapper() {
+	public CostCenterMapper() {// Noncompliant - method is empty
 	}
 	
 	public CostCenterDTO toDto(CostCenter entity) {

@@ -23,7 +23,7 @@ public class BranchOfficeMapper {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	public BranchOfficeMapper() {
+	public BranchOfficeMapper() {// Noncompliant - method is empty
 	}
 	
 	public BranchOffice toEntity(BranchOfficeDTO entity) {
@@ -52,7 +52,7 @@ public class BranchOfficeMapper {
 	        dto.setFather(this.modelMapper.map(entity.getFather(), EntitySelectDTO.class));
 	    }
 	    
-		ArrayList<EntitySelectDTO> childsDTO = new ArrayList<EntitySelectDTO>();
+		ArrayList<EntitySelectDTO> childsDTO = new ArrayList<>();
 		if (entity.getChilds() != null) {
 			entity.getChilds().forEach(child -> {
 				EntitySelectDTO dtoE = new EntitySelectDTO();
@@ -67,7 +67,7 @@ public class BranchOfficeMapper {
 			dto.setAddress(this.modelMapper.map(entity.getAddress(), AddressDTO.class));
 		}
 		dto.setEnabled(entity.isEnabled());
-		//e.setManagingCompanies(null);
+		//e.setManagingCompanies(null)
 		
 		return dto;
 	}
@@ -90,7 +90,7 @@ public class BranchOfficeMapper {
 		if (entity.getBranchOfficeType() != null) {
 	        e.setBranchOfficeType(this.modelMapper.map(entity.getBranchOfficeType(), BranchOfficeType.class));
 	    }
-		//e.setManagingCompany(entity.getManagingCompany());
+		//e.setManagingCompany(entity.getManagingCompany())
 		if (entity.getCostCenter() != null) {
 	        e.setCostCenter(this.modelMapper.map(entity.getCostCenter(), CostCenter.class));
 	    }
@@ -100,7 +100,7 @@ public class BranchOfficeMapper {
 		if (entity.getFather() != null) {
 	        e.setFather(this.modelMapper.map(entity.getFather(), BranchOffice.class));
 	    }
-		//e.setChilds(entity.getChilds());
+		//e.setChilds(entity.getChilds())
 		e.setEnabled(entity.isEnabled());
 		
 		return e;
@@ -119,7 +119,7 @@ public class BranchOfficeMapper {
 		if (entity.getBranchOfficeType() != null) {
 	        e.setBranchOfficeType(this.modelMapper.map(entity.getBranchOfficeType(), BranchOfficeType.class));
 	    }
-		//e.setManagingCompany(entity.getManagingCompany());
+		//e.setManagingCompany(entity.getManagingCompany())
 		if (entity.getCostCenter() != null) {
 	        e.setCostCenter(this.modelMapper.map(entity.getCostCenter(), CostCenter.class));
 	    }
@@ -129,7 +129,7 @@ public class BranchOfficeMapper {
 		if (entity.getFather() != null) {
 	        e.setFather(this.modelMapper.map(entity.getFather(), BranchOffice.class));
 	    }
-		//e.setChilds(entity.getChilds());
+		//e.setChilds(entity.getChilds())
 		e.setEnabled(entity.isEnabled());
 		
 		return e;
