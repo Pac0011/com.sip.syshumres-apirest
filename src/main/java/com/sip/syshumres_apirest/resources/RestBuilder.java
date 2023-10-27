@@ -167,8 +167,10 @@ public class RestBuilder<T> {
 	private HttpHeaders headers() {
 		HttpHeaders headers = new HttpHeaders();
 		
-		for (String key : headerValues.keySet()) {
-			headers.set(key, headerValues.get(key));
+		for (Map.Entry<String, String> entry : headerValues.entrySet()) {
+		   String key = entry.getKey();
+		   String value = entry.getValue();
+		   headers.set(key, value);
 		}
 		
 		if (authorization != null) {
