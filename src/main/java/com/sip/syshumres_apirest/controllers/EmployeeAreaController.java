@@ -30,6 +30,7 @@ import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.FatherAssignException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.EmployeeAreaService;
 import com.sip.syshumres_utils.StringTrim;
@@ -119,9 +120,9 @@ public class EmployeeAreaController extends CommonController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<EmployeeAreaDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<EmployeeArea> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
@@ -133,13 +134,13 @@ public class EmployeeAreaController extends CommonController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody EmployeeAreaDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de area no coinciden para actualización");

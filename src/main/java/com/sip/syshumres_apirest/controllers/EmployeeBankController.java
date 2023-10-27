@@ -26,6 +26,7 @@ import com.sip.syshumres_entities.dtos.EmployeeBankDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.EmployeeBankService;
 import com.sip.syshumres_utils.StringTrim;
@@ -64,9 +65,9 @@ public class EmployeeBankController extends CommonCatalogController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<EmployeeBankDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<EmployeeBank> entity = service.findById(id);
 		if(entity.isEmpty()) {
@@ -90,13 +91,13 @@ public class EmployeeBankController extends CommonCatalogController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody EmployeeBankDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException();

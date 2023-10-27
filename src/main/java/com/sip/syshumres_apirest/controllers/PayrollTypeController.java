@@ -26,6 +26,7 @@ import com.sip.syshumres_entities.dtos.PayrollTypeDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
+import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.PayrollTypeService;
 import com.sip.syshumres_utils.StringTrim;
@@ -80,9 +81,9 @@ public class PayrollTypeController extends CommonCatalogController {
 	
 	@GetMapping(ID)
 	public ResponseEntity<PayrollTypeDTO> formEdit(@PathVariable Long id) 
-			throws EntityIdNotFoundException, IllegalArgumentException {
+			throws EntityIdNotFoundException, InvalidIdException {
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		Optional<PayrollType> entity = this.service.findById(id);
 		if(entity.isEmpty()) {
@@ -94,13 +95,13 @@ public class PayrollTypeController extends CommonCatalogController {
 	
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody PayrollTypeDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, IllegalArgumentException {
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
 		if (result.hasErrors()) {
 			return ErrorsBindingFields.validate(result);
 		}
 		
 		if (id <= 0) {
-			throw new IllegalArgumentException("Id no puede ser cero o negativo");
+			throw new InvalidIdException();
 		}
 		if(!Objects.equals(id, entity.getId())){
 			throw new IdsEntityNotEqualsException("Ids de documento de contratación no coinciden para actualización");
