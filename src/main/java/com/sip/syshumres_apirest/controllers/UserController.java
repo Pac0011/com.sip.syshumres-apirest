@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.config.SwaggerConfig;
 import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.mappers.AuthorityMapper;
 import com.sip.syshumres_apirest.mappers.ListMapper;
@@ -47,7 +48,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Api(value = "UserController", description = "REST APIs related to User Entity")
+@Api(tags = {SwaggerConfig.USER_TAG})
 @RestController
 @RequestMapping(UserController.URLENDPOINT)
 public class UserController extends CommonController {
@@ -176,7 +177,7 @@ public class UserController extends CommonController {
 	@PutMapping(ID)
 	public ResponseEntity<?> edit(@Valid @RequestBody UserDTO entity, BindingResult result, @PathVariable Long id) 
 			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
-		//Se quito validacion if (result.hasErrors()) ya que el password se actualiza de forma independiente.
+		//Se quito validacion result.hasErrors pq el password se actualiza independiente
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}

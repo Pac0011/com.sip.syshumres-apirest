@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,8 @@ public class UserDetailsImpl implements UserDetails {
 	 */
 	private static final long serialVersionUID = 1L;
 	private final User user;
+	
+	private static final Logger logger = LoggerFactory.getLogger(UserDetailsImpl.class);
 
 	public UserDetailsImpl() {
 		super();
@@ -34,12 +38,13 @@ public class UserDetailsImpl implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 	   List<GrantedAuthority> authorities = new ArrayList<>();
-       for (Authority autho: user.getAuthorities()) {
-    	    System.out.println(autho.getDescription());
+       for (Authority autho: user.getAuthorities()) {    	    
+    	    if (logger.isDebugEnabled()) {
+			    logger.debug(autho.getDescription());
+	   		}
             authorities.add(new SimpleGrantedAuthority(autho.getDescription()));
         }
 		return authorities;
-		//return Collections.emptyList();
 	}
 	
 	@Override

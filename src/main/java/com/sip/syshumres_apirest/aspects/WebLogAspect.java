@@ -25,8 +25,8 @@ import org.springframework.core.annotation.Order;
 @Order(3)
 public class WebLogAspect {
 	private static final Logger logger = LoggerFactory.getLogger(WebLogAspect.class);
-	private static final String MSG_BEFORE = "Before method: ";
-	private static final String MSG_FORMAT_OUTPUT = "user:{}, ip:{}, url-{}";
+	private static final String MSG_BEFORE = "Before method:  {}";
+	private static final String MSG_USER = "user:{}, ip:{}, url-{}";
 	
 	ThreadLocal<Long> timeThreadLocal = new ThreadLocal<>();
 	
@@ -51,20 +51,23 @@ public class WebLogAspect {
 			return;
 		}
 		HttpServletRequest request = attributes.getRequest();
-		logger.info("=========oo===========");
-		if (joinPoint != null && joinPoint.getSignature() != null) {
-		    logger.info(String.format("%1$s %2$s", MSG_BEFORE, joinPoint.getSignature()));
-		}
-		if (request.getRequestURL() != null) {
-		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request), request.getRequestURL().toString());
-		}
-		if (joinPoint != null && joinPoint.getArgs() != null) {
-			Object[] signatureArgs = joinPoint.getArgs();
-			for (Object signatureArg: signatureArgs) {
-				logger.info(String.format("Arg: %1$s", signatureArg));
+		if (logger.isInfoEnabled()) {
+			logger.info("=========oo===========");
+			if (joinPoint != null) {
+		        logger.info(MSG_BEFORE, joinPoint.getSignature());
 			}
+			if (request.getRequestURL() != null) {
+				logger.info(MSG_USER, getUserName(), getIpAddr(request)
+						, request.getRequestURL());
+			}
+			if (joinPoint != null && joinPoint.getArgs() != null) {
+				Object[] signatureArgs = joinPoint.getArgs();
+				for (Object signatureArg: signatureArgs) {
+					logger.info("Arg: {}", signatureArg);
+				}
+			}
+			logger.info("================ooo=======================");
 		}
-		logger.info("================ooo=======================");
     }
 	
 	@Before("logCreateEntityPointcut(newEntity)")  
@@ -76,14 +79,16 @@ public class WebLogAspect {
 			return;
 		}
 		HttpServletRequest request = attributes.getRequest();
-		logger.info("=========Create entity===========");
-		logger.info(String.format("%1$s %2$s", MSG_BEFORE, joinPoint.getSignature()));
-		if (request.getRequestURL() != null) {
-		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request)
-		    		, request.getRequestURL().toString());
+		if (logger.isInfoEnabled()) {
+			logger.info("=========Create entity===========");			
+			logger.info(MSG_BEFORE, joinPoint.getSignature());
+			if (request.getRequestURL() != null) {
+			    logger.info(MSG_USER, getUserName(), getIpAddr(request)
+						, request.getRequestURL());
+			}
+			logger.info("New: {}", newEntity);
+			logger.info("================End create=======================");
 		}
-		logger.info(String.format("New: %1$s", newEntity));
-		logger.info("================End create=======================");
     }
 	
 	@Before("logEditEntityPointcut(originalEntity, newEntity)")  
@@ -91,25 +96,29 @@ public class WebLogAspect {
 		timeThreadLocal.set(System.currentTimeMillis());
 		
 		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		if (attributes == null) {
-			logger.info("=========attributes == null===========");
-			return;
+		if (logger.isInfoEnabled()) {
+			if (attributes == null) {
+				logger.info("=========attributes == null===========");
+				return;
+			}
+			HttpServletRequest request = attributes.getRequest();
+			logger.info("=========Edit entity===========");
+			logger.info(MSG_BEFORE, joinPoint.getSignature());
+			if (request.getRequestURL() != null) {
+			    logger.info(MSG_USER, getUserName(), getIpAddr(request)
+						, request.getRequestURL());
+			}
+			logger.info("Original: {}", originalEntity);
+			logger.info("New: {}", newEntity);
+			logger.info("================End edit=======================");
 		}
-		HttpServletRequest request = attributes.getRequest();
-		logger.info("=========Edit entity===========");
-		logger.info(String.format("%1$s %2$s", MSG_BEFORE, joinPoint.getSignature()));
-		if (request.getRequestURL() != null) {
-		    logger.info(MSG_FORMAT_OUTPUT, getUserName(), getIpAddr(request)
-		    		, request.getRequestURL().toString());
-		}
-		logger.info(String.format("Original: %1$s", originalEntity));
-		logger.info(String.format("New: %1$s", newEntity));
-		logger.info("================End edit=======================");
     }
 	
 	@AfterReturning("logPointcut()")
-	public void doAfterReturning(JoinPoint joinPoint) throws Throwable {
-		logger.info("time: {}", (System.currentTimeMillis() - timeThreadLocal.get()) + "ms");
+	public void doAfterReturning(JoinPoint joinPoint) {
+		if (logger.isInfoEnabled()) {
+		    logger.info("time: {}", (System.currentTimeMillis() - timeThreadLocal.get()) + "ms");
+		}
 	}
 	
 	private String getUserName() {

@@ -88,17 +88,6 @@ public class WebSecurityConfig {
 				.build();
 	}
 	
-	/*@Bean
-	UserDetailsService userDetailService() {
-		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-		manager.createUser(User.withUsername("admin")
-				.password(passwordEncoder().encode("admin"))
-				.roles()
-				.build());
-		
-		return manager;
-	}*/
-	
 	@Bean
 	AuthenticationManager authManager(HttpSecurity http) throws Exception {
 		return http.getSharedObject(AuthenticationManagerBuilder.class)
@@ -113,8 +102,4 @@ public class WebSecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 	
-	//public static void main(String[] args) {
-	//	System.out.println("pass: " + new BCryptPasswordEncoder().encode("admin"));
-	//}
-
 }

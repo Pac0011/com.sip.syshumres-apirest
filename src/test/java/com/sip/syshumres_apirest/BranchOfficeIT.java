@@ -34,7 +34,7 @@ import com.sip.syshumres_utils.RandomString;
 @TestPropertySource(locations = "/application-test.properties")
 @WebAppConfiguration
 @AutoConfigureMockMvc(addFilters = false)//no aplica filtros de autenticacion
-public class BranchOfficeIT {
+class BranchOfficeIT {
 		
     private MockMvc mockMvc;
 	
@@ -47,7 +47,7 @@ public class BranchOfficeIT {
 	}
 	 
 	@Test
-	public void listActive() throws Exception {
+	void listActive() throws Exception {
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.get(
 				"/" + BranchOfficeController.URLENDPOINT + BranchOfficeController.ACTIVE)
 				.accept(MediaType.APPLICATION_JSON))
@@ -60,7 +60,7 @@ public class BranchOfficeIT {
 	}
 	
 	@Test
-	public void page() throws Exception {
+	void page() throws Exception {
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.get(
 				"/" + BranchOfficeController.URLENDPOINT + BranchOfficeController.PAGE)
 				.queryParam("page", "0")
@@ -72,7 +72,7 @@ public class BranchOfficeIT {
 	}
 	
 	@Test
-	public void create() throws Exception {
+	void create() throws Exception {
 		BranchOfficeDTO b = buildBranchOffice();
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.post(
 				"/" + BranchOfficeController.URLENDPOINT)
@@ -84,7 +84,7 @@ public class BranchOfficeIT {
 	}
 	
 	@Test
-	public void formEdit() throws Exception {
+	void formEdit() throws Exception {
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.get(
 				"/" + BranchOfficeController.URLENDPOINT + BranchOfficeController.ID, 1L)
 				.accept(MediaType.APPLICATION_JSON))
@@ -93,7 +93,7 @@ public class BranchOfficeIT {
 	}
 	
 	@Test
-	public void createWithError() throws Exception {
+	void createWithError() throws Exception {
 		BranchOfficeDTO b = buildBranchOffice();
 		b.setEmail(null);
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.post(
@@ -106,7 +106,7 @@ public class BranchOfficeIT {
 	}
 	
 	@Test
-	public void formEditWithError() throws Exception {
+	void formEditWithError() throws Exception {
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.get(
 				"/" + BranchOfficeController.URLENDPOINT + BranchOfficeController.ID, 666L)
 				.accept(MediaType.APPLICATION_JSON))
@@ -115,7 +115,7 @@ public class BranchOfficeIT {
 	}
 	
 	@Test
-	public void methodNotSupportedError() throws Exception {
+	void methodNotSupportedError() throws Exception {
 		MvcResult mockMvcResult = mockMvc.perform(MockMvcRequestBuilders.get(
 				"/" + BranchOfficeController.URLENDPOINT)
 				.accept(MediaType.APPLICATION_JSON))

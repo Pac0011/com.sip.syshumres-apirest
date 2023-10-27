@@ -173,7 +173,7 @@ public class RestBuilder<T> {
 		
 		if (authorization != null) {
 			headers.set("Authorization", authorization);
-			//headers.set("Authorization", "Bearer "+ accessToken);
+			//headers.set("Authorization", "Bearer "+ accessToken)
 		}
 		
 		if(!this.mediaTypes.isEmpty()) {
@@ -214,7 +214,7 @@ public class RestBuilder<T> {
 			if (log) {
 				Logger.getLogger(this.getClass()).info(response.getStatusCode()  + "==" + response.getHeaders());
 			}
-			//return response.getBody();
+			//return response.getBody()
 		} else {
 			response = restTemplate.exchange(this.uri(), method, new HttpEntity<Object>(this.headers()), clazz);
 			if (log) {

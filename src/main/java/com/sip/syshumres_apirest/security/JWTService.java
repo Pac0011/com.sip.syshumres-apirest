@@ -43,7 +43,7 @@ public class JWTService {
 		this.userDetailServiceImpl = userDetailServiceImpl;
 	}
 
-	public String createToken(String name, String username, HttpServletRequest request) throws UsernameNotFoundException {
+	public String createToken(String username, HttpServletRequest request) throws UsernameNotFoundException {
 		long expirationTime = this.accessTokenValiditySeconds * 1_000;
 		Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
 		
@@ -94,31 +94,4 @@ public class JWTService {
 		}
 	}
 
-    /*public Boolean hasTokenExpired(String token) {
-        return Jwts.parser()
-                .setSigningKey(ACCESS_TOKEN_SECRET)
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration()
-                .before(new Date());
-    }
-
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        String username = extractUsername(token);
-        return (userDetails.getUsername().equals(username) && !hasTokenExpired(token));
-
-    }
-
-    public String extractUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    public Collection<? extends GrantedAuthority> getAuthorities(String token) {
-        Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-        return (Collection<? extends GrantedAuthority>) claims.get(AUTHORITIES);
-    }*/
 }

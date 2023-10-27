@@ -43,7 +43,7 @@ public class LogoutController {
         if(entity.isEmpty()) {
 			throw new UsernameNotFoundException();
 		}
-        session = service.logout(session, sessionUserName);
+        service.logout(session, sessionUserName);
         //User e = entity.get()
         //user.setOnline(false)
         //userServ.saveUser(user)

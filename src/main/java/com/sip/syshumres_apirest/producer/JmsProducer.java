@@ -2,6 +2,8 @@ package com.sip.syshumres_apirest.producer;
 
 import javax.jms.Queue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,8 @@ import com.sip.syshumres_entities.ProspectProfile;
 @Component
 //@Slf4j
 public class JmsProducer {
+	
+	private static final Logger logger = LoggerFactory.getLogger(JmsProducer.class);
     
     @Autowired
 	private JmsTemplate jmsTemplate;
@@ -22,11 +26,14 @@ public class JmsProducer {
 	public void sendMessage(ProspectProfile prospect) {
 
 		try {
-            //log.info("Attempting Send message to Topic: "+ topic);
+			if (logger.isInfoEnabled()) {
+			    logger.info("Attempting Send message to Topic: {} ", prospect);
+	   		}
 			jmsTemplate.convertAndSend(queue, prospect);
 		} catch (Exception e) {
-			//log.error("Recieved Exception during send Message: ", e);
-			System.out.println("Error " + e.getMessage());
+			if (logger.isErrorEnabled()) {
+        	   logger.error("Error: {} ", e.getMessage());
+	   	    }
 		}
 	}
 }
