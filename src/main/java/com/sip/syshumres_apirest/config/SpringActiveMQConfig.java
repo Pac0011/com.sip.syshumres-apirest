@@ -1,5 +1,7 @@
 package com.sip.syshumres_apirest.config;
 
+import java.util.Arrays;
+
 import javax.jms.Queue;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -29,6 +31,7 @@ public class SpringActiveMQConfig {
 	public ActiveMQConnectionFactory activeMQConnectionFactory() {
 		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
 		activeMQConnectionFactory.setBrokerURL(brokerUrl);
+		activeMQConnectionFactory.setTrustedPackages(Arrays.asList("com.sip.syshumres_entities"));
 		return activeMQConnectionFactory;
 	}
 
