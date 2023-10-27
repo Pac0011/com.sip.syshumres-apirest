@@ -41,7 +41,7 @@ import org.springframework.web.client.HttpClientErrorException.BadRequest;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)//Para evitar que en cada Test inicialice la Clase y elimine el token
-public class BranchOfficeFunctionalTesting {
+class BranchOfficeTestCase {
 	
 	//@Value("${local.server.port}")
 	//private int port;
@@ -50,17 +50,17 @@ public class BranchOfficeFunctionalTesting {
 	private long idEdit = 1L;
 	private long idError = 0;
 	
-	public String getToken() {
+	private String getToken() {
 		return token;
 	}
 
-	public void setToken(String token) {
+	private void setToken(String token) {
 		this.token = token;
 	}
 
 	@Test
 	@Order(1)
-	public void login() {
+	void login() {
 		String credentials = "{\"username\": \"admin\", \"password\": \"admin\"}";
 		ResponseEntity<?> response = new RestBuilder<String>()
 				.clazz(String.class)
@@ -83,7 +83,7 @@ public class BranchOfficeFunctionalTesting {
 	
 	@Test
 	@Order(2)
-	public void listActive() {
+	void listActive() {
 		ResponseEntity<?> response = new RestBuilder<String>()
 				.clazz(String.class)
 				.basicAuthToken(this.token)
@@ -103,7 +103,7 @@ public class BranchOfficeFunctionalTesting {
 	
 	@Test
 	@Order(3) 
-	public void page() {
+	void page() {
 		//?page=0&size=5&sort=
 		ResponseEntity<?> response = new RestBuilder<String>()
 				.clazz(String.class)
@@ -130,7 +130,7 @@ public class BranchOfficeFunctionalTesting {
 	
 	@Test
 	@Order(4) 
-	public void formEdit() {
+	void formEdit() {
 		ResponseEntity<?> response = new RestBuilder<String>()
 				.clazz(String.class)
 				.basicAuthToken(getToken())
@@ -148,12 +148,12 @@ public class BranchOfficeFunctionalTesting {
 		
 		assertEquals(HttpStatus.SC_OK, response.getStatusCodeValue());
 		assertTrue(branchOfficeGet.getDescription().length() > 0);
-		assertTrue(branchOfficeGet.getId() == this.idEdit);
+		assertEquals(branchOfficeGet.getId(), this.idEdit);
 	}
 		
 	@Test
 	@Order(5)
-	public void error() {
+	void error() {
 		Throwable exception = assertThrows(BadRequest.class, () -> {
 	    	new RestBuilder<String>()
 			.clazz(String.class)
