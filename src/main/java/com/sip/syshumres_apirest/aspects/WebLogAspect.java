@@ -131,25 +131,18 @@ public class WebLogAspect {
 	}
 	
 	private String getIpAddr(HttpServletRequest request) {
-		String ipAddress = request.getHeader("x-forwarded-for");
-		String searchUnknown = "unknown";
-		if (ipAddress == null || ipAddress.length() == 0 || searchUnknown.equalsIgnoreCase(ipAddress)) {
-			ipAddress = request.getHeader("Proxy-Client-IP");
-		}
-		if (ipAddress == null || ipAddress.length() == 0 || searchUnknown.equalsIgnoreCase(ipAddress)) {
-			ipAddress = request.getHeader("WL-Proxy-Client-IP");
-		}
-		if (ipAddress == null || ipAddress.length() == 0 || searchUnknown.equalsIgnoreCase(ipAddress)) {
-			ipAddress = request.getRemoteAddr();
-			if (ipAddress.equals("127.0.0.1") || ipAddress.equals("0:0:0:0:0:0:0:1")) {
-				InetAddress inet = null;
-				try {
-					inet = InetAddress.getLocalHost();
-					if (inet != null) {
-						ipAddress= inet.getHostAddress();
-				    }
-				} catch (UnknownHostException e) {
-					e.printStackTrace();
+		String ipAddress = searchIpAddress(request);
+		
+		if (ipAddress.equals("127.0.0.1") || ipAddress.equals("0:0:0:0:0:0:0:1")) {
+			InetAddress inet = null;
+			try {
+				inet = InetAddress.getLocalHost();
+				if (inet != null) {
+					ipAddress= inet.getHostAddress();
+			    }
+			} catch (UnknownHostException e) {
+				if (logger.isErrorEnabled()) {
+				    logger.error(e.getMessage());
 				}
 			}
 		}
@@ -158,6 +151,26 @@ public class WebLogAspect {
 		}
 		
 		return ipAddress; 
+	}
+	
+	private String searchIpAddress(HttpServletRequest request) {
+		String ipAddress = request.getHeader("x-forwarded-for");
+		if (searchUnknown(ipAddress)) {
+			ipAddress = request.getHeader("Proxy-Client-IP");
+			if (searchUnknown(ipAddress)) {
+				ipAddress = request.getHeader("WL-Proxy-Client-IP");
+				if (searchUnknown(ipAddress)) {
+					ipAddress = request.getRemoteAddr();
+				}
+			}
+		}
+		
+		return ipAddress;
+	}
+	
+	private boolean searchUnknown(String ipAddress) {
+		return (ipAddress == null || ipAddress.length() == 0 
+				|| "unknown".equalsIgnoreCase(ipAddress));
 	}
 
 }

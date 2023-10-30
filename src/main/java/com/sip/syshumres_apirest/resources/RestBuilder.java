@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpStatus;
 import org.jboss.logging.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -157,7 +156,7 @@ public class RestBuilder<T> {
 	
 	public RestBuilder<T> notError() {
 		restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
-			protected boolean hasError(HttpStatus statusCode) {
+			protected boolean hasErrorCustom() {
 				return false;
 			}
 		});
