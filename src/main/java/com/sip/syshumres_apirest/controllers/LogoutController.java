@@ -1,7 +1,5 @@
 package com.sip.syshumres_apirest.controllers;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
@@ -13,7 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_entities.User;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_exceptions.UsernameNotFoundException;
 import com.sip.syshumres_services.UserService;
 
@@ -34,9 +34,7 @@ public class LogoutController {
 	}
 
 	@PostMapping(LOGOUT)
-	public ResponseEntity<Map<String, Object>> logoutUser(HttpSession session) throws UsernameNotFoundException {
-		Map<String, Object> response = new HashMap<>();
-		response.put("response", "Logout exitoso");
+	public ResponseEntity<ResponseDTO> logoutUser(HttpSession session) throws UsernameNotFoundException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         
         Optional<User> entity = service.findOneByUsername(username);
@@ -51,6 +49,9 @@ public class LogoutController {
         //BranchOffice branchOfficeSession2 = (BranchOffice) session.getAttribute(this.sessionUserName)
         //System.out.println("branchOfficeSession 2: " + branchOfficeSession2.getDescription())
         
+        ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_LOGOUT.getMessage());
         return ResponseEntity.ok().body(response);
     }
 

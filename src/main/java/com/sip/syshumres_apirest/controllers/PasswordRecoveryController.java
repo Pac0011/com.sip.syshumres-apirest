@@ -1,7 +1,5 @@
 package com.sip.syshumres_apirest.controllers;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.mail.MessagingException;
@@ -16,13 +14,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_entities.PasswordRecovery;
 import com.sip.syshumres_entities.User;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EmailUserNotFoundException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.InvalidFieldException;
 import com.sip.syshumres_exceptions.SendEmailException;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_exceptions.UrlInvalidException;
 import com.sip.syshumres_services.EmailService;
 import com.sip.syshumres_services.PasswordRecoveryService;
@@ -41,7 +42,6 @@ public class PasswordRecoveryController {
 	public static final String CHANGE = "/change-password";
 	
 	private static final String MSG_NOT_EXIST = " no existe";
-	private static final String MSG_RESPONSE = "response";
 	
 	private final PasswordRecoveryService service;
 	
@@ -58,11 +58,8 @@ public class PasswordRecoveryController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Map<String, Object>> passwordRecovery(@RequestParam String email) 
+	public ResponseEntity<ResponseDTO> passwordRecovery(@RequestParam String email) 
 			throws EmailUserNotFoundException, CreateRegisterException, SendEmailException {
-		Map<String, Object> response = new HashMap<>();
-		response.put(MSG_RESPONSE, "Se envió un email con una liga para que pueda cambiar su contraseña, valide sus bandejas de entrada");
-		
 		Optional<User> o = this.serviceU.findOneByEmail(StringTrim.trimAndRemoveDiacriticalMarks(email));
 		if (!o.isPresent()) {
 			throw new EmailUserNotFoundException("El email no existe, valide que este correcto");
@@ -77,9 +74,11 @@ public class PasswordRecoveryController {
 			throw new CreateRegisterException("No se pudo crear recuperación de password, valide la info enviada");
 		}
 		
+		ResponseDTO response = new ResponseDTO();
 		try {
 			String link = this.serviceEmail.sendHtmlEmailRecoveryPassword(email, "Recuperación contraseña Sysrh", e);
-			response.replace(MSG_RESPONSE, link);
+			//response.addEntry(message, "Se envió un email con una liga para que pueda cambiar su contraseña, valide sus bandejas de entrada")
+			response.addEntry("message", link);
 		} catch (MessagingException ex) {
 			throw new SendEmailException("No se pudo enviar el email con la liga de recuperación, valide con el administrador");
 		}
@@ -108,14 +107,11 @@ public class PasswordRecoveryController {
 	}
 	
 	@PatchMapping(UUID + CHANGE)
-	public ResponseEntity<Map<String, Object>> changePassword(@PathVariable String uuid,
+	public ResponseEntity<ResponseDTO> changePassword(@PathVariable String uuid,
 			@RequestParam String passwordNew, 
 			@RequestParam String passwordNewConfirm, 
 			HttpSession session) throws EntityIdNotFoundException, EmailUserNotFoundException, InvalidFieldException, 
-			CreateRegisterException {
-		Map<String, Object> response = new HashMap<>();
-		response.put(MSG_RESPONSE, "La contraseña fue actualizada con éxito");
-		
+	UpdateRegisterException {
 		String tmp = StringTrim.trimAndRemoveDiacriticalMarks(uuid);
 		if (tmp.equals("")) {
 			throw new EntityIdNotFoundException("Cadena vacia");
@@ -144,13 +140,16 @@ public class PasswordRecoveryController {
 		
 		passwordRecovery.setEnabled(false);
 		if (this.service.save(passwordRecovery) == null) {
-			throw new CreateRegisterException("No se pudo actualizar el password de recuperación, valide con el administrador");
+			throw new UpdateRegisterException("No se pudo actualizar el password de recuperación, valide con el administrador");
 		}
 		
 		if (this.serviceU.saveNewPassword(user, passN) == null) {
-			throw new CreateRegisterException("No se pudo actualizar el password, valide con el administrador");
+			throw new UpdateRegisterException("No se pudo actualizar el password, valide con el administrador");
 		} 
 		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CHANGE_PASSWORD.getMessage());
 		return ResponseEntity.ok().body(response);
 	}
 

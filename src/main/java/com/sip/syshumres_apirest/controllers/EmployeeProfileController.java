@@ -1,7 +1,6 @@
 package com.sip.syshumres_apirest.controllers;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,21 +28,24 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
 import com.sip.syshumres_entities.EmployeeProfile;
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.EmployeeProfileDTO;
 import com.sip.syshumres_entities.dtos.EmployeeProfileViewDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.enums.EmployeeTypeEnum;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.UnknownOptionException;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_exceptions.UploadFileException;
 import com.sip.syshumres_exceptions.UploadFormatsAllowException;
 import com.sip.syshumres_exceptions.UserSessionNotFoundException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.EmployeeProfileService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -141,19 +143,29 @@ public class EmployeeProfileController extends CommonController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody EmployeeProfileDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody EmployeeProfileDTO entity, BindingResult result) 
+	throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		EmployeeProfile employeeProfile = customMapper.toSaveEntity(entity);
-		Map<String, Object> errorsCustomFields = this.service.validEntity(employeeProfile, 0L);
+		Map<String, String> errorsCustomFields = this.service.validEntity(employeeProfile, 0L);
 		if (!errorsCustomFields.isEmpty()) {
-			return ResponseEntity.badRequest().body(errorsCustomFields);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(errorsCustomFields));
 		}
 		
+		EmployeeProfile e = service.save(employeeProfile);
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(service.save(employeeProfile)));
+				.body(response);
 	}
 	
 	@GetMapping(ID)
@@ -171,10 +183,12 @@ public class EmployeeProfileController extends CommonController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody EmployeeProfileDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody EmployeeProfileDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException
+	, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -191,17 +205,24 @@ public class EmployeeProfileController extends CommonController {
 		EmployeeProfile entityDb = o.get();
 		entityDb = customMapper.toEditEntity(entityDb, entity);
 		
-		Map<String, Object> errorsCustomFields = this.service.validEntity(entityDb, id);
+		Map<String, String> errorsCustomFields = this.service.validEntity(entityDb, id);
 		if (!errorsCustomFields.isEmpty()) {
-			return ResponseEntity.badRequest().body(errorsCustomFields);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(errorsCustomFields));
+		}
+		if (service.save(entityDb) == null) {
+			throw new UpdateRegisterException();
 		}
 		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(this.service.save(entityDb)));
+				.body(response);
 	}
 	
 	@PutMapping(ID + UPLOADFILE)
-	public ResponseEntity<Map<String, Object>> uploadFileProfile(@PathVariable Long id, 
+	public ResponseEntity<ResponseDTO> uploadFileProfile(@PathVariable Long id, 
 			@RequestParam String nameInput, 
 			@RequestParam MultipartFile fileUpload) 
 					throws IOException, EntityIdNotFoundException, UploadFormatsAllowException, 
@@ -209,9 +230,13 @@ public class EmployeeProfileController extends CommonController {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}
-				
-		return ResponseEntity.ok()
-				.body(this.service.uploadFile(id, nameInput, fileUpload));
+		
+		String urlFile = this.service.uploadFile(id, nameInput, fileUpload);
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPLOAD.getMessage());
+		response.addEntry(StatusMessages.URLFILE_KEY.getMessage(), urlFile);
+		return ResponseEntity.ok().body(response);
 	}
 	
 	@GetMapping(ID + DOCUMENT)
@@ -311,14 +336,15 @@ public class EmployeeProfileController extends CommonController {
 	}
 	
 	@GetMapping(SEARCHNAMERELATIONSHIP)
-	public ResponseEntity<Map<String, Object>> searchNameRelationshipEmployee(@RequestParam String lastName,
+	public ResponseEntity<ResponseDTO> searchNameRelationshipEmployee(@RequestParam String lastName,
 			@RequestParam String lastNameSecond) {
-		Map<String, Object> response = new HashMap<>();
-		response.put("name", "");
+		String res = "";
 		if (this.service.countByNameAnotherEmployee(StringTrim.trimAndRemoveDiacriticalMarks(lastName), 
 				StringTrim.trimAndRemoveDiacriticalMarks(lastNameSecond)) > 1) {
-			response.replace("name", "Posible parentesco con otro empleado");
+			res = "Posible parentesco con otro empleado";
 		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry("name", res);
 		return ResponseEntity.ok().body(response);
 	}
 

@@ -23,16 +23,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.BranchOfficeMapper;
 import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.FatherAssignException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.MalFormedHeaderException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.BranchOfficeService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -114,14 +118,23 @@ public class BranchOfficeController extends CommonController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody BranchOfficeDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody BranchOfficeDTO entity, BindingResult result) 
+			throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		BranchOffice e = service.save(customMapper.toCreateEntity(entity));
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@GetMapping(ID)
@@ -139,10 +152,12 @@ public class BranchOfficeController extends CommonController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody BranchOfficeDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody BranchOfficeDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, FatherAssignException
+			, InvalidIdException, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -161,9 +176,14 @@ public class BranchOfficeController extends CommonController {
 			throw new FatherAssignException("El padre de la sucursal no puede ser ella misma");
 		}
 		
-		BranchOffice e = this.service.save(customMapper.toEditEntity(entityDb, entity));
+		if (this.service.save(customMapper.toEditEntity(entityDb, entity)) == null) {
+			throw new UpdateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@GetMapping(ERROR + ID)

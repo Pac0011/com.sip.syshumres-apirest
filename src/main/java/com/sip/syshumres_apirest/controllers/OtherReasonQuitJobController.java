@@ -23,13 +23,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonCatalogController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_entities.OtherReasonQuitJob;
 import com.sip.syshumres_entities.dtos.OtherReasonQuitJobDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_services.OtherReasonQuitJobService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -100,18 +104,25 @@ public class OtherReasonQuitJobController extends CommonCatalogController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody OtherReasonQuitJobDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody OtherReasonQuitJobDTO entity, BindingResult result) 
+	throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		OtherReasonQuitJob e = new OtherReasonQuitJob();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setEnabled(entity.isEnabled());
-		OtherReasonQuitJob e2 = this.service.save(e);
 		
+		if (this.service.save(e) == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(modelMapper.map(e2, OtherReasonQuitJobDTO.class));
+				.body(response);
 	}
 	
 	@GetMapping(ID)
@@ -129,10 +140,12 @@ public class OtherReasonQuitJobController extends CommonCatalogController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody OtherReasonQuitJobDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody OtherReasonQuitJobDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException
+	, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -149,10 +162,15 @@ public class OtherReasonQuitJobController extends CommonCatalogController {
 		OtherReasonQuitJob e = o.get();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setEnabled(entity.isEnabled());
-		OtherReasonQuitJob e2 = this.service.save(e);
 		
+		if (service.save(e) == null) {
+			throw new UpdateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(modelMapper.map(e2, OtherReasonQuitJobDTO.class));
+				.body(response);
 	}
 
 }

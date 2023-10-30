@@ -20,14 +20,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonCatalogController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_entities.AddressState;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_entities.dtos.AddressStateDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.AddressStateService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -79,21 +83,32 @@ public class AddressStateController extends CommonCatalogController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody AddressStateDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody AddressStateDTO entity, BindingResult result) 
+			throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		AddressState e = service.save(this.modelMapper.map(entity, AddressState.class));
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(this.modelMapper.map(e, AddressStateDTO.class));
+				.body(response);
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody AddressStateDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody AddressStateDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException
+			, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -110,9 +125,15 @@ public class AddressStateController extends CommonCatalogController {
 		AddressState e = o.get();
 		e.setDescription(StringTrim.trimAndRemoveDiacriticalMarks(entity.getDescription()));
 		e.setEnabled(entity.isEnabled());
+		if (service.save(e) == null) {
+			throw new UpdateRegisterException();
+		}
 		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(this.modelMapper.map(service.save(e), AddressStateDTO.class));
+				.body(response);
 	}
 
 }

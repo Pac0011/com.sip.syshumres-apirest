@@ -24,15 +24,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonCatalogController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_entities.HiringDocuments;
 import com.sip.syshumres_entities.HiringDocumentsType;
 import com.sip.syshumres_entities.dtos.HiringDocumentsDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_services.HiringDocumentsService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -110,9 +114,11 @@ public class HiringDocumentsController extends CommonCatalogController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody HiringDocumentsDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody HiringDocumentsDTO entity, BindingResult result) 
+	throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		HiringDocuments e = new HiringDocuments();
@@ -122,10 +128,15 @@ public class HiringDocumentsController extends CommonCatalogController {
 	        		HiringDocumentsType.class));
 	    }
 		e.setEnabled(entity.isEnabled());
-		HiringDocuments e2 = this.service.save(e);
 		
+		if (this.service.save(e) == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(modelMapper.map(e2, HiringDocumentsDTO.class));
+				.body(response);
 	}
 	
 	@GetMapping(ID)
@@ -143,10 +154,12 @@ public class HiringDocumentsController extends CommonCatalogController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody HiringDocumentsDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody HiringDocumentsDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException
+	, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -166,11 +179,15 @@ public class HiringDocumentsController extends CommonCatalogController {
 	        e.setHiringDocumentsType(modelMapper.map(entity.getHiringDocumentsType(), 
 	        		HiringDocumentsType.class));
 	    }
-		e.setEnabled(entity.isEnabled());
-		HiringDocuments e2 = this.service.save(e);
-		
+		e.setEnabled(entity.isEnabled());		
+		if (service.save(e) == null) {
+			throw new UpdateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(modelMapper.map(e2, HiringDocumentsDTO.class));
+				.body(response);
 	}
 
 }

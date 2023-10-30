@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.BranchOfficeMapper;
 import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_apirest.mappers.ManagingCompanyMapper;
@@ -31,10 +32,13 @@ import com.sip.syshumres_entities.BranchOffice;
 import com.sip.syshumres_entities.ManagingCompany;
 import com.sip.syshumres_entities.dtos.BranchOfficeDTO;
 import com.sip.syshumres_entities.dtos.ManagingCompanyDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_services.ManagingCompanyService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -132,14 +136,22 @@ public class ManagingCompanyController extends CommonController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody ManagingCompanyDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody ManagingCompanyDTO entity, BindingResult result) 
+	throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		ManagingCompany e = service.save(customMapper.toSaveEntity(entity));
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@GetMapping(ID)
@@ -157,10 +169,12 @@ public class ManagingCompanyController extends CommonController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody ManagingCompanyDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody ManagingCompanyDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException
+	, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -174,14 +188,19 @@ public class ManagingCompanyController extends CommonController {
 			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
-		ManagingCompany e = this.service.save(customMapper.toEditEntity(o.get(), entity));
+		if (this.service.save(customMapper.toEditEntity(o.get(), entity)) == null) {
+			throw new UpdateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@PatchMapping(ID + ABRANCHOFFICES)
-	public ResponseEntity<ManagingCompanyDTO> assignBranchOffices(@RequestBody List<BranchOfficeDTO> branchOffices, @PathVariable Long id) 
-			throws EntityIdNotFoundException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> assignBranchOffices(@RequestBody List<BranchOfficeDTO> branchOffices, @PathVariable Long id) 
+			throws EntityIdNotFoundException, InvalidIdException, UpdateRegisterException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}
@@ -191,13 +210,18 @@ public class ManagingCompanyController extends CommonController {
 		}
 		
 		ManagingCompany e = this.service.assignBranchOffices(o.get(), listMapper.mapList(branchOffices, BranchOffice.class));
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+		if (e == null) {
+			throw new UpdateRegisterException(StatusMessages.ERROR_ADD.getMessage());
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_ADD.getMessage());
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
 	@PatchMapping(ID + RBRANCHOFFICE)
-	public ResponseEntity<ManagingCompanyDTO> removeBranchOffice(@RequestBody BranchOfficeDTO branchOffice, @PathVariable Long id) 
-			throws EntityIdNotFoundException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> removeBranchOffice(@RequestBody BranchOfficeDTO branchOffice, @PathVariable Long id) 
+			throws EntityIdNotFoundException, InvalidIdException, UpdateRegisterException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}
@@ -207,8 +231,13 @@ public class ManagingCompanyController extends CommonController {
 		}
 
 		ManagingCompany e = this.service.removeBranchOffice(o.get(), customMapper2.toEntity(branchOffice));
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+		if (e == null) {
+			throw new UpdateRegisterException(StatusMessages.ERROR_REMOVE.getMessage());
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_REMOVE.getMessage());
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 }

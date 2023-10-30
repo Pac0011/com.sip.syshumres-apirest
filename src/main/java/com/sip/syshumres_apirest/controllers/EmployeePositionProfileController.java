@@ -23,14 +23,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.EmployeePositionProfileMapper;
 import com.sip.syshumres_entities.EmployeePositionProfile;
 import com.sip.syshumres_entities.dtos.EmployeePositionProfileDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_services.EmployeePositionProfileService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -107,14 +111,22 @@ public class EmployeePositionProfileController extends CommonController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody EmployeePositionProfileDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody EmployeePositionProfileDTO entity, BindingResult result) 
+	throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		EmployeePositionProfile e = service.save(customMapper.toSaveEntity(entity));
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@GetMapping(ID)
@@ -132,10 +144,12 @@ public class EmployeePositionProfileController extends CommonController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody EmployeePositionProfileDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody EmployeePositionProfileDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException
+	, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -149,9 +163,15 @@ public class EmployeePositionProfileController extends CommonController {
 			throw new EntityIdNotFoundException("Id perfil puesto " + id + " no encontrado");
 		}
 		
-		EmployeePositionProfile e = this.service.save(customMapper.toEditEntity(o.get(), entity));
+		if (this.service.save(customMapper.toEditEntity(o.get(), entity)) == null) {
+			throw new UpdateRegisterException();
+		}
+		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 
 }

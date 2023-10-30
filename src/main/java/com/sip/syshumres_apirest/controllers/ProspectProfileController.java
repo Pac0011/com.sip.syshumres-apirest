@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
 import com.sip.syshumres_apirest.mappers.ProspectProfileMapper;
 import com.sip.syshumres_entities.BranchOffice;
@@ -34,18 +35,21 @@ import com.sip.syshumres_entities.ProspectStatus;
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.EmployeeProfileDTO;
 import com.sip.syshumres_entities.dtos.ProspectProfileDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.enums.EmployeeStatusEnum;
 import com.sip.syshumres_entities.enums.ProspectStatusEnum;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
 import com.sip.syshumres_exceptions.BranchOfficeUserNotFoundException;
 import com.sip.syshumres_exceptions.CreateEmployeeProfileException;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EmployeeFieldsAlreadyExistException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.ProspectFieldsAlreadyExistException;
 import com.sip.syshumres_exceptions.StatusCatalogNotFoundException;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_exceptions.UserSessionNotFoundException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.BranchOfficeService;
 import com.sip.syshumres_services.EmployeeProfileService;
 import com.sip.syshumres_services.EmployeeStatusService;
@@ -154,11 +158,12 @@ public class ProspectProfileController extends CommonController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody ProspectProfileDTO entity, BindingResult result, HttpSession session) 
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody ProspectProfileDTO entity, BindingResult result, HttpSession session) 
 		throws UserSessionNotFoundException, BranchOfficeUserNotFoundException, StatusCatalogNotFoundException, 
-		ProspectFieldsAlreadyExistException, EmployeeFieldsAlreadyExistException {
+		ProspectFieldsAlreadyExistException, EmployeeFieldsAlreadyExistException, CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		User userSession = (User) session.getAttribute(this.sessionUserName);
@@ -177,9 +182,15 @@ public class ProspectProfileController extends CommonController {
 		ProspectProfile prospectProfile = customMapper.toSaveEntity(entity);
 		this.service.validEntity(prospectProfile, 0L);
 
-		ProspectProfile e = this.service.save(prospectProfile, optionalB.get(), optional.get());
+		ProspectProfile e = this.service.save(prospectProfile, optionalB.get(), optional.get());		
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@GetMapping(ID)
@@ -197,11 +208,12 @@ public class ProspectProfileController extends CommonController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody ProspectProfileDTO entity, BindingResult result, @PathVariable Long id) 
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody ProspectProfileDTO entity, BindingResult result, @PathVariable Long id) 
 			throws IdsEntityNotEqualsException, EntityIdNotFoundException, ProspectFieldsAlreadyExistException, 
-			EmployeeFieldsAlreadyExistException, InvalidIdException {
+			EmployeeFieldsAlreadyExistException, InvalidIdException, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -219,9 +231,14 @@ public class ProspectProfileController extends CommonController {
 		
 		this.service.validEntity(entityDb, id);
 		
-		ProspectProfile e = this.service.save(entityDb);
+		if (this.service.save(entityDb) == null) {
+			throw new UpdateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@PutMapping(ID + NEWHIRE)

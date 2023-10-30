@@ -1,6 +1,5 @@
 package com.sip.syshumres_apirest.controllers;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,18 +27,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.config.SwaggerConfig;
 import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.AuthorityMapper;
 import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_apirest.mappers.UserMapper;
 import com.sip.syshumres_entities.Authority;
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.AuthorityDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.dtos.UserDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.ChangePasswordException;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_services.UserService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -135,23 +138,32 @@ public class UserController extends CommonController {
 	      @ApiResponse(code = 400, message = "Bad request"), 
 	      @ApiResponse(code = 403, message = "forbidden!!!"),
 	      @ApiResponse(code = 404, message = "not found!!!") })
-	public ResponseEntity<?> create(@Valid @RequestBody UserDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody UserDTO entity, BindingResult result) 
+	throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		User user = customMapper.toSaveEntity(entity);
 		
-		Map<String, Object> errorsCustomFields = this.service.validEntity(user, 0L);
+		Map<String, String> errorsCustomFields = this.service.validEntity(user, 0L);
 		if (!errorsCustomFields.isEmpty()) {
-			return ResponseEntity.badRequest().body(errorsCustomFields);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(errorsCustomFields));
 		}
 		
 		//valid password and encode
 		entity.setPassword(this.service.encodePassword(entity.getPassword()));
 		
 		User e = service.save(user);
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@ApiOperation(value = "Form to edit User", response = Iterable.class, tags = "formEdit")
@@ -175,8 +187,9 @@ public class UserController extends CommonController {
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody UserDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody UserDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException
+	, UpdateRegisterException {
 		//Se quito validacion result.hasErrors pq el password se actualiza independiente
 		if (id <= 0) {
 			throw new InvalidIdException();
@@ -191,21 +204,28 @@ public class UserController extends CommonController {
 		User entityDb = o.get(); 
 		entityDb = customMapper.toEditEntity(entityDb, entity);
 		
-		Map<String, Object> errorsCustomFields = this.service.validEntity(entityDb, id);
+		Map<String, String> errorsCustomFields = this.service.validEntity(entityDb, id);
 		if (!errorsCustomFields.isEmpty()) {
-			return ResponseEntity.badRequest().body(errorsCustomFields);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(errorsCustomFields));
 		}
 		
 		User e = this.service.save(entityDb);
+		if (service.save(e) == null) {
+			throw new UpdateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@PatchMapping(ID + CHANGE)
-	public ResponseEntity<Map<String, Object>> changePassword(@PathVariable Long id,
+	public ResponseEntity<ResponseDTO> changePassword(@PathVariable Long id,
 			@RequestParam String passwordNew, 
 			@RequestParam String passwordNewConfirm) 
-					throws EntityIdNotFoundException, CreateRegisterException, InvalidIdException {
+					throws EntityIdNotFoundException, ChangePasswordException, InvalidIdException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}
@@ -214,19 +234,21 @@ public class UserController extends CommonController {
 			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 		
-		String passN = StringTrim.trimAndRemoveDiacriticalMarks(passwordNew);
-		String passC = StringTrim.trimAndRemoveDiacriticalMarks(passwordNewConfirm);
-		Map<String, Object> errorsCustomFields = this.service.validNewPassword(passN, passC);
+		String passN = StringTrim.trimAndRemoveDiacriticalMarksPassword(passwordNew);
+		String passC = StringTrim.trimAndRemoveDiacriticalMarksPassword(passwordNewConfirm);
+		Map<String, String> errorsCustomFields = this.service.validNewPassword(passN, passC);
 		if (!errorsCustomFields.isEmpty()) {
-			return ResponseEntity.badRequest().body(errorsCustomFields);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(errorsCustomFields));
 		}
 		
 		if (this.service.saveNewPassword(o.get(), passN) == null) {
-			throw new CreateRegisterException("No se pudo guardar la nueva contraseña");
+			throw new ChangePasswordException();
 		}
-		Map<String, Object> response = new HashMap<>();
-		response.put("response", "La contraseña fue actualizada con éxito");
 		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CHANGE_PASSWORD.getMessage());
 		return ResponseEntity.ok().body(response);
 	}
 	
@@ -245,8 +267,8 @@ public class UserController extends CommonController {
 	}
 	
 	@PatchMapping(ID + AAUTHORITIES)
-	public ResponseEntity<UserDTO> assignAuthorities(@RequestBody List<AuthorityDTO> authorities, @PathVariable Long id) 
-			throws EntityIdNotFoundException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> assignAuthorities(@RequestBody List<AuthorityDTO> authorities, @PathVariable Long id) 
+			throws EntityIdNotFoundException, InvalidIdException, UpdateRegisterException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}
@@ -256,13 +278,18 @@ public class UserController extends CommonController {
 		}
 		
 		User e = this.service.assignAuthorities(o.get(), listMapper.mapList(authorities, Authority.class));
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+		if (e == null) {
+			throw new UpdateRegisterException(StatusMessages.ERROR_ADD.getMessage());
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_ADD.getMessage());
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
 	@PatchMapping(ID + RAUTHORITY)
-	public ResponseEntity<UserDTO> removeAuthority(@RequestBody AuthorityDTO authority, @PathVariable Long id) 
-			throws EntityIdNotFoundException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> removeAuthority(@RequestBody AuthorityDTO authority, @PathVariable Long id) 
+			throws EntityIdNotFoundException, InvalidIdException, UpdateRegisterException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}
@@ -271,9 +298,14 @@ public class UserController extends CommonController {
 			throw new EntityIdNotFoundException(MSG_ID + id + MSG_NOT_FOUND);
 		}
 
-		User e = this.service.removeAuthority(o.get(), customMapper2.toEntity(authority));
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+		User e = this.service.removeAuthority(o.get(), customMapper2.toEntity(authority));	
+		if (e == null) {
+			throw new UpdateRegisterException(StatusMessages.ERROR_REMOVE.getMessage());
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_REMOVE.getMessage());
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 }

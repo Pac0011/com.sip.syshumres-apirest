@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.AuthorityMapper;
 import com.sip.syshumres_apirest.mappers.ListMapper;
 import com.sip.syshumres_apirest.mappers.ModuleCustomMapper;
@@ -31,12 +32,15 @@ import com.sip.syshumres_entities.Module;
 import com.sip.syshumres_entities.Authority;
 import com.sip.syshumres_entities.dtos.AuthorityDTO;
 import com.sip.syshumres_entities.dtos.ModuleDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.MalFormedHeaderException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_services.AuthorityService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -143,14 +147,22 @@ public class AuthorityController extends CommonController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody AuthorityDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody AuthorityDTO entity, BindingResult result) 
+			throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 
 		Authority e = service.save(customMapper.toSaveEntity(entity));
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@GetMapping(ID)
@@ -169,10 +181,12 @@ public class AuthorityController extends CommonController {
 	
 	//@LogWeb
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody AuthorityDTO entity, BindingResult result, @PathVariable Long id) 
-			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody AuthorityDTO entity, BindingResult result, @PathVariable Long id) 
+			throws EntityIdNotFoundException, IdsEntityNotEqualsException, InvalidIdException
+			, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -187,13 +201,18 @@ public class AuthorityController extends CommonController {
 		}
 		
 		Authority e = this.service.save(customMapper.toEditEntity(o.get(), entity));
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+		if (e == null) {
+			throw new UpdateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
 	@PatchMapping(ID + AMODULES)
-	public ResponseEntity<AuthorityDTO> assignModules(@RequestBody List<ModuleDTO> modules, @PathVariable Long id) 
-			throws EntityIdNotFoundException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> assignModules(@RequestBody List<ModuleDTO> modules, @PathVariable Long id) 
+			throws EntityIdNotFoundException, InvalidIdException, UpdateRegisterException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}
@@ -203,13 +222,18 @@ public class AuthorityController extends CommonController {
 		}
 		
 		Authority e = this.service.assignModules(o.get(), listMapper.mapList(modules, Module.class));
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+		if (e == null) {
+			throw new UpdateRegisterException(StatusMessages.ERROR_ADD.getMessage());
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_ADD.getMessage());
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
 	@PatchMapping(ID + RMODULE)
-	public ResponseEntity<AuthorityDTO> removeModule(@RequestBody ModuleDTO module, @PathVariable Long id) 
-			throws EntityIdNotFoundException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> removeModule(@RequestBody ModuleDTO module, @PathVariable Long id) 
+			throws EntityIdNotFoundException, InvalidIdException, UpdateRegisterException {
 		if (id <= 0) {
 			throw new InvalidIdException();
 		}
@@ -219,8 +243,13 @@ public class AuthorityController extends CommonController {
 		}
 		
 		Authority e = this.service.removeModule(o.get(), customMapper2.toEntity(module));
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+		if (e == null) {
+			throw new UpdateRegisterException(StatusMessages.ERROR_REMOVE.getMessage());
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_REMOVE.getMessage());
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 	
 	@GetMapping(ERROR + ID)

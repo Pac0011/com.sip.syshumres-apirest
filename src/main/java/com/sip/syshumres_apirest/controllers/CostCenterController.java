@@ -23,14 +23,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonController;
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.CostCenterMapper;
 import com.sip.syshumres_entities.CostCenter;
 import com.sip.syshumres_entities.dtos.CostCenterDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
 import com.sip.syshumres_entities.dtos.common.EntitySelectDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
+import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_services.CostCenterService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -106,21 +110,31 @@ public class CostCenterController extends CommonController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody CostCenterDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody CostCenterDTO entity, BindingResult result) 
+	throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		CostCenter e = service.save(customMapper.toSaveEntity(entity));
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 	
 	@PutMapping(ID)
-	public ResponseEntity<?> edit(@Valid @RequestBody CostCenterDTO entity, BindingResult result, @PathVariable Long id) 
-			throws IdsEntityNotEqualsException, EntityIdNotFoundException, InvalidIdException {
+	public ResponseEntity<ResponseDTO> edit(@Valid @RequestBody CostCenterDTO entity, BindingResult result, @PathVariable Long id) 
+			throws IdsEntityNotEqualsException, EntityIdNotFoundException, InvalidIdException
+	, UpdateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
 		if (id <= 0) {
@@ -134,9 +148,15 @@ public class CostCenterController extends CommonController {
 			throw new EntityIdNotFoundException("Id centro de costos " + id + " no encontrado");
 		}
 		
-		CostCenter e = this.service.save(customMapper.toEditEntity(o.get(), entity));
+		if (this.service.save(customMapper.toEditEntity(o.get(), entity)) == null) {
+			throw new UpdateRegisterException();
+		}
+		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPDATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(customMapper.toDto(e));
+				.body(response);
 	}
 
 }

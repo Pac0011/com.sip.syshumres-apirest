@@ -1,6 +1,5 @@
 package com.sip.syshumres_apirest.controllers;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -13,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_entities.User;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
 import com.sip.syshumres_exceptions.ChangePasswordException;
 import com.sip.syshumres_exceptions.UserSessionNotFoundException;
 import com.sip.syshumres_services.UserService;
@@ -38,7 +40,7 @@ public class UserSettingsController {
 	}
 	
 	@PatchMapping(CHANGE)
-	public ResponseEntity<Map<String, Object>> changePassword(@RequestParam String passwordOld,
+	public ResponseEntity<ResponseDTO> changePassword(@RequestParam String passwordOld,
 			@RequestParam String passwordNew, 
 			@RequestParam String passwordNewConfirm, 
 			HttpSession session) throws UserSessionNotFoundException, ChangePasswordException {
@@ -47,21 +49,23 @@ public class UserSettingsController {
 			throw new UserSessionNotFoundException("Su sesión ha caducado, vuelva a logearse");
 		}
 		
-		String passOld = StringTrim.trimAndRemoveDiacriticalMarks(passwordOld);
-		String passNew = StringTrim.trimAndRemoveDiacriticalMarks(passwordNew);
-		String passConfirm = StringTrim.trimAndRemoveDiacriticalMarks(passwordNewConfirm);
-		Map<String, Object> errorsCustomFields = this.service.validChangePassword(userSession.getPassword(), passOld, 
+		String passOld = StringTrim.trimAndRemoveDiacriticalMarksPassword(passwordOld);
+		String passNew = StringTrim.trimAndRemoveDiacriticalMarksPassword(passwordNew);
+		String passConfirm = StringTrim.trimAndRemoveDiacriticalMarksPassword(passwordNewConfirm);
+		Map<String, String> errorsCustomFields = this.service.validChangePassword(userSession.getPassword(), passOld, 
 				passNew, passConfirm);
 		if (!errorsCustomFields.isEmpty()) {
-			return ResponseEntity.badRequest().body(errorsCustomFields);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(errorsCustomFields));
 		}
 		
 		if (this.service.saveNewPassword(userSession, passNew) == null) {
 			throw new ChangePasswordException();
 		}
-		Map<String, Object> response = new HashMap<>();
-		response.put("response", "La contraseña fue actualizada con éxito");
 		
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CHANGE_PASSWORD.getMessage());
 		return ResponseEntity.ok().body(response);
 	}
 

@@ -1,7 +1,6 @@
 package com.sip.syshumres_apirest.controllers;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -19,15 +18,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_entities.EmployeeDocument;
 import com.sip.syshumres_entities.dtos.EmployeeDocumentDTO;
+import com.sip.syshumres_entities.dtos.ResponseDTO;
+import com.sip.syshumres_entities.utils.ErrorsBindingFields;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.InvalidIdException;
 import com.sip.syshumres_exceptions.TypeHiringDocumentNotExistException;
 import com.sip.syshumres_exceptions.UploadFileException;
 import com.sip.syshumres_exceptions.UploadFormatsAllowException;
-import com.sip.syshumres_exceptions.utils.ErrorsBindingFields;
 import com.sip.syshumres_services.EmployeeDocumentService;
 
 
@@ -50,18 +51,25 @@ public class EmployeeDocumentController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> create(@Valid @RequestBody EmployeeDocumentDTO entity, BindingResult result) {
+	public ResponseEntity<ResponseDTO> create(@Valid @RequestBody EmployeeDocumentDTO entity, BindingResult result) 
+	throws CreateRegisterException {
 		if (result.hasErrors()) {
-			return ErrorsBindingFields.validate(result);
+			return ResponseEntity.badRequest()
+					.body(ErrorsBindingFields.getErrors(result));
 		}
 		EmployeeDocument e = service.save(this.modelMapper.map(entity, EmployeeDocument.class));
-		
+		if (e == null) {
+			throw new CreateRegisterException();
+		}
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_CREATE.getMessage());
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(this.modelMapper.map(e, EmployeeDocumentDTO.class));
+				.body(response);
 	}
 	
 	@PutMapping(IDUPLOADFILE)
-	public ResponseEntity<Map<String, Object>> uploadFileNew(@PathVariable Long idEmployeeProfile, 
+	public ResponseEntity<ResponseDTO> uploadFileNew(@PathVariable Long idEmployeeProfile, 
 			@RequestParam("nameInput") Long idHiringDocument,
 			@RequestParam MultipartFile fileUpload) throws IOException, UploadFormatsAllowException
 	, EntityIdNotFoundException, TypeHiringDocumentNotExistException, CreateRegisterException
@@ -70,8 +78,12 @@ public class EmployeeDocumentController {
 			throw new InvalidIdException();
 		}
 		
-		return ResponseEntity.ok().body(this.service
-				.uploadFile(idEmployeeProfile, idHiringDocument, fileUpload));
+		String urlFile = this.service.uploadFile(idEmployeeProfile, idHiringDocument, fileUpload);
+		ResponseDTO response = new ResponseDTO();
+		response.addEntry(StatusMessages.MESSAGE_KEY.getMessage(), 
+				StatusMessages.SUCCESS_UPLOAD.getMessage());
+		response.addEntry(StatusMessages.URLFILE_KEY.getMessage(), urlFile);
+		return ResponseEntity.ok().body(response);
 	}
 
 }
