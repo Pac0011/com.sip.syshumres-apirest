@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -42,11 +43,22 @@ public class EmployeeDocumentController {
     private final EmployeeDocumentService service;
     
     private final ModelMapper modelMapper;
+    
+	@Value("${UPLOAD.PATH.DOCUMENTS.EMPLOYEES}")
+	private String uploadDocuments;
+	
+	@Value("${URL.DOCUMENTS.EMPLOYEES}")
+	private String urlDocuments;
+	
+	@Value("${UPLOAD.LIST.FORMATS.ALLOW}")
+	private String uploadFormatsAllow;
 	
 	@Autowired
 	public EmployeeDocumentController(EmployeeDocumentService service, 
 			ModelMapper modelMapper) {
 		this.service = service;
+		this.service.configBasePaths(this.uploadDocuments
+				, this.urlDocuments, this.uploadFormatsAllow);
 		this.modelMapper = modelMapper;
 	}
 	

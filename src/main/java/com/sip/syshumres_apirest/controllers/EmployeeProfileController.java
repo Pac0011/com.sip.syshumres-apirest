@@ -77,10 +77,27 @@ public class EmployeeProfileController extends CommonController {
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;
 	
+	@Value("${UPLOAD.BASE.DOCUMENTS.EMPLOYEES}")
+	private String uploadBaseDocuments;
+	
+	@Value("${UPLOAD.PATH.DOCUMENTS.EMPLOYEES}")
+	private String uploadDocuments;
+	
+	@Value("${URL.DOCUMENTS.EMPLOYEES}")
+	private String urlDocuments;
+	
+	@Value("${UPLOAD.LIST.FORMATS.ALLOW}")
+	private String uploadFormatsAllow;
+	
+	@Value("${SIZE.EMPLOYEE.NUMBER}")
+	private int sizeEmployeeNumber;
+	
 	@Autowired
 	public EmployeeProfileController(EmployeeProfileService service,
 			EmployeeProfileMapper customMapper) {
 		this.service = service;
+		this.service.configBasePaths(uploadBaseDocuments, uploadDocuments
+				, urlDocuments, uploadFormatsAllow, sizeEmployeeNumber);
 		this.customMapper = customMapper;
 		this.filter = "";
 	}

@@ -76,6 +76,9 @@ public class ProspectProfileController extends CommonController {
 	@Value("${SESSION.USER.NAME}")
 	private String sessionUserName;
 	
+	@Value("${SIZE.HASH.DIR.UPLOAD.EMPLOYEE}")
+	private int sizeHashDirUploadEmployee;
+	
 	private final ProspectStatusService serviceS;
 	
 	private final EmployeeStatusService serviceES;
@@ -90,6 +93,7 @@ public class ProspectProfileController extends CommonController {
 			ProspectProfileMapper customMapper, 
 			EmployeeProfileMapper customMapper2) {
 		this.service = service;
+		this.service.configProspectProfileService(sizeHashDirUploadEmployee);
 		this.serviceS = serviceS;
 		this.serviceB = serviceB;
 		this.serviceP = serviceP;
