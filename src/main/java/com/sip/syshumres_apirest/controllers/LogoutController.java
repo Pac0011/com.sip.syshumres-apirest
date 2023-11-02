@@ -5,12 +5,12 @@ import java.util.Optional;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.config.AppProperties;
 import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.ResponseDTO;
@@ -25,12 +25,12 @@ public class LogoutController {
 	
 	private final UserService service;
 	
-	@Value("${SESSION.USER.NAME}")
-	private String sessionUserName;
+	private final AppProperties appProperties;
 	
 	@Autowired
-	public LogoutController(UserService service) {
+	public LogoutController(UserService service, AppProperties appProperties) {
 		this.service = service;
+		this.appProperties = appProperties;
 	}
 
 	@PostMapping(LOGOUT)
@@ -41,7 +41,7 @@ public class LogoutController {
         if(entity.isEmpty()) {
 			throw new UsernameNotFoundException();
 		}
-        service.logout(session, sessionUserName);
+        service.logout(session, appProperties.getSessionUserName());
         //User e = entity.get()
         //user.setOnline(false)
         //userServ.saveUser(user)

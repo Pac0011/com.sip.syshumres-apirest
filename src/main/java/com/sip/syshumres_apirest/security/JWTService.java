@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.MenuDTO;
+import com.sip.syshumres_apirest.config.AppProperties;
 import com.sip.syshumres_entities.Module;
 
 import io.jsonwebtoken.Claims;
@@ -24,30 +25,26 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class JWTService {
 	private static final String ACCESS_TOKEN_SECRET = "sjkdhfjisd8726347jJHHHSDhsgdfhsgdfh";
 	
-	private UserDetailServiceImpl userDetailServiceImpl;
+	private final UserDetailServiceImpl userDetailServiceImpl;
 	
-	@Value("${SESSION.USER.NAME}")
-	private String sessionUserName;
-	
-	@Value("${ACCESS_TOKEN_VALIDITY_SECONDS}")
-	private Long accessTokenValiditySeconds;
+	private final AppProperties appProperties;
 	
 	@Autowired
-	public JWTService(UserDetailServiceImpl userDetailServiceImpl) {
+	public JWTService(UserDetailServiceImpl userDetailServiceImpl, AppProperties appProperties) {
 		this.userDetailServiceImpl = userDetailServiceImpl;
+		this.appProperties = appProperties;
 	}
 
 	public String createToken(String username, HttpServletRequest request) throws UsernameNotFoundException {
-		long expirationTime = this.accessTokenValiditySeconds * 1_000;
+		long expirationTime = appProperties.getAccessTokenValiditySeconds() * 1_000;
 		Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
 		
-		User userSession = (User) request.getSession().getAttribute(this.sessionUserName);
+		User userSession = (User) request.getSession().getAttribute(appProperties.getSessionUserName());
 		Map<String, Object> extra = new HashMap<>();
 		extra.put("branchOffice", userSession == null?"":userSession.getBranchOffice().getDescription());
 		

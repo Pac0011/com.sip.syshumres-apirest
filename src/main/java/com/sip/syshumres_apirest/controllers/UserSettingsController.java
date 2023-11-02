@@ -5,13 +5,13 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.config.AppProperties;
 import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.ResponseDTO;
@@ -31,12 +31,12 @@ public class UserSettingsController {
 	
 	private final UserService service;
 	
-	@Value("${SESSION.USER.NAME}")
-	private String sessionUserName;
+	private final AppProperties appProperties;
 	
 	@Autowired
-	public UserSettingsController(UserService service) {
+	public UserSettingsController(UserService service, AppProperties appProperties) {
 		this.service = service;
+		this.appProperties = appProperties;
 	}
 	
 	@PatchMapping(CHANGE)
@@ -44,7 +44,7 @@ public class UserSettingsController {
 			@RequestParam String passwordNew, 
 			@RequestParam String passwordNewConfirm, 
 			HttpSession session) throws UserSessionNotFoundException, ChangePasswordException {
-		User userSession = (User) session.getAttribute(this.sessionUserName);
+		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
 		if (userSession == null) {
 			throw new UserSessionNotFoundException("Su sesión ha caducado, vuelva a logearse");
 		}

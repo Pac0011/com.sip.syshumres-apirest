@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sip.syshumres_apirest.config.AppProperties;
+import com.sip.syshumres_apirest.config.UploadProperties;
 import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
@@ -50,7 +52,6 @@ import com.sip.syshumres_services.EmployeeProfileService;
 import com.sip.syshumres_utils.StringTrim;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 
 
@@ -73,32 +74,21 @@ public class EmployeeProfileController extends CommonController {
     private final EmployeeProfileService service;
     
     private final EmployeeProfileMapper customMapper;
-			
-	@Value("${SESSION.USER.NAME}")
-	private String sessionUserName;
-	
-	@Value("${UPLOAD.BASE.DOCUMENTS.EMPLOYEES}")
-	private String uploadBaseDocuments;
-	
-	@Value("${UPLOAD.PATH.DOCUMENTS.EMPLOYEES}")
-	private String uploadDocuments;
-	
-	@Value("${URL.DOCUMENTS.EMPLOYEES}")
-	private String urlDocuments;
-	
-	@Value("${UPLOAD.LIST.FORMATS.ALLOW}")
-	private String uploadFormatsAllow;
-	
-	@Value("${SIZE.EMPLOYEE.NUMBER}")
-	private int sizeEmployeeNumber;
-	
+    
+    private final AppProperties appProperties;
+    	
 	@Autowired
 	public EmployeeProfileController(EmployeeProfileService service,
-			EmployeeProfileMapper customMapper) {
+			EmployeeProfileMapper customMapper, AppProperties appProperties
+			, UploadProperties uploadProperties) {
 		this.service = service;
-		this.service.configBasePaths(uploadBaseDocuments, uploadDocuments
-				, urlDocuments, uploadFormatsAllow, sizeEmployeeNumber);
 		this.customMapper = customMapper;
+		this.appProperties = appProperties;
+		this.service.configBasePaths(uploadProperties.getBaseDocumentsEmployees()
+				, uploadProperties.getPathDocumentsEmployees() 
+				, uploadProperties.getUrlDocumentsEmployees()
+				, uploadProperties.getListFormatsAllow()
+				, appProperties.getSizeEmployeeNumber());
 		this.filter = "";
 	}
 	
@@ -109,7 +99,7 @@ public class EmployeeProfileController extends CommonController {
 	@GetMapping(OPER + PAGE)
 	public ResponseEntity<Page<EmployeeProfileViewDTO>> listEmployeeTypeOper(Pageable pageable, HttpSession session) 
 			throws UserSessionNotFoundException {
-		User userSession = (User) session.getAttribute(this.sessionUserName);
+		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
 		if (userSession == null) {
 			throw new UserSessionNotFoundException();
 		}
@@ -284,7 +274,7 @@ public class EmployeeProfileController extends CommonController {
 	@GetMapping(ADM + PAGE)
 	public ResponseEntity<Page<EmployeeProfileViewDTO>> listEmployeeTypeAdm(Pageable pageable, HttpSession session) 
 			throws UserSessionNotFoundException {		
-		User userSession = (User) session.getAttribute(this.sessionUserName);
+		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
 		//System.out.println(branchOfficeSession.getDescription())
 		if (userSession == null) {
 			throw new UserSessionNotFoundException();
@@ -337,7 +327,7 @@ public class EmployeeProfileController extends CommonController {
 	@GetMapping(SEARCHSTRING)
 	public ResponseEntity<Page<EmployeeProfileViewDTO>> list(@RequestParam Long idEmployeeType, Pageable pageable, HttpSession session) 
 			throws UserSessionNotFoundException {
-		User userSession = (User) session.getAttribute(this.sessionUserName);
+		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
 		//System.out.println(branchOfficeSession.getDescription())
 		if (userSession == null) {
 			throw new UserSessionNotFoundException();

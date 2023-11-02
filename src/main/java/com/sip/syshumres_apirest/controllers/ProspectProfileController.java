@@ -7,7 +7,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sip.syshumres_apirest.config.AppProperties;
 import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
@@ -72,12 +72,8 @@ public class ProspectProfileController extends CommonController {
 	private final ProspectProfileMapper customMapper;
 		
 	private final EmployeeProfileMapper customMapper2;
-		
-	@Value("${SESSION.USER.NAME}")
-	private String sessionUserName;
 	
-	@Value("${SIZE.HASH.DIR.UPLOAD.EMPLOYEE}")
-	private int sizeHashDirUploadEmployee;
+	private final AppProperties appProperties;
 	
 	private final ProspectStatusService serviceS;
 	
@@ -91,9 +87,10 @@ public class ProspectProfileController extends CommonController {
 	public ProspectProfileController(ProspectProfileService service, ProspectStatusService serviceS, 
 			BranchOfficeService serviceB, EmployeeProfileService serviceP, EmployeeStatusService serviceES, 
 			ProspectProfileMapper customMapper, 
-			EmployeeProfileMapper customMapper2) {
+			EmployeeProfileMapper customMapper2,
+			AppProperties appProperties) {
 		this.service = service;
-		this.service.configProspectProfileService(sizeHashDirUploadEmployee);
+		this.service.configProspectProfileService(appProperties.getSizeHashDirUploadEmployee());
 		this.serviceS = serviceS;
 		this.serviceB = serviceB;
 		this.serviceP = serviceP;
@@ -101,6 +98,7 @@ public class ProspectProfileController extends CommonController {
 		this.filter = "";
 		this.customMapper = customMapper;
 		this.customMapper2 = customMapper2;
+		this.appProperties = appProperties;
 	}
 	
 	/*
@@ -109,7 +107,7 @@ public class ProspectProfileController extends CommonController {
      */
 	@GetMapping(PAGE)
 	public ResponseEntity<Page<ProspectProfileDTO>> list(Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
-		User userSession = (User) session.getAttribute(this.sessionUserName);
+		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
 		if (userSession == null) {
 			throw new UserSessionNotFoundException();
 		}
@@ -170,7 +168,7 @@ public class ProspectProfileController extends CommonController {
 					.body(ErrorsBindingFields.getErrors(result));
 		}
 		
-		User userSession = (User) session.getAttribute(this.sessionUserName);
+		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
 		if (userSession == null) {
 			throw new UserSessionNotFoundException();
 		}

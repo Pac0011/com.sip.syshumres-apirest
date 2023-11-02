@@ -1,7 +1,6 @@
 package com.sip.syshumres_apirest.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.sip.syshumres_apirest.config.AppProperties;
+import com.sip.syshumres_apirest.config.UploadProperties;
+
 @Configuration
 public class WebSecurityConfig {
 	
@@ -21,27 +23,26 @@ public class WebSecurityConfig {
 	
 	private final JWTAuthorizationFilter jwtAuthorizationFilter;
 	
-	private final JWTService jwtService;
+	private final JWTService jwtService;	
+			
+	private final AppProperties appProperties;
 	
-	@Value("${URL.DOCUMENTS.EMPLOYEES}")
-	private String urlDocuments;
-	
-	@Value("${URL.ACCESS.LOGIN}")
-	private String urlLogin;
-	
-	@Value("${URL.PASSWORD.RECOVERY}")
-	private String urlRecovery;
+	private final UploadProperties uploadProperties;
 	
 	private static final String ROLE_ADMIN = "ROLE_ADMIN";
 	
 	@Autowired
 	public WebSecurityConfig(UserDetailsService userDetailsService, 
 			JWTAuthorizationFilter jwtAuthorizationFilter,
-			JWTService jwtService) {
+			JWTService jwtService,
+			AppProperties appProperties,
+			UploadProperties uploadProperties) {
 		super();
 		this.userDetailService = userDetailsService;
 		this.jwtAuthorizationFilter = jwtAuthorizationFilter;
 		this.jwtService = jwtService;
+		this.appProperties = appProperties;
+		this.uploadProperties = uploadProperties;
 	}
 
 	@Bean
@@ -49,12 +50,12 @@ public class WebSecurityConfig {
 		
 		JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(jwtService);
 		jwtAuthenticationFilter.setAuthenticationManager(authManager);
-		jwtAuthenticationFilter.setFilterProcessesUrl(this.urlLogin);
+		jwtAuthenticationFilter.setFilterProcessesUrl(appProperties.getUrlAccessLogin());
 		
 		//"/","/include/**","/css/**","/icons/**","/images/**","/js/**","/layer/**"
 		String[] resources = new String[] {
-                this.urlDocuments + "**", 
-                this.urlRecovery + "**",
+				uploadProperties.getUrlDocumentsEmployees() + "**", 
+				appProperties.getUrlPasswordRecovery() + "**",
                 "/home"
         };
 		//.logout()

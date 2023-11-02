@@ -1,6 +1,5 @@
 package com.sip.syshumres_apirest.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -14,17 +13,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer{
 	
-	@Value("${UPLOAD.PATH.DOCUMENTS.EMPLOYEES}")
-	private String uploadDocuments;
+	private final UploadProperties uploadProperties;
 	
-	@Value("${URL.DOCUMENTS.EMPLOYEES}")
-	private String urlDocuments;
+	public WebConfig(UploadProperties uploadProperties) {
+		this.uploadProperties = uploadProperties;
+	}
 	
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		//pathImages = "/Users/prong/jobs/imgvacants/"
 		//System.out.println("Ruta con value: " + this.uploadDocuments)
-		registry.addResourceHandler(urlDocuments + "**").addResourceLocations("file:" + this.uploadDocuments); // Linux
+		registry.addResourceHandler(uploadProperties.getUrlDocumentsEmployees() + "**")
+			.addResourceLocations("file:" +  uploadProperties.getPathDocumentsEmployees()); // Linux
 		//registry.addResourceHandler("/cv/**").addResourceLocations("file:" + pathCv); // Linux
 		
 		registry.addResourceHandler("swagger-ui.html")
