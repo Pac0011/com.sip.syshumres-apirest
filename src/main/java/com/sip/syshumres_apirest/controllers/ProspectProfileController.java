@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.config.AppProperties;
@@ -140,8 +141,8 @@ public class ProspectProfileController extends CommonController {
 	 * @throws UserSessionNotFoundException 
      */
 	@GetMapping(PAGEFILTER)
-	public ResponseEntity<Page<ProspectProfileDTO>> list(String text, Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
-		this.filter = StringTrim.trimAndRemoveDiacriticalMarks(text);
+	public ResponseEntity<Page<ProspectProfileDTO>> list(@RequestParam String q, Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
+		this.filter = StringTrim.urlDecodingAndTrim(q);
 		return this.list(pageable, session);
 	}
 	
@@ -154,9 +155,9 @@ public class ProspectProfileController extends CommonController {
 	 * @throws UserSessionNotFoundException 
      */
 	@GetMapping(PAGEFILTERORDER)
-	public ResponseEntity<Page<ProspectProfileDTO>> list(String text, Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<ProspectProfileDTO>> list(@RequestParam String q, Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
 		Pageable pageableOrder = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		return this.list(text, pageableOrder, session);
+		return this.list(q, pageableOrder, session);
 	}
 	
 	@PostMapping

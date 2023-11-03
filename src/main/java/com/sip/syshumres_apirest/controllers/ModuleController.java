@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sip.syshumres_apirest.controllers.common.CommonController;
@@ -100,8 +101,8 @@ public class ModuleController extends CommonController {
      * @return Page object with entitys after filtering
      */
 	@GetMapping(PAGEFILTER)
-	public ResponseEntity<Page<ModuleDTO>> list(String text, Pageable pageable) {
-		this.filter = StringTrim.trimAndRemoveDiacriticalMarks(text);
+	public ResponseEntity<Page<ModuleDTO>> list(@RequestParam String q, Pageable pageable) {
+		this.filter = StringTrim.urlDecodingAndTrim(q);
 		return this.list(pageable);
 	}
 	
@@ -113,9 +114,9 @@ public class ModuleController extends CommonController {
      * @return Page object with entitys after filtering and sorting
      */
 	@GetMapping(PAGEFILTERORDER)
-	public ResponseEntity<Page<ModuleDTO>> list(String text, Pageable pageable, Sort sort) {
+	public ResponseEntity<Page<ModuleDTO>> list(@RequestParam String q, Pageable pageable, Sort sort) {
 		Pageable pageableOrder = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		return this.list(text, pageableOrder);
+		return this.list(q, pageableOrder);
 	}
 	
 	@PostMapping

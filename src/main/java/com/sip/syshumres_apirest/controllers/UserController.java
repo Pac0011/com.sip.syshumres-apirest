@@ -113,8 +113,8 @@ public class UserController extends CommonController {
      * @return Page object with entitys after filtering
      */
 	@GetMapping(PAGEFILTER)
-	public ResponseEntity<Page<UserDTO>> list(String text, Pageable pageable) {
-		this.filter = StringTrim.trimAndRemoveDiacriticalMarks(text);
+	public ResponseEntity<Page<UserDTO>> list(@RequestParam String q, Pageable pageable) {
+		this.filter = StringTrim.urlDecodingAndTrim(q);
 		return this.list(pageable);
 	}
 	
@@ -126,9 +126,9 @@ public class UserController extends CommonController {
      * @return Page object with entitys after filtering and sorting
      */
 	@GetMapping(PAGEFILTERORDER)
-	public ResponseEntity<Page<UserDTO>> list(String text, Pageable pageable, Sort sort) {
+	public ResponseEntity<Page<UserDTO>> list(@RequestParam String q, Pageable pageable, Sort sort) {
 		Pageable pageableOrder = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		return this.list(text, pageableOrder);
+		return this.list(q, pageableOrder);
 	}
 	
 	@PostMapping

@@ -131,8 +131,8 @@ public class EmployeeProfileController extends CommonController {
      * @return Page object with entitys after filtering
      */
 	@GetMapping(OPER + PAGEFILTER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(String text, Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
-		this.filter = StringTrim.trimAndRemoveDiacriticalMarks(text);
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(@RequestParam String q, Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
+		this.filter = StringTrim.urlDecodingAndTrim(q);
 		return this.listEmployeeTypeOper(pageable, session);
 	}
 	
@@ -144,9 +144,9 @@ public class EmployeeProfileController extends CommonController {
      * @return Page object with entitys after filtering and sorting
      */
 	@GetMapping(OPER + PAGEFILTERORDER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(String text, Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(@RequestParam String q, Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
 		Pageable pageableOrder = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		return this.listOper(text, pageableOrder, session);
+		return this.listOper(q, pageableOrder, session);
 	}
 	
 	@PostMapping
@@ -306,8 +306,8 @@ public class EmployeeProfileController extends CommonController {
      * @return Page object with entitys after filtering
      */
 	@GetMapping(ADM + PAGEFILTER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(String text, Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
-		this.filter = StringTrim.trimAndRemoveDiacriticalMarks(text);
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(@RequestParam String q, Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
+		this.filter = StringTrim.urlDecodingAndTrim(q);
 		return this.listEmployeeTypeAdm(pageable, session);
 	}
 	
@@ -319,9 +319,9 @@ public class EmployeeProfileController extends CommonController {
      * @return Page object with entitys after filtering and sorting
      */
 	@GetMapping(ADM + PAGEFILTERORDER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(String text, Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(@RequestParam String q, Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
 		Pageable pageableOrder = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		return this.listAdm(text, pageableOrder, session);
+		return this.listAdm(q, pageableOrder, session);
 	}
 	
 	@GetMapping(SEARCHSTRING)
@@ -346,8 +346,8 @@ public class EmployeeProfileController extends CommonController {
 	public ResponseEntity<ResponseDTO> searchNameRelationshipEmployee(@RequestParam String lastName,
 			@RequestParam String lastNameSecond) {
 		String res = "";
-		if (this.service.countByNameAnotherEmployee(StringTrim.trimAndRemoveDiacriticalMarks(lastName), 
-				StringTrim.trimAndRemoveDiacriticalMarks(lastNameSecond)) > 1) {
+		if (this.service.countByNameAnotherEmployee(StringTrim.urlDecodingAndTrim(lastName), 
+				StringTrim.urlDecodingAndTrim(lastNameSecond)) > 1) {
 			res = "Posible parentesco con otro empleado";
 		}
 		ResponseDTO response = new ResponseDTO();
