@@ -12,6 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.sip.syshumres_apirest.config.AppProperties;
 import com.sip.syshumres_apirest.config.UploadProperties;
@@ -65,7 +68,7 @@ public class WebSecurityConfig {
     	//	.and()
 		
 		return http
-				.csrf().disable()//Se deshabilita por que es una ApiRest y no manda un formulario
+				.cors().and().csrf().disable()//Se deshabilita por que es una ApiRest y no manda un formulario
 				.formLogin().disable()//Se deshabilita por que es una ApiRest y no manda un formulario
 				.logout().disable()//Se deshabilita por que es una ApiRest y no manda un formulario
 				.authorizeRequests()
@@ -102,5 +105,20 @@ public class WebSecurityConfig {
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
+	@Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:4200"); // Reemplaza con tu origen permitido
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("Content-Type");
+        configuration.addAllowedHeader("Authorization");
+        configuration.addExposedHeader("*");
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        
+        return source;
+    }
 	
 }
