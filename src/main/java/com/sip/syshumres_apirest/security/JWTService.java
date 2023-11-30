@@ -1,6 +1,7 @@
 package com.sip.syshumres_apirest.security;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.MenuDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sip.syshumres_apirest.config.AppProperties;
 import com.sip.syshumres_entities.Module;
 
@@ -40,7 +43,8 @@ public class JWTService {
 		this.appProperties = appProperties;
 	}
 
-	public String createToken(String username, HttpServletRequest request) throws UsernameNotFoundException {
+	public String createToken(String username, HttpServletRequest request) 
+			throws UsernameNotFoundException, JsonProcessingException {
 		long expirationTime = appProperties.getAccessTokenValiditySeconds() * 1_000;
 		Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
 		
@@ -48,29 +52,16 @@ public class JWTService {
 		Map<String, Object> extra = new HashMap<>();
 		extra.put("branchOffice", userSession == null?"":userSession.getBranchOffice().getDescription());
 		
-		List<MenuDTO> listMenus = new ArrayList<>();
-		List<Module> modulesChilds = userDetailServiceImpl.findModulesChildByUsername(username);
-		List<Module> modules = userDetailServiceImpl.findModulesFatherByUsername(username);
-		if (modules != null) {
-			modules.stream().forEach(m -> {
-				List<MenuDTO> listMenusChilds = new ArrayList<>();
-				m.getChilds().forEach(c -> {
-					if (modulesChilds.contains(c)) {
-					    listMenusChilds.add(new MenuDTO(c.getDescription(), c.getUrlMenu(), c.getIcon()));
-					}
-				});
-				listMenusChilds.sort(Comparator.comparing(MenuDTO::getN));
-				listMenus.add(new MenuDTO(m.getDescription(), m.getUrlMenu(), m.getIcon(), listMenusChilds));
-			});
-		}
-		extra.put("menu", listMenus);
-		
+		//Generate menu for username
+        String menubase64 = encodeToBase64(convertListToJson(generateMenu(username)));
+        extra.put("menu", menubase64);
+
 		return Jwts.builder()
 				.setSubject(username)
 				.addClaims(extra)
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(expirationDate)
-				.signWith(Keys.hmacShaKeyFor(ACCESS_TOKEN_SECRET.getBytes()))
+				.signWith(Keys.hmacShaKeyFor(ACCESS_TOKEN_SECRET.getBytes()))//.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 	}
     
@@ -90,5 +81,39 @@ public class JWTService {
 			return null;
 		}
 	}
+    
+    private List<MenuDTO> generateMenu(String username) {
+    	List<MenuDTO> listMenus = new ArrayList<>();
+    	
+		List<Module> modulesChilds = userDetailServiceImpl.findModulesChildByUsername(username);
+		List<Module> modules = userDetailServiceImpl.findModulesFatherByUsername(username);
+		if (modules != null) {
+			modules.stream().forEach(module -> {
+				List<MenuDTO> listMenusChilds = new ArrayList<>();
+				module.getChilds().forEach(c -> {
+					if (modulesChilds.contains(c)) {
+					    listMenusChilds.add(new MenuDTO(c.getDescription(), c.getUrlMenu(), c.getIcon()));
+					}
+				});
+				listMenusChilds.sort(Comparator.comparing(MenuDTO::getN));
+				listMenus.add(new MenuDTO(module.getDescription(), module.getUrlMenu(), module.getIcon(), listMenusChilds));
+			});
+		}
+    	
+		return listMenus;
+    }
+    
+    private String convertListToJson(List<MenuDTO> list) 
+    		throws JsonProcessingException {
+        // Utilizar Jackson para convertir la lista a JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(list);
+    }
+    
+    private String encodeToBase64(String input) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        
+        return encoder.encodeToString(input.getBytes());
+    }
 
 }
