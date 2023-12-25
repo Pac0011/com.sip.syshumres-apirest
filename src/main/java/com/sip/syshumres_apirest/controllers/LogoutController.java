@@ -2,15 +2,12 @@ package com.sip.syshumres_apirest.controllers;
 
 import java.util.Optional;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sip.syshumres_apirest.config.AppProperties;
 import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.ResponseDTO;
@@ -24,24 +21,21 @@ public class LogoutController {
 	public static final String LOGOUT = "logout";
 	
 	private final UserService service;
-	
-	private final AppProperties appProperties;
-	
+		
 	@Autowired
-	public LogoutController(UserService service, AppProperties appProperties) {
+	public LogoutController(UserService service) {
 		this.service = service;
-		this.appProperties = appProperties;
 	}
 
 	@PostMapping(LOGOUT)
-	public ResponseEntity<ResponseDTO> logoutUser(HttpSession session) throws UsernameNotFoundException {
+	public ResponseEntity<ResponseDTO> logoutUser() throws UsernameNotFoundException {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         
         Optional<User> entity = service.findOneByUsername(username);
         if(entity.isEmpty()) {
 			throw new UsernameNotFoundException();
 		}
-        service.logout(session, appProperties.getSessionUserName());
+        //service.logout(session, appProperties.getSessionUserName());
         //User e = entity.get()
         //user.setOnline(false)
         //userServ.saveUser(user)

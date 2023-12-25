@@ -1,11 +1,11 @@
 package com.sip.syshumres_apirest.controllers;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.data.domain.Page;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,22 +33,25 @@ import com.sip.syshumres_apirest.config.UploadProperties;
 import com.sip.syshumres_apirest.controllers.common.CommonController;
 import com.sip.syshumres_apirest.enums.StatusMessages;
 import com.sip.syshumres_apirest.mappers.EmployeeProfileMapper;
+import com.sip.syshumres_apirest.security.JwtTokenDecoder;
 import com.sip.syshumres_entities.EmployeeProfile;
-import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.EmployeeProfileDTO;
 import com.sip.syshumres_entities.dtos.EmployeeProfileViewDTO;
 import com.sip.syshumres_entities.dtos.ResponseDTO;
+import com.sip.syshumres_entities.dtos.UserTokenExtraDTO;
 import com.sip.syshumres_entities.enums.EmployeeTypeEnum;
 import com.sip.syshumres_entities.utils.ErrorsBindingFields;
 import com.sip.syshumres_exceptions.CreateRegisterException;
 import com.sip.syshumres_exceptions.EntityIdNotFoundException;
 import com.sip.syshumres_exceptions.IdsEntityNotEqualsException;
 import com.sip.syshumres_exceptions.InvalidIdException;
+import com.sip.syshumres_exceptions.JwtNotFoundException;
 import com.sip.syshumres_exceptions.UnknownOptionException;
 import com.sip.syshumres_exceptions.UpdateRegisterException;
 import com.sip.syshumres_exceptions.UploadFileException;
 import com.sip.syshumres_exceptions.UploadFormatsAllowException;
 import com.sip.syshumres_exceptions.UserSessionNotFoundException;
+import com.sip.syshumres_exceptions.UserTokenExtraNotFoundException;
 import com.sip.syshumres_services.EmployeeProfileService;
 import com.sip.syshumres_utils.StringTrim;
 
@@ -75,21 +79,21 @@ public class EmployeeProfileController extends CommonController {
     
     private final EmployeeProfileMapper customMapper;
     
-    private final AppProperties appProperties;
+    private final JwtTokenDecoder jwtTokenDecoder;
     	
 	@Autowired
 	public EmployeeProfileController(EmployeeProfileService service,
 			EmployeeProfileMapper customMapper, AppProperties appProperties
-			, UploadProperties uploadProperties) {
+			, UploadProperties uploadProperties, JwtTokenDecoder jwtTokenDecoder) {
 		this.service = service;
 		this.customMapper = customMapper;
-		this.appProperties = appProperties;
 		this.service.configBasePaths(uploadProperties.getBaseDocumentsEmployees()
 				, uploadProperties.getPathDocumentsEmployees() 
 				, uploadProperties.getUrlDocumentsEmployees()
 				, uploadProperties.getListFormatsAllow()
 				, appProperties.getSizeEmployeeNumber());
 		this.filter = "";
+		this.jwtTokenDecoder = jwtTokenDecoder;
 	}
 	
     /*
@@ -97,15 +101,13 @@ public class EmployeeProfileController extends CommonController {
      * 
      */
 	@GetMapping(OPER + PAGE)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listEmployeeTypeOper(Pageable pageable, HttpSession session) 
-			throws UserSessionNotFoundException {
-		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
-		if (userSession == null) {
-			throw new UserSessionNotFoundException();
-		}
-		//System.out.println("branchOfficeSession: " + userSession.getBranchOffice().getDescription())
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listEmployeeTypeOper(Pageable pageable, 
+			@RequestHeader("Authorization") String jwtToken) 
+			throws UserTokenExtraNotFoundException, ParseException, JwtNotFoundException {
+		UserTokenExtraDTO userToken = jwtTokenDecoder.getExtraFromToken(jwtToken);
+		
 		Page<EmployeeProfile> entities = this.service.findByFilterSession(this.filter, 
-			 userSession, EmployeeTypeEnum.OPER.getValue(), pageable);
+				userToken, EmployeeTypeEnum.OPER.getValue(), pageable);
 		
 		Page<EmployeeProfileViewDTO> entitiesPageDTO = entities.map(customMapper::toViewDto);
 
@@ -117,11 +119,16 @@ public class EmployeeProfileController extends CommonController {
      * @param size          number of entries in each page
      * @param sort  		Sort object
      * @return Page object with entitys after sorting
+	 * @throws ParseException 
+	 * @throws JwtNotFoundException 
      */
 	@GetMapping(OPER + PAGEORDER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(Pageable pageable, Sort sort, 
+			@RequestHeader("Authorization") String jwtToken) 
+					throws UserTokenExtraNotFoundException, ParseException, JwtNotFoundException {
 		this.filter = "";
-		return this.listEmployeeTypeOper(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort), session);
+		return this.listEmployeeTypeOper(PageRequest.of(pageable.getPageNumber(), 
+				pageable.getPageSize(), sort), jwtToken);
 	}
 	
 	/**
@@ -129,11 +136,15 @@ public class EmployeeProfileController extends CommonController {
      * @param page          number of the page returned
      * @param size          number of entries in each page
      * @return Page object with entitys after filtering
+	 * @throws ParseException 
+	 * @throws JwtNotFoundException 
      */
 	@GetMapping(OPER + PAGEFILTER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(@RequestParam String q, Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(@RequestParam String q, 
+			Pageable pageable, @RequestHeader("Authorization") String jwtToken) 
+					throws UserTokenExtraNotFoundException, ParseException, JwtNotFoundException {
 		this.filter = StringTrim.urlDecodingAndTrim(q);
-		return this.listEmployeeTypeOper(pageable, session);
+		return this.listEmployeeTypeOper(pageable, jwtToken);
 	}
 	
 	/**
@@ -142,11 +153,15 @@ public class EmployeeProfileController extends CommonController {
      * @param size          number of entries in each page
      * @param sort  		Sort object
      * @return Page object with entitys after filtering and sorting
+	 * @throws ParseException 
+	 * @throws JwtNotFoundException 
      */
 	@GetMapping(OPER + PAGEFILTERORDER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(@RequestParam String q, Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listOper(@RequestParam String q, Pageable pageable, 
+			Sort sort, @RequestHeader("Authorization") String jwtToken) 
+					throws UserTokenExtraNotFoundException, ParseException, JwtNotFoundException {
 		Pageable pageableOrder = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		return this.listOper(q, pageableOrder, session);
+		return this.listOper(q, pageableOrder, jwtToken);
 	}
 	
 	@PostMapping
@@ -272,15 +287,13 @@ public class EmployeeProfileController extends CommonController {
 	}
 	
 	@GetMapping(ADM + PAGE)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listEmployeeTypeAdm(Pageable pageable, HttpSession session) 
-			throws UserSessionNotFoundException {		
-		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
-		//System.out.println(branchOfficeSession.getDescription())
-		if (userSession == null) {
-			throw new UserSessionNotFoundException();
-		}
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listEmployeeTypeAdm(Pageable pageable, 
+			@RequestHeader("Authorization") String jwtToken) 
+			throws UserSessionNotFoundException, ParseException, UserTokenExtraNotFoundException, JwtNotFoundException {		
+		UserTokenExtraDTO userToken = jwtTokenDecoder.getExtraFromToken(jwtToken);
+		
 		Page<EmployeeProfile> entities = this.service.findByFilterSession(this.filter, 
-				 userSession, EmployeeTypeEnum.ADM.getValue(), pageable);
+				userToken, EmployeeTypeEnum.ADM.getValue(), pageable);
 		
 		Page<EmployeeProfileViewDTO> entitiesPageDTO = entities.map(customMapper::toViewDto);
 
@@ -292,11 +305,15 @@ public class EmployeeProfileController extends CommonController {
      * @param size          number of entries in each page
      * @param sort  		Sort object
      * @return Page object with entitys after sorting
+	 * @throws UserTokenExtraNotFoundException 
+	 * @throws ParseException 
+	 * @throws JwtNotFoundException 
      */
 	@GetMapping(ADM + PAGEORDER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(Pageable pageable, Sort sort, 
+			@RequestHeader("Authorization") String jwtToken) throws UserSessionNotFoundException, ParseException, UserTokenExtraNotFoundException, JwtNotFoundException {
 		this.filter = "";
-		return this.listEmployeeTypeAdm(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort), session);
+		return this.listEmployeeTypeAdm(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort), jwtToken);
 	}
 	
 	/**
@@ -304,11 +321,15 @@ public class EmployeeProfileController extends CommonController {
      * @param page          number of the page returned
      * @param size          number of entries in each page
      * @return Page object with entitys after filtering
+	 * @throws UserTokenExtraNotFoundException 
+	 * @throws ParseException 
+	 * @throws JwtNotFoundException 
      */
 	@GetMapping(ADM + PAGEFILTER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(@RequestParam String q, Pageable pageable, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(@RequestParam String q, Pageable pageable, 
+			@RequestHeader("Authorization") String jwtToken) throws UserSessionNotFoundException, ParseException, UserTokenExtraNotFoundException, JwtNotFoundException {
 		this.filter = StringTrim.urlDecodingAndTrim(q);
-		return this.listEmployeeTypeAdm(pageable, session);
+		return this.listEmployeeTypeAdm(pageable, jwtToken);
 	}
 	
 	/**
@@ -317,27 +338,25 @@ public class EmployeeProfileController extends CommonController {
      * @param size          number of entries in each page
      * @param sort  		Sort object
      * @return Page object with entitys after filtering and sorting
+	 * @throws UserTokenExtraNotFoundException 
+	 * @throws ParseException 
+	 * @throws JwtNotFoundException 
      */
 	@GetMapping(ADM + PAGEFILTERORDER)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(@RequestParam String q, Pageable pageable, Sort sort, HttpSession session) throws UserSessionNotFoundException {
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> listAdm(@RequestParam String q, Pageable pageable, Sort sort, 
+			@RequestHeader("Authorization") String jwtToken) throws UserSessionNotFoundException, ParseException, UserTokenExtraNotFoundException, JwtNotFoundException {
 		Pageable pageableOrder = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		return this.listAdm(q, pageableOrder, session);
+		return this.listAdm(q, pageableOrder, jwtToken);
 	}
 	
 	@GetMapping(SEARCHSTRING)
-	public ResponseEntity<Page<EmployeeProfileViewDTO>> list(@RequestParam Long idEmployeeType, Pageable pageable, HttpSession session) 
-			throws UserSessionNotFoundException {
-		User userSession = (User) session.getAttribute(appProperties.getSessionUserName());
-		//System.out.println(branchOfficeSession.getDescription())
-		if (userSession == null) {
-			throw new UserSessionNotFoundException();
-		}
-		if (userSession.isSeeAllBranchs()) {
-			Page<EmployeeProfileViewDTO> entitiesPageDTO =  service.listEmployeeType(idEmployeeType, pageable)
-				.map(customMapper::toViewDto);
-			return ResponseEntity.ok(entitiesPageDTO);
-		}
-		Page<EmployeeProfileViewDTO> entitiesPageDTO =  service.listEmployeeType(userSession.getBranchOffice().getId(), idEmployeeType, pageable)
+	public ResponseEntity<Page<EmployeeProfileViewDTO>> list(@RequestParam Long idEmployeeType
+			, Pageable pageable
+			, @RequestHeader("Authorization") String jwtToken) 
+			throws UserTokenExtraNotFoundException, ParseException, JwtNotFoundException {
+		UserTokenExtraDTO userToken = jwtTokenDecoder.getExtraFromToken(jwtToken);
+		
+		Page<EmployeeProfileViewDTO> entitiesPageDTO =  service.listEmployeeType(idEmployeeType, pageable, userToken)
 			.map(customMapper::toViewDto);
 		return ResponseEntity.ok(entitiesPageDTO);
 	}
