@@ -2,19 +2,14 @@ package com.sip.syshumres_apirest.security;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.sip.syshumres_entities.User;
-import com.sip.syshumres_apirest.config.AppProperties;
 import com.sip.syshumres_entities.Module;
 import com.sip.syshumres_repositories.AuthorityRepository;
 import com.sip.syshumres_repositories.ModuleRepository;
@@ -29,17 +24,14 @@ public class UserDetailServiceImpl implements UserDetailsService {
 	private final AuthorityRepository authorityRepository;
 	
 	private final ModuleRepository moduleRepository;
-	
-	private final AppProperties appProperties;
-	
+		
 	@Autowired
 	public UserDetailServiceImpl(UserRepository userRepository, AuthorityRepository authorityRepository,
-			ModuleRepository moduleRepository, AppProperties appProperties) {
+			ModuleRepository moduleRepository) {
 		super();
 		this.userRepository = userRepository;
 		this.authorityRepository = authorityRepository;
 		this.moduleRepository = moduleRepository;
-		this.appProperties = appProperties;
 	}
 
 	@Override
@@ -49,12 +41,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
 		
 		//Add Authorities(Roles) to user
 		user.setAuthorities(authorityRepository.findAuthoritiesByUsername(username));
-		
-		//Create session
-		ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-		HttpSession session = attr.getRequest().getSession(true);
-		session.setMaxInactiveInterval(15);
-		session.setAttribute(appProperties.getSessionUserName(), user);
 		
 		return new UserDetailsImpl(user);
 	}

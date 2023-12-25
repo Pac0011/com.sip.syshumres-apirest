@@ -8,14 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.sip.syshumres_entities.User;
 import com.sip.syshumres_entities.dtos.MenuDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +27,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
-public class JWTService {
+public class JwtService {
 	private static final String ACCESS_TOKEN_SECRET = "sjkdhfjisd8726347jJHHHSDhsgdfhsgdfh";
 	
 	private final UserDetailServiceImpl userDetailServiceImpl;
@@ -38,26 +35,29 @@ public class JWTService {
 	private final AppProperties appProperties;
 	
 	@Autowired
-	public JWTService(UserDetailServiceImpl userDetailServiceImpl, AppProperties appProperties) {
+	public JwtService(UserDetailServiceImpl userDetailServiceImpl, AppProperties appProperties) {
 		this.userDetailServiceImpl = userDetailServiceImpl;
 		this.appProperties = appProperties;
 	}
 
-	public String createToken(String username, HttpServletRequest request) 
+	public String createToken(UserDetailsImpl userDetailsImpl) 
 			throws UsernameNotFoundException, JsonProcessingException {
 		long expirationTime = appProperties.getAccessTokenValiditySeconds() * 1_000;
 		Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
 		
-		User userSession = (User) request.getSession().getAttribute(appProperties.getSessionUserName());
 		Map<String, Object> extra = new HashMap<>();
-		extra.put("branchOffice", userSession == null?"":userSession.getBranchOffice().getDescription());
+		//userDetails
+		extra.put("idBranchOffice", userDetailsImpl.getBranchOffice().getId());
+		extra.put("branchOffice", userDetailsImpl.getBranchOffice().getDescription());
+		extra.put("multiBranchOffice", userDetailsImpl.isMultiBranchOffice());
+		extra.put("seeAllBranchs", userDetailsImpl.isSeeAllBranchs());
 		
 		//Generate menu for username
-        String menubase64 = encodeToBase64(convertListToJson(generateMenu(username)));
+        String menubase64 = encodeToBase64(convertListToJson(generateMenu(userDetailsImpl.getUsername())));
         extra.put("menu", menubase64);
 
 		return Jwts.builder()
-				.setSubject(username)
+				.setSubject(userDetailsImpl.getUsername())
 				.addClaims(extra)
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(expirationDate)
@@ -74,6 +74,7 @@ public class JWTService {
 					.parseClaimsJws(token)
 					.getBody();
 			String username = claims.getSubject();
+			//Get user details
 			UserDetails userDetails = userDetailServiceImpl.loadUserByUsername(username);
 			
 			return new UsernamePasswordAuthenticationToken(username, null, userDetails.getAuthorities());

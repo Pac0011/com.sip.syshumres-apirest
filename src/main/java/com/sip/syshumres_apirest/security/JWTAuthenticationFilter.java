@@ -18,14 +18,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
-	private static final Logger loggerErr = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+	private static final Logger loggerErr = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 	
-	private final JWTService jwtService;
+	private final JwtService jwtService;
 
 	@Autowired
-	public JWTAuthenticationFilter(JWTService jwtService) {
+	public JwtAuthenticationFilter(JwtService jwtService) {
 		super();
 		this.jwtService = jwtService;
 	}
@@ -59,7 +59,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 											Authentication authResult) throws IOException, ServletException {
 		
 		UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
-		String token = jwtService.createToken(userDetails.getUsername(), request);
+		System.out.println("============");
+		System.out.println("isSeeAllBranchs: " + userDetails.isSeeAllBranchs());
+		System.out.println("isMultiBranchOffice: " + userDetails.isMultiBranchOffice());
+		System.out.println("BranchOffice: " + userDetails.getBranchOffice());
+		System.out.println("============");
+		
+		String token = jwtService.createToken(userDetails);
 		
 		response.addHeader("Authorization", "Bearer " + token);
 		response.getWriter().flush();

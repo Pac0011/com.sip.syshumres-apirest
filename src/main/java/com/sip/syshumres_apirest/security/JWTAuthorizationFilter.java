@@ -16,12 +16,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
-public class JWTAuthorizationFilter extends OncePerRequestFilter {
+public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	
-	private JWTService jwtService;
+	private JwtService jwtService;
 	
 	@Autowired
-	public JWTAuthorizationFilter(JWTService jwtService) {
+	public JwtAuthorizationFilter(JwtService jwtService) {
 		this.jwtService = jwtService;
 	}
 

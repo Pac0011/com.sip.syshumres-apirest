@@ -24,9 +24,9 @@ public class WebSecurityConfig {
 	
 	private final UserDetailsService userDetailService;
 	
-	private final JWTAuthorizationFilter jwtAuthorizationFilter;
+	private final JwtAuthorizationFilter jwtAuthorizationFilter;
 	
-	private final JWTService jwtService;	
+	private final JwtService jwtService;	
 			
 	private final AppProperties appProperties;
 	
@@ -36,8 +36,8 @@ public class WebSecurityConfig {
 	
 	@Autowired
 	public WebSecurityConfig(UserDetailsService userDetailsService, 
-			JWTAuthorizationFilter jwtAuthorizationFilter,
-			JWTService jwtService,
+			JwtAuthorizationFilter jwtAuthorizationFilter,
+			JwtService jwtService,
 			AppProperties appProperties,
 			UploadProperties uploadProperties) {
 		super();
@@ -51,7 +51,7 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
 		
-		JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(jwtService);
+		JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService);
 		jwtAuthenticationFilter.setAuthenticationManager(authManager);
 		jwtAuthenticationFilter.setFilterProcessesUrl(appProperties.getUrlAccessLogin());
 		

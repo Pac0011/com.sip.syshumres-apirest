@@ -20,7 +20,8 @@ public class UserDetailsImpl implements UserDetails {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 5422347918771041203L;
+	
 	private final User user;
 	
 	private static final Logger logger = LoggerFactory.getLogger(UserDetailsImpl.class);
@@ -74,7 +75,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		return true;
+		return user.isEnabled();
 	}
 	
 	public String getFirstName() {
@@ -83,6 +84,15 @@ public class UserDetailsImpl implements UserDetails {
 	
 	public BranchOffice getBranchOffice() {
 		return user.getBranchOffice();
+	}
+	
+	public boolean isMultiBranchOffice() {
+		return user.isMultiBranchOffice();
+		
+	}
+	
+	public boolean isSeeAllBranchs() {
+		return user.isSeeAllBranchs();
 	}
 
 }
